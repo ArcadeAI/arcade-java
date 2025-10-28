@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.arcadeai.api"
+    group = "com.arcade_engine.api"
     version = "0.0.1-alpha.0"
 }
 

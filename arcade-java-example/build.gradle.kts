@@ -14,5 +14,5 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 application {
-    mainClass = "org.arcadeai.api.example.Main"
+    mainClass = "com.arcade_engine.api.example.Main"
 }
