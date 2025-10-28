@@ -27,9 +27,9 @@ configure<PublishingExtension> {
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/stainless-sdks/arcade-engine-java.git")
-                    developerConnection.set("scm:git:git://github.com/stainless-sdks/arcade-engine-java.git")
-                    url.set("https://github.com/stainless-sdks/arcade-engine-java")
+                    connection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
+                    developerConnection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
+                    url.set("https://github.com/ArcadeAI/arcade-java")
                 }
 
                 versionMapping {

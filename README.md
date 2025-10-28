@@ -1,6 +1,10 @@
 # Arcade Java API Library
 
+<!-- x-release-please-start-version -->
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.arcade_engine.api/arcade-java)](https://central.sonatype.com/artifact/com.arcade_engine.api/arcade-java/0.0.1-alpha.0)
+
+<!-- x-release-please-end -->
 
 The Arcade Java SDK provides convenient access to the Arcade REST API from applications written in Java.
 
@@ -9,6 +13,8 @@ It is generated with [Stainless](https://www.stainlessapi.com/).
 The REST API documentation can be found on [docs.arcade.dev](https://docs.arcade.dev).
 
 ## Installation
+
+<!-- x-release-please-start-version -->
 
 ### Gradle
 
@@ -25,6 +31,8 @@ implementation("com.arcade_engine.api:arcade-java:0.0.1-alpha.0")
     <version>0.0.1-alpha.0</version>
 </dependency>
 ```
+
+<!-- x-release-please-end -->
 
 ## Requirements
 
@@ -436,4 +444,4 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/arcade-engine-java/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/ArcadeAI/arcade-java/issues) with questions, bugs, or suggestions.
