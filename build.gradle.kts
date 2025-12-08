@@ -3,8 +3,8 @@ plugins {
 }
 
 allprojects {
-    group = "com.arcade_engine.api"
-    version = "0.0.1-alpha.0"
+    group = "dev.arcade"
+    version = "0.1.0-alpha.1" // x-release-please-version
 }
 
 nexusPublishing {
