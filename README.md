@@ -2,7 +2,7 @@
 
 <!-- x-release-please-start-version -->
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.arcade_engine.api/arcade-java)](https://central.sonatype.com/artifact/com.arcade_engine.api/arcade-java/0.0.1-alpha.0)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.arcade/arcade-java)](https://central.sonatype.com/artifact/dev.arcade/arcade-java/0.0.1-alpha.0)
 
 <!-- x-release-please-end -->
 
@@ -19,14 +19,14 @@ The REST API documentation can be found on [docs.arcade.dev](https://docs.arcade
 ### Gradle
 
 ```kotlin
-implementation("com.arcade_engine.api:arcade-java:0.0.1-alpha.0")
+implementation("dev.arcade:arcade-java:0.0.1-alpha.0")
 ```
 
 ### Maven
 
 ```xml
 <dependency>
-    <groupId>com.arcade_engine.api</groupId>
+    <groupId>dev.arcade</groupId>
     <artifactId>arcade-java</artifactId>
     <version>0.0.1-alpha.0</version>
 </dependency>
@@ -41,11 +41,11 @@ This library requires Java 8 or later.
 ## Usage
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ExecuteToolResponse;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.ToolExecuteParams;
 
 // Configures using the `ARCADE_API_KEY` environment variable
 ArcadeClient client = ArcadeOkHttpClient.fromEnv();
@@ -63,8 +63,8 @@ ExecuteToolResponse executeToolResponse = client.tools().execute(params);
 Configure the client using environment variables:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 // Configures using the `ARCADE_API_KEY` environment variable
 ArcadeClient client = ArcadeOkHttpClient.fromEnv();
@@ -73,8 +73,8 @@ ArcadeClient client = ArcadeOkHttpClient.fromEnv();
 Or manually:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
     .apiKey("My API Key")
@@ -84,8 +84,8 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
 Or using a combination of the two approaches:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
     // Configures using the `ARCADE_API_KEY` environment variable
@@ -123,11 +123,11 @@ Because each class is immutable, builder modification will _never_ affect alread
 The default client is synchronous. To switch to asynchronous execution, call the `async()` method:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ExecuteToolResponse;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
 // Configures using the `ARCADE_API_KEY` environment variable
@@ -144,11 +144,11 @@ CompletableFuture<ExecuteToolResponse> executeToolResponse = client.async().tool
 Or create an asynchronous client from the beginning:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClientAsync;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClientAsync;
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ExecuteToolResponse;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.client.ArcadeClientAsync;
+import dev.arcade.client.okhttp.ArcadeOkHttpClientAsync;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
 // Configures using the `ARCADE_API_KEY` environment variable
@@ -168,7 +168,7 @@ The asynchronous client supports the same options as the synchronous one, except
 
 The SDK throws custom unchecked exception types:
 
-- [`ArcadeServiceException`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/errors/ArcadeServiceException.kt): Base class for HTTP errors. See this table for which exception subclass is thrown for each HTTP status code:
+- [`ArcadeServiceException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeServiceException.kt): Base class for HTTP errors. See this table for which exception subclass is thrown for each HTTP status code:
 
   | Status | Exception                       |
   | ------ | ------------------------------- |
@@ -181,11 +181,11 @@ The SDK throws custom unchecked exception types:
   | 5xx    | `InternalServerException`       |
   | others | `UnexpectedStatusCodeException` |
 
-- [`ArcadeIoException`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/errors/ArcadeIoException.kt): I/O networking errors.
+- [`ArcadeIoException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeIoException.kt): I/O networking errors.
 
-- [`ArcadeInvalidDataException`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/errors/ArcadeInvalidDataException.kt): Failure to interpret successfully parsed data. For example, when accessing a property that's supposed to be required, but the API unexpectedly omitted it from the response.
+- [`ArcadeInvalidDataException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeInvalidDataException.kt): Failure to interpret successfully parsed data. For example, when accessing a property that's supposed to be required, but the API unexpectedly omitted it from the response.
 
-- [`ArcadeException`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/errors/ArcadeException.kt): Base class for all exceptions. Most errors will result in one of the previously mentioned ones, but completely generic errors may be thrown using the base class.
+- [`ArcadeException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeException.kt): Base class for all exceptions. Most errors will result in one of the previously mentioned ones, but completely generic errors may be thrown using the base class.
 
 ## Logging
 
@@ -222,8 +222,8 @@ The API may also explicitly instruct the SDK to retry or not retry a response.
 To set a custom number of retries, configure the client using the `maxRetries` method:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
     .fromEnv()
@@ -238,9 +238,9 @@ Requests time out after 1 minute by default.
 To set a custom timeout, configure the method call using the `timeout` method:
 
 ```java
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ExecuteToolResponse;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.ToolExecuteParams;
 
 ExecuteToolResponse executeToolResponse = client.tools().execute(
   params, RequestOptions.builder().timeout(Duration.ofSeconds(30)).build()
@@ -250,8 +250,8 @@ ExecuteToolResponse executeToolResponse = client.tools().execute(
 Or configure the default for all method calls at the client level:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 import java.time.Duration;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
@@ -265,8 +265,8 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
 To route requests through a proxy, configure the client using the `proxy` method:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
@@ -289,8 +289,8 @@ The SDK is typed for convenient usage of the documented API. However, it also su
 To set undocumented parameters, call the `putAdditionalHeader`, `putAdditionalQueryParam`, or `putAdditionalBodyProperty` methods on any `Params` class:
 
 ```java
-import com.arcade_engine.api.core.JsonValue;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.core.JsonValue;
+import dev.arcade.models.ToolExecuteParams;
 
 ToolExecuteParams params = ToolExecuteParams.builder()
     .putAdditionalHeader("Secret-Header", "42")
@@ -301,11 +301,11 @@ ToolExecuteParams params = ToolExecuteParams.builder()
 
 These can be accessed on the built object later using the `_additionalHeaders()`, `_additionalQueryParams()`, and `_additionalBodyProperties()` methods. You can also set undocumented parameters on nested headers, query params, or body classes using the `putAdditionalProperty` method. These properties can be accessed on the built object later using the `_additionalProperties()` method.
 
-To set a documented parameter or property to an undocumented or not yet supported _value_, pass a [`JsonValue`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/core/JsonValue.kt) object to its setter:
+To set a documented parameter or property to an undocumented or not yet supported _value_, pass a [`JsonValue`](arcade-java-core/src/main/kotlin/dev/arcade/core/JsonValue.kt) object to its setter:
 
 ```java
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ToolExecuteParams;
 
 ToolExecuteParams params = ToolExecuteParams.builder()
     .executeToolRequest(ExecuteToolRequest.builder()
@@ -319,7 +319,7 @@ ToolExecuteParams params = ToolExecuteParams.builder()
 To access undocumented response properties, call the `_additionalProperties()` method:
 
 ```java
-import com.arcade_engine.api.core.JsonValue;
+import dev.arcade.core.JsonValue;
 import java.util.Map;
 
 Map<String, JsonValue> additionalProperties = client.tools().execute(params)._additionalProperties();
@@ -349,7 +349,7 @@ String result = secretPropertyValue.accept(new JsonValue.Visitor<>() {
 To access a property's raw JSON value, which may be undocumented, call its `_` prefixed method:
 
 ```java
-import com.arcade_engine.api.core.JsonField;
+import dev.arcade.core.JsonField;
 import java.util.Optional;
 
 JsonField<Object> field = client.tools().execute(params)._field();
@@ -372,12 +372,12 @@ if (field.isMissing()) {
 
 In rare cases, the API may return a response that doesn't match the expected type. For example, the SDK may expect a property to contain a `String`, but the API could return something else.
 
-By default, the SDK will not throw an exception in this case. It will throw [`ArcadeInvalidDataException`](arcade-java-core/src/main/kotlin/com/arcade_engine/api/errors/ArcadeInvalidDataException.kt) only if you directly access the property.
+By default, the SDK will not throw an exception in this case. It will throw [`ArcadeInvalidDataException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeInvalidDataException.kt) only if you directly access the property.
 
 If you would prefer to check that the response is completely well-typed upfront, then either call `validate()`:
 
 ```java
-import com.arcade_engine.api.models.ExecuteToolResponse;
+import dev.arcade.models.ExecuteToolResponse;
 
 ExecuteToolResponse executeToolResponse = client.tools().execute(params).validate();
 ```
@@ -385,9 +385,9 @@ ExecuteToolResponse executeToolResponse = client.tools().execute(params).validat
 Or configure the method call to validate the response using the `responseValidation` method:
 
 ```java
-import com.arcade_engine.api.models.ExecuteToolRequest;
-import com.arcade_engine.api.models.ExecuteToolResponse;
-import com.arcade_engine.api.models.ToolExecuteParams;
+import dev.arcade.models.ExecuteToolRequest;
+import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.ToolExecuteParams;
 
 ExecuteToolResponse executeToolResponse = client.tools().execute(
   params, RequestOptions.builder().responseValidation(true).build()
@@ -397,8 +397,8 @@ ExecuteToolResponse executeToolResponse = client.tools().execute(
 Or configure the default for all method calls at the client level:
 
 ```java
-import com.arcade_engine.api.client.ArcadeClient;
-import com.arcade_engine.api.client.okhttp.ArcadeOkHttpClient;
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
     .fromEnv()
