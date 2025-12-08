@@ -2,7 +2,7 @@
 
 <!-- x-release-please-start-version -->
 
-[![Maven Central](https://img.shields.io/maven-central/v/dev.arcade/arcade-java)](https://central.sonatype.com/artifact/dev.arcade/arcade-java/0.0.1-alpha.0)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.arcade/arcade-java)](https://central.sonatype.com/artifact/dev.arcade/arcade-java/0.1.0-alpha.1)
 
 <!-- x-release-please-end -->
 
@@ -19,7 +19,7 @@ The REST API documentation can be found on [docs.arcade.dev](https://docs.arcade
 ### Gradle
 
 ```kotlin
-implementation("dev.arcade:arcade-java:0.0.1-alpha.0")
+implementation("dev.arcade:arcade-java:0.1.0-alpha.1")
 ```
 
 ### Maven
@@ -28,7 +28,7 @@ implementation("dev.arcade:arcade-java:0.0.1-alpha.0")
 <dependency>
     <groupId>dev.arcade</groupId>
     <artifactId>arcade-java</artifactId>
-    <version>0.0.1-alpha.0</version>
+    <version>0.1.0-alpha.1</version>
 </dependency>
 ```
 
