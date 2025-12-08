@@ -5,11 +5,20 @@
 package dev.arcade.services.blocking.admin
 
 import dev.arcade.core.RequestOptions
+import dev.arcade.models.AdminSecretCreateParams
 import dev.arcade.models.AdminSecretDeleteParams
 import dev.arcade.models.AdminSecretListParams
 import dev.arcade.models.AdminSecretListResponse
+import dev.arcade.models.SecretResponse
 
 interface SecretService {
+
+    /** Create or update a secret */
+    @JvmOverloads
+    fun create(
+        params: AdminSecretCreateParams,
+        requestOptions: RequestOptions = RequestOptions.none(),
+    ): SecretResponse
 
     /** List all secrets that are visible to the caller */
     @JvmOverloads

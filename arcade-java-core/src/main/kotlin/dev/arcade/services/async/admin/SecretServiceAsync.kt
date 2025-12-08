@@ -5,12 +5,21 @@
 package dev.arcade.services.async.admin
 
 import dev.arcade.core.RequestOptions
+import dev.arcade.models.AdminSecretCreateParams
 import dev.arcade.models.AdminSecretDeleteParams
 import dev.arcade.models.AdminSecretListParams
 import dev.arcade.models.AdminSecretListResponse
+import dev.arcade.models.SecretResponse
 import java.util.concurrent.CompletableFuture
 
 interface SecretServiceAsync {
+
+    /** Create or update a secret */
+    @JvmOverloads
+    fun create(
+        params: AdminSecretCreateParams,
+        requestOptions: RequestOptions = RequestOptions.none(),
+    ): CompletableFuture<SecretResponse>
 
     /** List all secrets that are visible to the caller */
     @JvmOverloads
