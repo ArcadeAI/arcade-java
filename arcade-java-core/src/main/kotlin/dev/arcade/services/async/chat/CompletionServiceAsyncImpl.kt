@@ -1,0 +1,52 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package dev.arcade.services.async.chat
+
+import dev.arcade.core.ClientOptions
+import dev.arcade.core.RequestOptions
+import dev.arcade.core.handlers.errorHandler
+import dev.arcade.core.handlers.jsonHandler
+import dev.arcade.core.handlers.withErrorHandler
+import dev.arcade.core.http.HttpMethod
+import dev.arcade.core.http.HttpRequest
+import dev.arcade.core.http.HttpResponse.Handler
+import dev.arcade.core.json
+import dev.arcade.core.prepareAsync
+import dev.arcade.errors.ArcadeError
+import dev.arcade.models.ChatCompletionCreateParams
+import dev.arcade.models.ChatResponse
+import java.util.concurrent.CompletableFuture
+
+class CompletionServiceAsyncImpl internal constructor(private val clientOptions: ClientOptions) :
+    CompletionServiceAsync {
+
+    private val errorHandler: Handler<ArcadeError> = errorHandler(clientOptions.jsonMapper)
+
+    private val createHandler: Handler<ChatResponse> =
+        jsonHandler<ChatResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
+
+    /** Interact with language models via OpenAI's chat completions API */
+    override fun create(
+        params: ChatCompletionCreateParams,
+        requestOptions: RequestOptions,
+    ): CompletableFuture<ChatResponse> {
+        val request =
+            HttpRequest.builder()
+                .method(HttpMethod.POST)
+                .addPathSegments("v1", "chat", "completions")
+                .body(json(clientOptions.jsonMapper, params._body()))
+                .build()
+                .prepareAsync(clientOptions, params)
+        return request
+            .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
+            .thenApply { response ->
+                response
+                    .use { createHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
+                            it.validate()
+                        }
+                    }
+            }
+    }
+}
