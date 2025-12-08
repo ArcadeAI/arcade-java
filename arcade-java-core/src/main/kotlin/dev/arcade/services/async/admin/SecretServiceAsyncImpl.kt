@@ -14,15 +14,45 @@ import dev.arcade.core.http.HttpResponse.Handler
 import dev.arcade.core.json
 import dev.arcade.core.prepareAsync
 import dev.arcade.errors.ArcadeError
+import dev.arcade.models.AdminSecretCreateParams
 import dev.arcade.models.AdminSecretDeleteParams
 import dev.arcade.models.AdminSecretListParams
 import dev.arcade.models.AdminSecretListResponse
+import dev.arcade.models.SecretResponse
 import java.util.concurrent.CompletableFuture
 
 class SecretServiceAsyncImpl internal constructor(private val clientOptions: ClientOptions) :
     SecretServiceAsync {
 
     private val errorHandler: Handler<ArcadeError> = errorHandler(clientOptions.jsonMapper)
+
+    private val createHandler: Handler<SecretResponse> =
+        jsonHandler<SecretResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
+
+    /** Create or update a secret */
+    override fun create(
+        params: AdminSecretCreateParams,
+        requestOptions: RequestOptions,
+    ): CompletableFuture<SecretResponse> {
+        val request =
+            HttpRequest.builder()
+                .method(HttpMethod.POST)
+                .addPathSegments("v1", "admin", "secrets", params.getPathParam(0))
+                .body(json(clientOptions.jsonMapper, params._body()))
+                .build()
+                .prepareAsync(clientOptions, params)
+        return request
+            .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
+            .thenApply { response ->
+                response
+                    .use { createHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
+                            it.validate()
+                        }
+                    }
+            }
+    }
 
     private val listHandler: Handler<AdminSecretListResponse> =
         jsonHandler<AdminSecretListResponse>(clientOptions.jsonMapper)
