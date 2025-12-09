@@ -1,8 +1,11 @@
 package dev.arcade.core.http
 
+import dev.arcade.core.DefaultSleeper
 import dev.arcade.core.RequestOptions
+import dev.arcade.core.Sleeper
 import dev.arcade.core.checkRequired
 import dev.arcade.errors.ArcadeIoException
+import dev.arcade.errors.ArcadeRetryableException
 import java.io.IOException
 import java.time.Clock
 import java.time.Duration
@@ -10,8 +13,6 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
-import java.util.Timer
-import java.util.TimerTask
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ThreadLocalRandom
@@ -23,6 +24,7 @@ import kotlin.math.pow
 class RetryingHttpClient
 private constructor(
     private val httpClient: HttpClient,
+    private val sleeper: Sleeper,
     private val clock: Clock,
     private val maxRetries: Int,
     private val idempotencyHeader: String?,
@@ -62,10 +64,10 @@ private constructor(
                     null
                 }
 
-            val backoffMillis = getRetryBackoffMillis(retries, response)
+            val backoffDuration = getRetryBackoffDuration(retries, response)
             // All responses must be closed, so close the failed one before retrying.
             response?.close()
-            Thread.sleep(backoffMillis.toMillis())
+            sleeper.sleep(backoffDuration)
         }
     }
 
@@ -111,10 +113,10 @@ private constructor(
                             }
                         }
 
-                        val backoffMillis = getRetryBackoffMillis(retries, response)
+                        val backoffDuration = getRetryBackoffDuration(retries, response)
                         // All responses must be closed, so close the failed one before retrying.
                         response?.close()
-                        return sleepAsync(backoffMillis.toMillis()).thenCompose {
+                        return sleeper.sleepAsync(backoffDuration).thenCompose {
                             executeWithRetries(requestWithRetryCount, requestOptions)
                         }
                     }
@@ -128,7 +130,10 @@ private constructor(
         return executeWithRetries(modifiedRequest, requestOptions)
     }
 
-    override fun close() = httpClient.close()
+    override fun close() {
+        httpClient.close()
+        sleeper.close()
+    }
 
     private fun isRetryable(request: HttpRequest): Boolean =
         // Some requests, such as when a request body is being streamed, cannot be retried because
@@ -175,11 +180,12 @@ private constructor(
     }
 
     private fun shouldRetry(throwable: Throwable): Boolean =
-        // Only retry IOException and ArcadeIoException, other exceptions are not intended to be
-        // retried.
-        throwable is IOException || throwable is ArcadeIoException
+        // Only retry known retryable exceptions, other exceptions are not intended to be retried.
+        throwable is IOException ||
+            throwable is ArcadeIoException ||
+            throwable is ArcadeRetryableException
 
-    private fun getRetryBackoffMillis(retries: Int, response: HttpResponse?): Duration {
+    private fun getRetryBackoffDuration(retries: Int, response: HttpResponse?): Duration {
         // About the Retry-After header:
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
         response
@@ -226,32 +232,20 @@ private constructor(
 
     companion object {
 
-        private val TIMER = Timer("RetryingHttpClient", true)
-
-        private fun sleepAsync(millis: Long): CompletableFuture<Void> {
-            val future = CompletableFuture<Void>()
-            TIMER.schedule(
-                object : TimerTask() {
-                    override fun run() {
-                        future.complete(null)
-                    }
-                },
-                millis,
-            )
-            return future
-        }
-
         @JvmStatic fun builder() = Builder()
     }
 
     class Builder internal constructor() {
 
         private var httpClient: HttpClient? = null
+        private var sleeper: Sleeper? = null
         private var clock: Clock = Clock.systemUTC()
         private var maxRetries: Int = 2
         private var idempotencyHeader: String? = null
 
         fun httpClient(httpClient: HttpClient) = apply { this.httpClient = httpClient }
+
+        fun sleeper(sleeper: Sleeper) = apply { this.sleeper = sleeper }
 
         fun clock(clock: Clock) = apply { this.clock = clock }
 
@@ -262,6 +256,7 @@ private constructor(
         fun build(): HttpClient =
             RetryingHttpClient(
                 checkRequired("httpClient", httpClient),
+                sleeper ?: DefaultSleeper(),
                 clock,
                 maxRetries,
                 idempotencyHeader,

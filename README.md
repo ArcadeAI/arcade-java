@@ -3,14 +3,19 @@
 <!-- x-release-please-start-version -->
 
 [![Maven Central](https://img.shields.io/maven-central/v/dev.arcade/arcade-java)](https://central.sonatype.com/artifact/dev.arcade/arcade-java/0.1.0-alpha.1)
+[![javadoc](https://javadoc.io/badge2/dev.arcade/arcade-java/0.1.0-alpha.1/javadoc.svg)](https://javadoc.io/doc/dev.arcade/arcade-java/0.1.0-alpha.1)
 
 <!-- x-release-please-end -->
 
-The Arcade Java SDK provides convenient access to the Arcade REST API from applications written in Java.
+The Arcade Java SDK provides convenient access to the [Arcade REST API](https://docs.arcade.dev) from applications written in Java.
 
-It is generated with [Stainless](https://www.stainlessapi.com/).
+It is generated with [Stainless](https://www.stainless.com/).
 
-The REST API documentation can be found on [docs.arcade.dev](https://docs.arcade.dev).
+<!-- x-release-please-start-version -->
+
+The REST API documentation can be found on [docs.arcade.dev](https://docs.arcade.dev). Javadocs are available on [javadoc.io](https://javadoc.io/doc/dev.arcade/arcade-java/0.1.0-alpha.1).
+
+<!-- x-release-please-end -->
 
 ## Installation
 
@@ -26,9 +31,9 @@ implementation("dev.arcade:arcade-java:0.1.0-alpha.1")
 
 ```xml
 <dependency>
-    <groupId>dev.arcade</groupId>
-    <artifactId>arcade-java</artifactId>
-    <version>0.1.0-alpha.1</version>
+  <groupId>dev.arcade</groupId>
+  <artifactId>arcade-java</artifactId>
+  <version>0.1.0-alpha.1</version>
 </dependency>
 ```
 
@@ -43,30 +48,30 @@ This library requires Java 8 or later.
 ```java
 import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ExecuteToolResponse;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ExecuteToolRequest;
+import dev.arcade.models.tools.ExecuteToolResponse;
+import dev.arcade.models.tools.ToolExecuteParams;
 
-// Configures using the `ARCADE_API_KEY` environment variable
+// Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
+// Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
 ArcadeClient client = ArcadeOkHttpClient.fromEnv();
 
-ToolExecuteParams params = ToolExecuteParams.builder()
-    .executeToolRequest(ExecuteToolRequest.builder()
-        .toolName("tool_name")
-        .build())
+ExecuteToolRequest params = ExecuteToolRequest.builder()
+    .toolName("tool_name")
     .build();
 ExecuteToolResponse executeToolResponse = client.tools().execute(params);
 ```
 
 ## Client configuration
 
-Configure the client using environment variables:
+Configure the client using system properties or environment variables:
 
 ```java
 import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
-// Configures using the `ARCADE_API_KEY` environment variable
+// Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
+// Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
 ArcadeClient client = ArcadeOkHttpClient.fromEnv();
 ```
 
@@ -88,7 +93,8 @@ import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 
 ArcadeClient client = ArcadeOkHttpClient.builder()
-    // Configures using the `ARCADE_API_KEY` environment variable
+    // Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
+    // Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
     .fromEnv()
     .apiKey("My API Key")
     .build();
@@ -96,13 +102,31 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
 
 See this table for the available options:
 
-| Setter   | Environment variable | Required | Default value |
-| -------- | -------------------- | -------- | ------------- |
-| `apiKey` | `ARCADE_API_KEY`     | true     | -             |
+| Setter    | System property  | Environment variable | Required | Default value              |
+| --------- | ---------------- | -------------------- | -------- | -------------------------- |
+| `apiKey`  | `arcade.apiKey`  | `ARCADE_API_KEY`     | true     | -                          |
+| `baseUrl` | `arcade.baseUrl` | `ARCADE_BASE_URL`    | true     | `"https://api.arcade.dev"` |
+
+System properties take precedence over environment variables.
 
 > [!TIP]
 > Don't create more than one client in the same application. Each client has a connection pool and
 > thread pools, which are more efficient to share between requests.
+
+### Modifying configuration
+
+To temporarily use a modified client configuration, while reusing the same connection and thread pools, call `withOptions()` on any client or service:
+
+```java
+import dev.arcade.client.ArcadeClient;
+
+ArcadeClient clientWithOptions = client.withOptions(optionsBuilder -> {
+    optionsBuilder.baseUrl("https://example.com");
+    optionsBuilder.maxRetries(42);
+});
+```
+
+The `withOptions()` method does not affect the original client or service.
 
 ## Requests and responses
 
@@ -125,18 +149,17 @@ The default client is synchronous. To switch to asynchronous execution, call the
 ```java
 import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ExecuteToolResponse;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ExecuteToolRequest;
+import dev.arcade.models.tools.ExecuteToolResponse;
+import dev.arcade.models.tools.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
-// Configures using the `ARCADE_API_KEY` environment variable
+// Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
+// Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
 ArcadeClient client = ArcadeOkHttpClient.fromEnv();
 
-ToolExecuteParams params = ToolExecuteParams.builder()
-    .executeToolRequest(ExecuteToolRequest.builder()
-        .toolName("tool_name")
-        .build())
+ExecuteToolRequest params = ExecuteToolRequest.builder()
+    .toolName("tool_name")
     .build();
 CompletableFuture<ExecuteToolResponse> executeToolResponse = client.async().tools().execute(params);
 ```
@@ -146,23 +169,50 @@ Or create an asynchronous client from the beginning:
 ```java
 import dev.arcade.client.ArcadeClientAsync;
 import dev.arcade.client.okhttp.ArcadeOkHttpClientAsync;
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ExecuteToolResponse;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ExecuteToolRequest;
+import dev.arcade.models.tools.ExecuteToolResponse;
+import dev.arcade.models.tools.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
-// Configures using the `ARCADE_API_KEY` environment variable
+// Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
+// Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
 ArcadeClientAsync client = ArcadeOkHttpClientAsync.fromEnv();
 
-ToolExecuteParams params = ToolExecuteParams.builder()
-    .executeToolRequest(ExecuteToolRequest.builder()
-        .toolName("tool_name")
-        .build())
+ExecuteToolRequest params = ExecuteToolRequest.builder()
+    .toolName("tool_name")
     .build();
 CompletableFuture<ExecuteToolResponse> executeToolResponse = client.tools().execute(params);
 ```
 
 The asynchronous client supports the same options as the synchronous one, except most methods return `CompletableFuture`s.
+
+## Raw responses
+
+The SDK defines methods that deserialize responses into instances of Java classes. However, these methods don't provide access to the response headers, status code, or the raw response body.
+
+To access this data, prefix any HTTP method call on a client or service with `withRawResponse()`:
+
+```java
+import dev.arcade.core.http.Headers;
+import dev.arcade.core.http.HttpResponseFor;
+import dev.arcade.models.chat.ChatRequest;
+import dev.arcade.models.chat.ChatResponse;
+import dev.arcade.models.chat.completions.CompletionCreateParams;
+
+ChatRequest params = ChatRequest.builder().build();
+HttpResponseFor<ChatResponse> chatResponse = client.chat().completions().withRawResponse().create(params);
+
+int statusCode = chatResponse.statusCode();
+Headers headers = chatResponse.headers();
+```
+
+You can still deserialize the response into an instance of a Java class if needed:
+
+```java
+import dev.arcade.models.chat.ChatResponse;
+
+ChatResponse parsedChatResponse = chatResponse.parse();
+```
 
 ## Error handling
 
@@ -170,18 +220,20 @@ The SDK throws custom unchecked exception types:
 
 - [`ArcadeServiceException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeServiceException.kt): Base class for HTTP errors. See this table for which exception subclass is thrown for each HTTP status code:
 
-  | Status | Exception                       |
-  | ------ | ------------------------------- |
-  | 400    | `BadRequestException`           |
-  | 401    | `AuthenticationException`       |
-  | 403    | `PermissionDeniedException`     |
-  | 404    | `NotFoundException`             |
-  | 422    | `UnprocessableEntityException`  |
-  | 429    | `RateLimitException`            |
-  | 5xx    | `InternalServerException`       |
-  | others | `UnexpectedStatusCodeException` |
+  | Status | Exception                                                                                                              |
+  | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+  | 400    | [`BadRequestException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/BadRequestException.kt)                     |
+  | 401    | [`UnauthorizedException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/UnauthorizedException.kt)                 |
+  | 403    | [`PermissionDeniedException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/PermissionDeniedException.kt)         |
+  | 404    | [`NotFoundException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/NotFoundException.kt)                         |
+  | 422    | [`UnprocessableEntityException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/UnprocessableEntityException.kt)   |
+  | 429    | [`RateLimitException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/RateLimitException.kt)                       |
+  | 5xx    | [`InternalServerException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/InternalServerException.kt)             |
+  | others | [`UnexpectedStatusCodeException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/UnexpectedStatusCodeException.kt) |
 
 - [`ArcadeIoException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeIoException.kt): I/O networking errors.
+
+- [`ArcadeRetryableException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeRetryableException.kt): Generic error indicating a failure that could be retried by the client.
 
 - [`ArcadeInvalidDataException`](arcade-java-core/src/main/kotlin/dev/arcade/errors/ArcadeInvalidDataException.kt): Failure to interpret successfully parsed data. For example, when accessing a property that's supposed to be required, but the API unexpectedly omitted it from the response.
 
@@ -194,20 +246,37 @@ The SDK uses the standard [OkHttp logging interceptor](https://github.com/square
 Enable logging by setting the `ARCADE_LOG` environment variable to `info`:
 
 ```sh
-$ export ARCADE_LOG=info
+export ARCADE_LOG=info
 ```
 
 Or to `debug` for more verbose logging:
 
 ```sh
-$ export ARCADE_LOG=debug
+export ARCADE_LOG=debug
 ```
+
+## ProGuard and R8
+
+Although the SDK uses reflection, it is still usable with [ProGuard](https://github.com/Guardsquare/proguard) and [R8](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization) because `arcade-java-core` is published with a [configuration file](arcade-java-core/src/main/resources/META-INF/proguard/arcade-java-core.pro) containing [keep rules](https://www.guardsquare.com/manual/configuration/usage).
+
+ProGuard and R8 should automatically detect and use the published rules, but you can also manually copy the keep rules if necessary.
+
+## Jackson
+
+The SDK depends on [Jackson](https://github.com/FasterXML/jackson) for JSON serialization/deserialization. It is compatible with version 2.13.4 or higher, but depends on version 2.18.2 by default.
+
+The SDK throws an exception if it detects an incompatible Jackson version at runtime (e.g. if the default version was overridden in your Maven or Gradle config).
+
+If the SDK threw an exception, but you're _certain_ the version is compatible, then disable the version check using the `checkJacksonVersionCompatibility` on [`ArcadeOkHttpClient`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClient.kt) or [`ArcadeOkHttpClientAsync`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClientAsync.kt).
+
+> [!CAUTION]
+> We make no guarantee that the SDK works correctly when the Jackson version check is disabled.
 
 ## Network options
 
 ### Retries
 
-The SDK automatically retries 2 times by default, with a short exponential backoff.
+The SDK automatically retries 2 times by default, with a short exponential backoff between requests.
 
 Only the following error types are retried:
 
@@ -217,7 +286,7 @@ Only the following error types are retried:
 - 429 Rate Limit
 - 5xx Internal
 
-The API may also explicitly instruct the SDK to retry or not retry a response.
+The API may also explicitly instruct the SDK to retry or not retry a request.
 
 To set a custom number of retries, configure the client using the `maxRetries` method:
 
@@ -238,11 +307,9 @@ Requests time out after 1 minute by default.
 To set a custom timeout, configure the method call using the `timeout` method:
 
 ```java
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ExecuteToolResponse;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.chat.ChatResponse;
 
-ExecuteToolResponse executeToolResponse = client.tools().execute(
+ChatResponse chatResponse = client.chat().completions().create(
   params, RequestOptions.builder().timeout(Duration.ofSeconds(30)).build()
 );
 ```
@@ -280,6 +347,63 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
     .build();
 ```
 
+### HTTPS
+
+> [!NOTE]
+> Most applications should not call these methods, and instead use the system defaults. The defaults include
+> special optimizations that can be lost if the implementations are modified.
+
+To configure how HTTPS connections are secured, configure the client using the `sslSocketFactory`, `trustManager`, and `hostnameVerifier` methods:
+
+```java
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.client.okhttp.ArcadeOkHttpClient;
+
+ArcadeClient client = ArcadeOkHttpClient.builder()
+    .fromEnv()
+    // If `sslSocketFactory` is set, then `trustManager` must be set, and vice versa.
+    .sslSocketFactory(yourSSLSocketFactory)
+    .trustManager(yourTrustManager)
+    .hostnameVerifier(yourHostnameVerifier)
+    .build();
+```
+
+### Custom HTTP client
+
+The SDK consists of three artifacts:
+
+- `arcade-java-core`
+  - Contains core SDK logic
+  - Does not depend on [OkHttp](https://square.github.io/okhttp)
+  - Exposes [`ArcadeClient`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClient.kt), [`ArcadeClientAsync`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientAsync.kt), [`ArcadeClientImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientImpl.kt), and [`ArcadeClientAsyncImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientAsyncImpl.kt), all of which can work with any HTTP client
+- `arcade-java-client-okhttp`
+  - Depends on [OkHttp](https://square.github.io/okhttp)
+  - Exposes [`ArcadeOkHttpClient`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClient.kt) and [`ArcadeOkHttpClientAsync`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClientAsync.kt), which provide a way to construct [`ArcadeClientImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientImpl.kt) and [`ArcadeClientAsyncImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientAsyncImpl.kt), respectively, using OkHttp
+- `arcade-java`
+  - Depends on and exposes the APIs of both `arcade-java-core` and `arcade-java-client-okhttp`
+  - Does not have its own logic
+
+This structure allows replacing the SDK's default HTTP client without pulling in unnecessary dependencies.
+
+#### Customized [`OkHttpClient`](https://square.github.io/okhttp/3.x/okhttp/okhttp3/OkHttpClient.html)
+
+> [!TIP]
+> Try the available [network options](#network-options) before replacing the default client.
+
+To use a customized `OkHttpClient`:
+
+1. Replace your [`arcade-java` dependency](#installation) with `arcade-java-core`
+2. Copy `arcade-java-client-okhttp`'s [`OkHttpClient`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/OkHttpClient.kt) class into your code and customize it
+3. Construct [`ArcadeClientImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientImpl.kt) or [`ArcadeClientAsyncImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientAsyncImpl.kt), similarly to [`ArcadeOkHttpClient`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClient.kt) or [`ArcadeOkHttpClientAsync`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClientAsync.kt), using your customized client
+
+### Completely custom HTTP client
+
+To use a completely custom HTTP client:
+
+1. Replace your [`arcade-java` dependency](#installation) with `arcade-java-core`
+2. Write a class that implements the [`HttpClient`](arcade-java-core/src/main/kotlin/dev/arcade/core/http/HttpClient.kt) interface
+3. Construct [`ArcadeClientImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientImpl.kt) or [`ArcadeClientAsyncImpl`](arcade-java-core/src/main/kotlin/dev/arcade/client/ArcadeClientAsyncImpl.kt), similarly to [`ArcadeOkHttpClient`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClient.kt) or [`ArcadeOkHttpClientAsync`](arcade-java-client-okhttp/src/main/kotlin/dev/arcade/client/okhttp/ArcadeOkHttpClientAsync.kt), using your new client class
+
 ## Undocumented API functionality
 
 The SDK is typed for convenient usage of the documented API. However, it also supports working with undocumented or not yet supported parts of the API.
@@ -290,7 +414,7 @@ To set undocumented parameters, call the `putAdditionalHeader`, `putAdditionalQu
 
 ```java
 import dev.arcade.core.JsonValue;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ToolExecuteParams;
 
 ToolExecuteParams params = ToolExecuteParams.builder()
     .putAdditionalHeader("Secret-Header", "42")
@@ -299,18 +423,74 @@ ToolExecuteParams params = ToolExecuteParams.builder()
     .build();
 ```
 
-These can be accessed on the built object later using the `_additionalHeaders()`, `_additionalQueryParams()`, and `_additionalBodyProperties()` methods. You can also set undocumented parameters on nested headers, query params, or body classes using the `putAdditionalProperty` method. These properties can be accessed on the built object later using the `_additionalProperties()` method.
+These can be accessed on the built object later using the `_additionalHeaders()`, `_additionalQueryParams()`, and `_additionalBodyProperties()` methods.
 
-To set a documented parameter or property to an undocumented or not yet supported _value_, pass a [`JsonValue`](arcade-java-core/src/main/kotlin/dev/arcade/core/JsonValue.kt) object to its setter:
+To set a documented parameter or property to an undocumented or not yet supported _value_, pass a [`JsonValue`](arcade-java-core/src/main/kotlin/dev/arcade/core/Values.kt) object to its setter:
 
 ```java
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ExecuteToolRequest;
+import dev.arcade.models.tools.ToolExecuteParams;
 
 ToolExecuteParams params = ToolExecuteParams.builder()
     .executeToolRequest(ExecuteToolRequest.builder()
         .toolName("tool_name")
         .build())
+    .build();
+```
+
+The most straightforward way to create a [`JsonValue`](arcade-java-core/src/main/kotlin/dev/arcade/core/Values.kt) is using its `from(...)` method:
+
+```java
+import dev.arcade.core.JsonValue;
+import java.util.List;
+import java.util.Map;
+
+// Create primitive JSON values
+JsonValue nullValue = JsonValue.from(null);
+JsonValue booleanValue = JsonValue.from(true);
+JsonValue numberValue = JsonValue.from(42);
+JsonValue stringValue = JsonValue.from("Hello World!");
+
+// Create a JSON array value equivalent to `["Hello", "World"]`
+JsonValue arrayValue = JsonValue.from(List.of(
+  "Hello", "World"
+));
+
+// Create a JSON object value equivalent to `{ "a": 1, "b": 2 }`
+JsonValue objectValue = JsonValue.from(Map.of(
+  "a", 1,
+  "b", 2
+));
+
+// Create an arbitrarily nested JSON equivalent to:
+// {
+//   "a": [1, 2],
+//   "b": [3, 4]
+// }
+JsonValue complexValue = JsonValue.from(Map.of(
+  "a", List.of(
+    1, 2
+  ),
+  "b", List.of(
+    3, 4
+  )
+));
+```
+
+Normally a `Builder` class's `build` method will throw [`IllegalStateException`](https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html) if any required parameter or property is unset.
+
+To forcibly omit a required parameter or property, pass [`JsonMissing`](arcade-java-core/src/main/kotlin/dev/arcade/core/Values.kt):
+
+```java
+import dev.arcade.core.JsonMissing;
+import dev.arcade.models.tools.ExecuteToolRequest;
+import dev.arcade.models.tools.ToolExecuteParams;
+
+ToolExecuteParams params = ToolExecuteParams.builder()
+    .executeToolRequest(ExecuteToolRequest.builder()
+        .toolName("tool_name")
+        .build())
+    .toolName(JsonMissing.of())
     .build();
 ```
 
@@ -377,7 +557,7 @@ By default, the SDK will not throw an exception in this case. It will throw [`Ar
 If you would prefer to check that the response is completely well-typed upfront, then either call `validate()`:
 
 ```java
-import dev.arcade.models.ExecuteToolResponse;
+import dev.arcade.models.tools.ExecuteToolResponse;
 
 ExecuteToolResponse executeToolResponse = client.tools().execute(params).validate();
 ```
@@ -385,9 +565,7 @@ ExecuteToolResponse executeToolResponse = client.tools().execute(params).validat
 Or configure the method call to validate the response using the `responseValidation` method:
 
 ```java
-import dev.arcade.models.ExecuteToolRequest;
-import dev.arcade.models.ExecuteToolResponse;
-import dev.arcade.models.ToolExecuteParams;
+import dev.arcade.models.tools.ExecuteToolResponse;
 
 ExecuteToolResponse executeToolResponse = client.tools().execute(
   params, RequestOptions.builder().responseValidation(true).build()

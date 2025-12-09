@@ -11,93 +11,150 @@ import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonField
 import dev.arcade.core.JsonMissing
 import dev.arcade.core.JsonValue
-import dev.arcade.core.NoAutoDetect
-import dev.arcade.core.immutableEmptyMap
+import dev.arcade.core.checkKnown
 import dev.arcade.core.toImmutable
 import dev.arcade.errors.ArcadeInvalidDataException
+import java.util.Collections
 import java.util.Objects
 import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
-@NoAutoDetect
 class AuthorizationResponse
-@JsonCreator
+@JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
-    @JsonProperty("id") @ExcludeMissing private val id: JsonField<String> = JsonMissing.of(),
-    @JsonProperty("context")
-    @ExcludeMissing
-    private val context: JsonField<AuthorizationContext> = JsonMissing.of(),
-    @JsonProperty("provider_id")
-    @ExcludeMissing
-    private val providerId: JsonField<String> = JsonMissing.of(),
-    @JsonProperty("scopes")
-    @ExcludeMissing
-    private val scopes: JsonField<List<String>> = JsonMissing.of(),
-    @JsonProperty("status")
-    @ExcludeMissing
-    private val status: JsonField<Status> = JsonMissing.of(),
-    @JsonProperty("url") @ExcludeMissing private val url: JsonField<String> = JsonMissing.of(),
-    @JsonProperty("user_id")
-    @ExcludeMissing
-    private val userId: JsonField<String> = JsonMissing.of(),
-    @JsonAnySetter private val additionalProperties: Map<String, JsonValue> = immutableEmptyMap(),
+    private val id: JsonField<String>,
+    private val context: JsonField<AuthorizationContext>,
+    private val providerId: JsonField<String>,
+    private val scopes: JsonField<List<String>>,
+    private val status: JsonField<Status>,
+    private val url: JsonField<String>,
+    private val userId: JsonField<String>,
+    private val additionalProperties: MutableMap<String, JsonValue>,
 ) {
 
-    fun id(): Optional<String> = Optional.ofNullable(id.getNullable("id"))
+    @JsonCreator
+    private constructor(
+        @JsonProperty("id") @ExcludeMissing id: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("context")
+        @ExcludeMissing
+        context: JsonField<AuthorizationContext> = JsonMissing.of(),
+        @JsonProperty("provider_id")
+        @ExcludeMissing
+        providerId: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("scopes") @ExcludeMissing scopes: JsonField<List<String>> = JsonMissing.of(),
+        @JsonProperty("status") @ExcludeMissing status: JsonField<Status> = JsonMissing.of(),
+        @JsonProperty("url") @ExcludeMissing url: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("user_id") @ExcludeMissing userId: JsonField<String> = JsonMissing.of(),
+    ) : this(id, context, providerId, scopes, status, url, userId, mutableMapOf())
 
-    fun context(): Optional<AuthorizationContext> =
-        Optional.ofNullable(context.getNullable("context"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun id(): Optional<String> = id.getOptional("id")
 
-    fun providerId(): Optional<String> = Optional.ofNullable(providerId.getNullable("provider_id"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun context(): Optional<AuthorizationContext> = context.getOptional("context")
 
-    fun scopes(): Optional<List<String>> = Optional.ofNullable(scopes.getNullable("scopes"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun providerId(): Optional<String> = providerId.getOptional("provider_id")
 
-    fun status(): Optional<Status> = Optional.ofNullable(status.getNullable("status"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun scopes(): Optional<List<String>> = scopes.getOptional("scopes")
 
-    fun url(): Optional<String> = Optional.ofNullable(url.getNullable("url"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun status(): Optional<Status> = status.getOptional("status")
 
-    fun userId(): Optional<String> = Optional.ofNullable(userId.getNullable("user_id"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun url(): Optional<String> = url.getOptional("url")
 
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun userId(): Optional<String> = userId.getOptional("user_id")
+
+    /**
+     * Returns the raw JSON value of [id].
+     *
+     * Unlike [id], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("id") @ExcludeMissing fun _id(): JsonField<String> = id
 
+    /**
+     * Returns the raw JSON value of [context].
+     *
+     * Unlike [context], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("context")
     @ExcludeMissing
     fun _context(): JsonField<AuthorizationContext> = context
 
+    /**
+     * Returns the raw JSON value of [providerId].
+     *
+     * Unlike [providerId], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("provider_id") @ExcludeMissing fun _providerId(): JsonField<String> = providerId
 
+    /**
+     * Returns the raw JSON value of [scopes].
+     *
+     * Unlike [scopes], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("scopes") @ExcludeMissing fun _scopes(): JsonField<List<String>> = scopes
 
+    /**
+     * Returns the raw JSON value of [status].
+     *
+     * Unlike [status], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("status") @ExcludeMissing fun _status(): JsonField<Status> = status
 
+    /**
+     * Returns the raw JSON value of [url].
+     *
+     * Unlike [url], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("url") @ExcludeMissing fun _url(): JsonField<String> = url
 
+    /**
+     * Returns the raw JSON value of [userId].
+     *
+     * Unlike [userId], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("user_id") @ExcludeMissing fun _userId(): JsonField<String> = userId
+
+    @JsonAnySetter
+    private fun putAdditionalProperty(key: String, value: JsonValue) {
+        additionalProperties.put(key, value)
+    }
 
     @JsonAnyGetter
     @ExcludeMissing
-    fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
-
-    private var validated: Boolean = false
-
-    fun validate(): AuthorizationResponse = apply {
-        if (validated) {
-            return@apply
-        }
-
-        id()
-        context().ifPresent { it.validate() }
-        providerId()
-        scopes()
-        status()
-        url()
-        userId()
-        validated = true
-    }
+    fun _additionalProperties(): Map<String, JsonValue> =
+        Collections.unmodifiableMap(additionalProperties)
 
     fun toBuilder() = Builder().from(this)
 
     companion object {
 
+        /** Returns a mutable builder for constructing an instance of [AuthorizationResponse]. */
         @JvmStatic fun builder() = Builder()
     }
 
@@ -127,45 +184,89 @@ private constructor(
 
         fun id(id: String) = id(JsonField.of(id))
 
+        /**
+         * Sets [Builder.id] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.id] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun id(id: JsonField<String>) = apply { this.id = id }
 
         fun context(context: AuthorizationContext) = context(JsonField.of(context))
 
+        /**
+         * Sets [Builder.context] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.context] with a well-typed [AuthorizationContext] value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
         fun context(context: JsonField<AuthorizationContext>) = apply { this.context = context }
 
         fun providerId(providerId: String) = providerId(JsonField.of(providerId))
 
+        /**
+         * Sets [Builder.providerId] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.providerId] with a well-typed [String] value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
         fun providerId(providerId: JsonField<String>) = apply { this.providerId = providerId }
 
         fun scopes(scopes: List<String>) = scopes(JsonField.of(scopes))
 
+        /**
+         * Sets [Builder.scopes] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.scopes] with a well-typed `List<String>` value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
         fun scopes(scopes: JsonField<List<String>>) = apply {
             this.scopes = scopes.map { it.toMutableList() }
         }
 
+        /**
+         * Adds a single [String] to [scopes].
+         *
+         * @throws IllegalStateException if the field was previously set to a non-list.
+         */
         fun addScope(scope: String) = apply {
             scopes =
-                (scopes ?: JsonField.of(mutableListOf())).apply {
-                    asKnown()
-                        .orElseThrow {
-                            IllegalStateException(
-                                "Field was set to non-list type: ${javaClass.simpleName}"
-                            )
-                        }
-                        .add(scope)
+                (scopes ?: JsonField.of(mutableListOf())).also {
+                    checkKnown("scopes", it).add(scope)
                 }
         }
 
         fun status(status: Status) = status(JsonField.of(status))
 
+        /**
+         * Sets [Builder.status] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.status] with a well-typed [Status] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun status(status: JsonField<Status>) = apply { this.status = status }
 
         fun url(url: String) = url(JsonField.of(url))
 
+        /**
+         * Sets [Builder.url] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.url] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun url(url: JsonField<String>) = apply { this.url = url }
 
         fun userId(userId: String) = userId(JsonField.of(userId))
 
+        /**
+         * Sets [Builder.userId] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.userId] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun userId(userId: JsonField<String>) = apply { this.userId = userId }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
@@ -187,6 +288,11 @@ private constructor(
             keys.forEach(::removeAdditionalProperty)
         }
 
+        /**
+         * Returns an immutable instance of [AuthorizationResponse].
+         *
+         * Further updates to this [Builder] will not mutate the returned instance.
+         */
         fun build(): AuthorizationResponse =
             AuthorizationResponse(
                 id,
@@ -196,9 +302,49 @@ private constructor(
                 status,
                 url,
                 userId,
-                additionalProperties.toImmutable(),
+                additionalProperties.toMutableMap(),
             )
     }
+
+    private var validated: Boolean = false
+
+    fun validate(): AuthorizationResponse = apply {
+        if (validated) {
+            return@apply
+        }
+
+        id()
+        context().ifPresent { it.validate() }
+        providerId()
+        scopes()
+        status().ifPresent { it.validate() }
+        url()
+        userId()
+        validated = true
+    }
+
+    fun isValid(): Boolean =
+        try {
+            validate()
+            true
+        } catch (e: ArcadeInvalidDataException) {
+            false
+        }
+
+    /**
+     * Returns a score indicating how many valid values are contained in this object recursively.
+     *
+     * Used for best match union deserialization.
+     */
+    @JvmSynthetic
+    internal fun validity(): Int =
+        (if (id.asKnown().isPresent) 1 else 0) +
+            (context.asKnown().getOrNull()?.validity() ?: 0) +
+            (if (providerId.asKnown().isPresent) 1 else 0) +
+            (scopes.asKnown().getOrNull()?.size ?: 0) +
+            (status.asKnown().getOrNull()?.validity() ?: 0) +
+            (if (url.asKnown().isPresent) 1 else 0) +
+            (if (userId.asKnown().isPresent) 1 else 0)
 
     class Status @JsonCreator private constructor(private val value: JsonField<String>) : Enum {
 
@@ -297,12 +443,39 @@ private constructor(
         fun asString(): String =
             _value().asString().orElseThrow { ArcadeInvalidDataException("Value is not a String") }
 
+        private var validated: Boolean = false
+
+        fun validate(): Status = apply {
+            if (validated) {
+                return@apply
+            }
+
+            known()
+            validated = true
+        }
+
+        fun isValid(): Boolean =
+            try {
+                validate()
+                true
+            } catch (e: ArcadeInvalidDataException) {
+                false
+            }
+
+        /**
+         * Returns a score indicating how many valid values are contained in this object
+         * recursively.
+         *
+         * Used for best match union deserialization.
+         */
+        @JvmSynthetic internal fun validity(): Int = if (value() == Value._UNKNOWN) 0 else 1
+
         override fun equals(other: Any?): Boolean {
             if (this === other) {
                 return true
             }
 
-            return /* spotless:off */ other is Status && value == other.value /* spotless:on */
+            return other is Status && value == other.value
         }
 
         override fun hashCode() = value.hashCode()
@@ -315,12 +488,20 @@ private constructor(
             return true
         }
 
-        return /* spotless:off */ other is AuthorizationResponse && id == other.id && context == other.context && providerId == other.providerId && scopes == other.scopes && status == other.status && url == other.url && userId == other.userId && additionalProperties == other.additionalProperties /* spotless:on */
+        return other is AuthorizationResponse &&
+            id == other.id &&
+            context == other.context &&
+            providerId == other.providerId &&
+            scopes == other.scopes &&
+            status == other.status &&
+            url == other.url &&
+            userId == other.userId &&
+            additionalProperties == other.additionalProperties
     }
 
-    /* spotless:off */
-    private val hashCode: Int by lazy { Objects.hash(id, context, providerId, scopes, status, url, userId, additionalProperties) }
-    /* spotless:on */
+    private val hashCode: Int by lazy {
+        Objects.hash(id, context, providerId, scopes, status, url, userId, additionalProperties)
+    }
 
     override fun hashCode(): Int = hashCode
 

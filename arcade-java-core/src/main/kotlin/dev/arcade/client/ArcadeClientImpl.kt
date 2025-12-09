@@ -16,6 +16,7 @@ import dev.arcade.services.blocking.ToolService
 import dev.arcade.services.blocking.ToolServiceImpl
 import dev.arcade.services.blocking.WorkerService
 import dev.arcade.services.blocking.WorkerServiceImpl
+import java.util.function.Consumer
 
 class ArcadeClientImpl(private val clientOptions: ClientOptions) : ArcadeClient {
 
@@ -29,6 +30,10 @@ class ArcadeClientImpl(private val clientOptions: ClientOptions) : ArcadeClient 
 
     // Pass the original clientOptions so that this client sets its own User-Agent.
     private val async: ArcadeClientAsync by lazy { ArcadeClientAsyncImpl(clientOptions) }
+
+    private val withRawResponse: ArcadeClient.WithRawResponse by lazy {
+        WithRawResponseImpl(clientOptions)
+    }
 
     private val admin: AdminService by lazy { AdminServiceImpl(clientOptionsWithUserAgent) }
 
@@ -44,6 +49,11 @@ class ArcadeClientImpl(private val clientOptions: ClientOptions) : ArcadeClient 
 
     override fun async(): ArcadeClientAsync = async
 
+    override fun withRawResponse(): ArcadeClient.WithRawResponse = withRawResponse
+
+    override fun withOptions(modifier: Consumer<ClientOptions.Builder>): ArcadeClient =
+        ArcadeClientImpl(clientOptions.toBuilder().apply(modifier::accept).build())
+
     override fun admin(): AdminService = admin
 
     override fun auth(): AuthService = auth
@@ -56,5 +66,52 @@ class ArcadeClientImpl(private val clientOptions: ClientOptions) : ArcadeClient 
 
     override fun workers(): WorkerService = workers
 
-    override fun close() = clientOptions.httpClient.close()
+    override fun close() = clientOptions.close()
+
+    class WithRawResponseImpl internal constructor(private val clientOptions: ClientOptions) :
+        ArcadeClient.WithRawResponse {
+
+        private val admin: AdminService.WithRawResponse by lazy {
+            AdminServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        private val auth: AuthService.WithRawResponse by lazy {
+            AuthServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        private val health: HealthService.WithRawResponse by lazy {
+            HealthServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        private val chat: ChatService.WithRawResponse by lazy {
+            ChatServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        private val tools: ToolService.WithRawResponse by lazy {
+            ToolServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        private val workers: WorkerService.WithRawResponse by lazy {
+            WorkerServiceImpl.WithRawResponseImpl(clientOptions)
+        }
+
+        override fun withOptions(
+            modifier: Consumer<ClientOptions.Builder>
+        ): ArcadeClient.WithRawResponse =
+            ArcadeClientImpl.WithRawResponseImpl(
+                clientOptions.toBuilder().apply(modifier::accept).build()
+            )
+
+        override fun admin(): AdminService.WithRawResponse = admin
+
+        override fun auth(): AuthService.WithRawResponse = auth
+
+        override fun health(): HealthService.WithRawResponse = health
+
+        override fun chat(): ChatService.WithRawResponse = chat
+
+        override fun tools(): ToolService.WithRawResponse = tools
+
+        override fun workers(): WorkerService.WithRawResponse = workers
+    }
 }

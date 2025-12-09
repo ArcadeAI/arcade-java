@@ -4,39 +4,37 @@ package dev.arcade.services.blocking.tools
 
 import dev.arcade.TestServerExtension
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
-import dev.arcade.models.ToolScheduledGetParams
-import dev.arcade.models.ToolScheduledListParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestServerExtension::class)
-class ScheduledServiceTest {
+internal class ScheduledServiceTest {
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val scheduledService = client.tools().scheduled()
-        val schemasOffsetPageSchemasToolExecutionListResponse =
-            scheduledService.list(ToolScheduledListParams.builder().build())
-        println(schemasOffsetPageSchemasToolExecutionListResponse)
-        schemasOffsetPageSchemasToolExecutionListResponse.items().forEach { it.validate() }
+
+        val page = scheduledService.list()
+
+        page.response().validate()
     }
 
     @Test
-    fun callGet() {
+    fun get() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val scheduledService = client.tools().scheduled()
-        val toolScheduledGetResponse =
-            scheduledService.get(ToolScheduledGetParams.builder().id("id").build())
-        println(toolScheduledGetResponse)
-        toolScheduledGetResponse.validate()
+
+        val scheduled = scheduledService.get("id")
+
+        scheduled.validate()
     }
 }

@@ -4,149 +4,233 @@ package dev.arcade.services.blocking.admin
 
 import dev.arcade.core.ClientOptions
 import dev.arcade.core.RequestOptions
+import dev.arcade.core.checkRequired
+import dev.arcade.core.handlers.errorBodyHandler
 import dev.arcade.core.handlers.errorHandler
 import dev.arcade.core.handlers.jsonHandler
-import dev.arcade.core.handlers.withErrorHandler
 import dev.arcade.core.http.HttpMethod
 import dev.arcade.core.http.HttpRequest
+import dev.arcade.core.http.HttpResponse
 import dev.arcade.core.http.HttpResponse.Handler
-import dev.arcade.core.json
+import dev.arcade.core.http.HttpResponseFor
+import dev.arcade.core.http.json
+import dev.arcade.core.http.parseable
 import dev.arcade.core.prepare
-import dev.arcade.errors.ArcadeError
-import dev.arcade.models.AdminAuthProviderCreateParams
-import dev.arcade.models.AdminAuthProviderDeleteParams
-import dev.arcade.models.AdminAuthProviderGetParams
-import dev.arcade.models.AdminAuthProviderListParams
-import dev.arcade.models.AdminAuthProviderListResponse
-import dev.arcade.models.AdminAuthProviderPatchParams
-import dev.arcade.models.AuthProviderResponse
+import dev.arcade.models.admin.authproviders.AuthProviderCreateParams
+import dev.arcade.models.admin.authproviders.AuthProviderDeleteParams
+import dev.arcade.models.admin.authproviders.AuthProviderGetParams
+import dev.arcade.models.admin.authproviders.AuthProviderListParams
+import dev.arcade.models.admin.authproviders.AuthProviderListResponse
+import dev.arcade.models.admin.authproviders.AuthProviderPatchParams
+import dev.arcade.models.admin.authproviders.AuthProviderResponse
+import java.util.function.Consumer
+import kotlin.jvm.optionals.getOrNull
 
 class AuthProviderServiceImpl internal constructor(private val clientOptions: ClientOptions) :
     AuthProviderService {
 
-    private val errorHandler: Handler<ArcadeError> = errorHandler(clientOptions.jsonMapper)
+    private val withRawResponse: AuthProviderService.WithRawResponse by lazy {
+        WithRawResponseImpl(clientOptions)
+    }
 
-    private val createHandler: Handler<AuthProviderResponse> =
-        jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
+    override fun withRawResponse(): AuthProviderService.WithRawResponse = withRawResponse
 
-    /** Create a new auth provider */
+    override fun withOptions(modifier: Consumer<ClientOptions.Builder>): AuthProviderService =
+        AuthProviderServiceImpl(clientOptions.toBuilder().apply(modifier::accept).build())
+
     override fun create(
-        params: AdminAuthProviderCreateParams,
+        params: AuthProviderCreateParams,
         requestOptions: RequestOptions,
-    ): AuthProviderResponse {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.POST)
-                .addPathSegments("v1", "admin", "auth_providers")
-                .body(json(clientOptions.jsonMapper, params._body()))
-                .build()
-                .prepare(clientOptions, params)
-        val response = clientOptions.httpClient.execute(request, requestOptions)
-        return response
-            .use { createHandler.handle(it) }
-            .also {
-                if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                    it.validate()
-                }
-            }
-    }
+    ): AuthProviderResponse =
+        // post /v1/admin/auth_providers
+        withRawResponse().create(params, requestOptions).parse()
 
-    private val listHandler: Handler<AdminAuthProviderListResponse> =
-        jsonHandler<AdminAuthProviderListResponse>(clientOptions.jsonMapper)
-            .withErrorHandler(errorHandler)
-
-    /** List a page of auth providers that are available to the caller */
     override fun list(
-        params: AdminAuthProviderListParams,
+        params: AuthProviderListParams,
         requestOptions: RequestOptions,
-    ): AdminAuthProviderListResponse {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.GET)
-                .addPathSegments("v1", "admin", "auth_providers")
-                .build()
-                .prepare(clientOptions, params)
-        val response = clientOptions.httpClient.execute(request, requestOptions)
-        return response
-            .use { listHandler.handle(it) }
-            .also {
-                if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                    it.validate()
-                }
-            }
-    }
+    ): AuthProviderListResponse =
+        // get /v1/admin/auth_providers
+        withRawResponse().list(params, requestOptions).parse()
 
-    private val deleteHandler: Handler<AuthProviderResponse> =
-        jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
-
-    /** Delete a specific auth provider */
     override fun delete(
-        params: AdminAuthProviderDeleteParams,
+        params: AuthProviderDeleteParams,
         requestOptions: RequestOptions,
-    ): AuthProviderResponse {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.DELETE)
-                .addPathSegments("v1", "admin", "auth_providers", params.getPathParam(0))
-                .apply { params._body().ifPresent { body(json(clientOptions.jsonMapper, it)) } }
-                .build()
-                .prepare(clientOptions, params)
-        val response = clientOptions.httpClient.execute(request, requestOptions)
-        return response
-            .use { deleteHandler.handle(it) }
-            .also {
-                if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                    it.validate()
-                }
-            }
-    }
+    ): AuthProviderResponse =
+        // delete /v1/admin/auth_providers/{id}
+        withRawResponse().delete(params, requestOptions).parse()
 
-    private val getHandler: Handler<AuthProviderResponse> =
-        jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
-
-    /** Get the details of a specific auth provider */
     override fun get(
-        params: AdminAuthProviderGetParams,
+        params: AuthProviderGetParams,
         requestOptions: RequestOptions,
-    ): AuthProviderResponse {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.GET)
-                .addPathSegments("v1", "admin", "auth_providers", params.getPathParam(0))
-                .build()
-                .prepare(clientOptions, params)
-        val response = clientOptions.httpClient.execute(request, requestOptions)
-        return response
-            .use { getHandler.handle(it) }
-            .also {
-                if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                    it.validate()
-                }
-            }
-    }
+    ): AuthProviderResponse =
+        // get /v1/admin/auth_providers/{id}
+        withRawResponse().get(params, requestOptions).parse()
 
-    private val patchHandler: Handler<AuthProviderResponse> =
-        jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper).withErrorHandler(errorHandler)
-
-    /** Patch an existing auth provider */
     override fun patch(
-        params: AdminAuthProviderPatchParams,
+        params: AuthProviderPatchParams,
         requestOptions: RequestOptions,
-    ): AuthProviderResponse {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.PATCH)
-                .addPathSegments("v1", "admin", "auth_providers", params.getPathParam(0))
-                .body(json(clientOptions.jsonMapper, params._body()))
-                .build()
-                .prepare(clientOptions, params)
-        val response = clientOptions.httpClient.execute(request, requestOptions)
-        return response
-            .use { patchHandler.handle(it) }
-            .also {
-                if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                    it.validate()
-                }
+    ): AuthProviderResponse =
+        // patch /v1/admin/auth_providers/{id}
+        withRawResponse().patch(params, requestOptions).parse()
+
+    class WithRawResponseImpl internal constructor(private val clientOptions: ClientOptions) :
+        AuthProviderService.WithRawResponse {
+
+        private val errorHandler: Handler<HttpResponse> =
+            errorHandler(errorBodyHandler(clientOptions.jsonMapper))
+
+        override fun withOptions(
+            modifier: Consumer<ClientOptions.Builder>
+        ): AuthProviderService.WithRawResponse =
+            AuthProviderServiceImpl.WithRawResponseImpl(
+                clientOptions.toBuilder().apply(modifier::accept).build()
+            )
+
+        private val createHandler: Handler<AuthProviderResponse> =
+            jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper)
+
+        override fun create(
+            params: AuthProviderCreateParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<AuthProviderResponse> {
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.POST)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "auth_providers")
+                    .body(json(clientOptions.jsonMapper, params._body()))
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { createHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
             }
+        }
+
+        private val listHandler: Handler<AuthProviderListResponse> =
+            jsonHandler<AuthProviderListResponse>(clientOptions.jsonMapper)
+
+        override fun list(
+            params: AuthProviderListParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<AuthProviderListResponse> {
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.GET)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "auth_providers")
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { listHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
+            }
+        }
+
+        private val deleteHandler: Handler<AuthProviderResponse> =
+            jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper)
+
+        override fun delete(
+            params: AuthProviderDeleteParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<AuthProviderResponse> {
+            // We check here instead of in the params builder because this can be specified
+            // positionally or in the params class.
+            checkRequired("id", params.id().getOrNull())
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.DELETE)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "auth_providers", params._pathParam(0))
+                    .apply { params._body().ifPresent { body(json(clientOptions.jsonMapper, it)) } }
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { deleteHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
+            }
+        }
+
+        private val getHandler: Handler<AuthProviderResponse> =
+            jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper)
+
+        override fun get(
+            params: AuthProviderGetParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<AuthProviderResponse> {
+            // We check here instead of in the params builder because this can be specified
+            // positionally or in the params class.
+            checkRequired("id", params.id().getOrNull())
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.GET)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "auth_providers", params._pathParam(0))
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { getHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
+            }
+        }
+
+        private val patchHandler: Handler<AuthProviderResponse> =
+            jsonHandler<AuthProviderResponse>(clientOptions.jsonMapper)
+
+        override fun patch(
+            params: AuthProviderPatchParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<AuthProviderResponse> {
+            // We check here instead of in the params builder because this can be specified
+            // positionally or in the params class.
+            checkRequired("pathId", params.pathId().getOrNull())
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.PATCH)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "auth_providers", params._pathParam(0))
+                    .body(json(clientOptions.jsonMapper, params._body()))
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { patchHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
+            }
+        }
     }
 }

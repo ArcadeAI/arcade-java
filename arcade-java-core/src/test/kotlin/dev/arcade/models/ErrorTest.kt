@@ -2,16 +2,29 @@
 
 package dev.arcade.models
 
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import dev.arcade.core.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class ErrorTest {
+internal class ErrorTest {
 
     @Test
-    fun createError() {
+    fun create() {
         val error = Error.builder().message("message").name("name").build()
-        assertThat(error).isNotNull
+
         assertThat(error.message()).contains("message")
         assertThat(error.name()).contains("name")
+    }
+
+    @Test
+    fun roundtrip() {
+        val jsonMapper = jsonMapper()
+        val error = Error.builder().message("message").name("name").build()
+
+        val roundtrippedError =
+            jsonMapper.readValue(jsonMapper.writeValueAsString(error), jacksonTypeRef<Error>())
+
+        assertThat(roundtrippedError).isEqualTo(error)
     }
 }
