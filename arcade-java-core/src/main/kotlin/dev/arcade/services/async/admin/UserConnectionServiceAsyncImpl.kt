@@ -4,71 +4,131 @@ package dev.arcade.services.async.admin
 
 import dev.arcade.core.ClientOptions
 import dev.arcade.core.RequestOptions
+import dev.arcade.core.checkRequired
 import dev.arcade.core.handlers.emptyHandler
+import dev.arcade.core.handlers.errorBodyHandler
 import dev.arcade.core.handlers.errorHandler
 import dev.arcade.core.handlers.jsonHandler
-import dev.arcade.core.handlers.withErrorHandler
 import dev.arcade.core.http.HttpMethod
 import dev.arcade.core.http.HttpRequest
+import dev.arcade.core.http.HttpResponse
 import dev.arcade.core.http.HttpResponse.Handler
-import dev.arcade.core.json
+import dev.arcade.core.http.HttpResponseFor
+import dev.arcade.core.http.json
+import dev.arcade.core.http.parseable
 import dev.arcade.core.prepareAsync
-import dev.arcade.errors.ArcadeError
-import dev.arcade.models.AdminUserConnectionDeleteParams
-import dev.arcade.models.AdminUserConnectionListPageAsync
-import dev.arcade.models.AdminUserConnectionListParams
+import dev.arcade.models.admin.userconnections.UserConnectionDeleteParams
+import dev.arcade.models.admin.userconnections.UserConnectionListPageAsync
+import dev.arcade.models.admin.userconnections.UserConnectionListPageResponse
+import dev.arcade.models.admin.userconnections.UserConnectionListParams
 import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
+import kotlin.jvm.optionals.getOrNull
 
 class UserConnectionServiceAsyncImpl
 internal constructor(private val clientOptions: ClientOptions) : UserConnectionServiceAsync {
 
-    private val errorHandler: Handler<ArcadeError> = errorHandler(clientOptions.jsonMapper)
-
-    private val listHandler: Handler<AdminUserConnectionListPageAsync.Response> =
-        jsonHandler<AdminUserConnectionListPageAsync.Response>(clientOptions.jsonMapper)
-            .withErrorHandler(errorHandler)
-
-    /** List all auth connections */
-    override fun list(
-        params: AdminUserConnectionListParams,
-        requestOptions: RequestOptions,
-    ): CompletableFuture<AdminUserConnectionListPageAsync> {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.GET)
-                .addPathSegments("v1", "admin", "user_connections")
-                .build()
-                .prepareAsync(clientOptions, params)
-        return request
-            .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
-            .thenApply { response ->
-                response
-                    .use { listHandler.handle(it) }
-                    .also {
-                        if (requestOptions.responseValidation ?: clientOptions.responseValidation) {
-                            it.validate()
-                        }
-                    }
-                    .let { AdminUserConnectionListPageAsync.of(this, params, it) }
-            }
+    private val withRawResponse: UserConnectionServiceAsync.WithRawResponse by lazy {
+        WithRawResponseImpl(clientOptions)
     }
 
-    private val deleteHandler: Handler<Void?> = emptyHandler().withErrorHandler(errorHandler)
+    override fun withRawResponse(): UserConnectionServiceAsync.WithRawResponse = withRawResponse
 
-    /** Delete a user/auth provider connection */
-    override fun delete(
-        params: AdminUserConnectionDeleteParams,
+    override fun withOptions(
+        modifier: Consumer<ClientOptions.Builder>
+    ): UserConnectionServiceAsync =
+        UserConnectionServiceAsyncImpl(clientOptions.toBuilder().apply(modifier::accept).build())
+
+    override fun list(
+        params: UserConnectionListParams,
         requestOptions: RequestOptions,
-    ): CompletableFuture<Void?> {
-        val request =
-            HttpRequest.builder()
-                .method(HttpMethod.DELETE)
-                .addPathSegments("v1", "admin", "user_connections", params.getPathParam(0))
-                .apply { params._body().ifPresent { body(json(clientOptions.jsonMapper, it)) } }
-                .build()
-                .prepareAsync(clientOptions, params)
-        return request
-            .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
-            .thenApply { response -> response.use { deleteHandler.handle(it) } }
+    ): CompletableFuture<UserConnectionListPageAsync> =
+        // get /v1/admin/user_connections
+        withRawResponse().list(params, requestOptions).thenApply { it.parse() }
+
+    override fun delete(
+        params: UserConnectionDeleteParams,
+        requestOptions: RequestOptions,
+    ): CompletableFuture<Void?> =
+        // delete /v1/admin/user_connections/{id}
+        withRawResponse().delete(params, requestOptions).thenAccept {}
+
+    class WithRawResponseImpl internal constructor(private val clientOptions: ClientOptions) :
+        UserConnectionServiceAsync.WithRawResponse {
+
+        private val errorHandler: Handler<HttpResponse> =
+            errorHandler(errorBodyHandler(clientOptions.jsonMapper))
+
+        override fun withOptions(
+            modifier: Consumer<ClientOptions.Builder>
+        ): UserConnectionServiceAsync.WithRawResponse =
+            UserConnectionServiceAsyncImpl.WithRawResponseImpl(
+                clientOptions.toBuilder().apply(modifier::accept).build()
+            )
+
+        private val listHandler: Handler<UserConnectionListPageResponse> =
+            jsonHandler<UserConnectionListPageResponse>(clientOptions.jsonMapper)
+
+        override fun list(
+            params: UserConnectionListParams,
+            requestOptions: RequestOptions,
+        ): CompletableFuture<HttpResponseFor<UserConnectionListPageAsync>> {
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.GET)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "user_connections")
+                    .build()
+                    .prepareAsync(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            return request
+                .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
+                .thenApply { response ->
+                    errorHandler.handle(response).parseable {
+                        response
+                            .use { listHandler.handle(it) }
+                            .also {
+                                if (requestOptions.responseValidation!!) {
+                                    it.validate()
+                                }
+                            }
+                            .let {
+                                UserConnectionListPageAsync.builder()
+                                    .service(UserConnectionServiceAsyncImpl(clientOptions))
+                                    .streamHandlerExecutor(clientOptions.streamHandlerExecutor)
+                                    .params(params)
+                                    .response(it)
+                                    .build()
+                            }
+                    }
+                }
+        }
+
+        private val deleteHandler: Handler<Void?> = emptyHandler()
+
+        override fun delete(
+            params: UserConnectionDeleteParams,
+            requestOptions: RequestOptions,
+        ): CompletableFuture<HttpResponse> {
+            // We check here instead of in the params builder because this can be specified
+            // positionally or in the params class.
+            checkRequired("id", params.id().getOrNull())
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.DELETE)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("v1", "admin", "user_connections", params._pathParam(0))
+                    .apply { params._body().ifPresent { body(json(clientOptions.jsonMapper, it)) } }
+                    .build()
+                    .prepareAsync(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            return request
+                .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
+                .thenApply { response ->
+                    errorHandler.handle(response).parseable {
+                        response.use { deleteHandler.handle(it) }
+                    }
+                }
+        }
     }
 }

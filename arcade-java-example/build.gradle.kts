@@ -1,7 +1,10 @@
 plugins {
-    id("arcade.kotlin")
-    id("java")
+    id("arcade.java")
     application
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -14,5 +17,12 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 application {
-    mainClass = "dev.arcade.example.Main"
+    // Use `./gradlew :arcade-java-example:run` to run `Main`
+    // Use `./gradlew :arcade-java-example:run -Pexample=Something` to run `SomethingExample`
+    mainClass = "dev.arcade.example.${
+        if (project.hasProperty("example"))
+            "${project.property("example")}Example"
+        else
+            "Main"
+    }"
 }

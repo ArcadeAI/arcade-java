@@ -2,12 +2,14 @@
 
 package dev.arcade.client
 
+import dev.arcade.core.ClientOptions
 import dev.arcade.services.blocking.AdminService
 import dev.arcade.services.blocking.AuthService
 import dev.arcade.services.blocking.ChatService
 import dev.arcade.services.blocking.HealthService
 import dev.arcade.services.blocking.ToolService
 import dev.arcade.services.blocking.WorkerService
+import java.util.function.Consumer
 
 /**
  * A client for interacting with the Arcade REST API synchronously. You can also switch to
@@ -33,6 +35,18 @@ interface ArcadeClient {
      */
     fun async(): ArcadeClientAsync
 
+    /**
+     * Returns a view of this service that provides access to raw HTTP responses for each method.
+     */
+    fun withRawResponse(): WithRawResponse
+
+    /**
+     * Returns a view of this service with the given option modifications applied.
+     *
+     * The original service is not modified.
+     */
+    fun withOptions(modifier: Consumer<ClientOptions.Builder>): ArcadeClient
+
     fun admin(): AdminService
 
     fun auth(): AuthService
@@ -57,4 +71,27 @@ interface ArcadeClient {
      * method.
      */
     fun close()
+
+    /** A view of [ArcadeClient] that provides access to raw HTTP responses for each method. */
+    interface WithRawResponse {
+
+        /**
+         * Returns a view of this service with the given option modifications applied.
+         *
+         * The original service is not modified.
+         */
+        fun withOptions(modifier: Consumer<ClientOptions.Builder>): ArcadeClient.WithRawResponse
+
+        fun admin(): AdminService.WithRawResponse
+
+        fun auth(): AuthService.WithRawResponse
+
+        fun health(): HealthService.WithRawResponse
+
+        fun chat(): ChatService.WithRawResponse
+
+        fun tools(): ToolService.WithRawResponse
+
+        fun workers(): WorkerService.WithRawResponse
+    }
 }

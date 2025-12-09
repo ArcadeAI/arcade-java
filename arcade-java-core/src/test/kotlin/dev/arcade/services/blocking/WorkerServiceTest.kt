@@ -5,86 +5,78 @@ package dev.arcade.services.blocking
 import dev.arcade.TestServerExtension
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
 import dev.arcade.core.JsonValue
-import dev.arcade.models.CreateWorkerRequest
-import dev.arcade.models.UpdateWorkerRequest
-import dev.arcade.models.WorkerCreateParams
-import dev.arcade.models.WorkerDeleteParams
-import dev.arcade.models.WorkerGetParams
-import dev.arcade.models.WorkerHealthParams
-import dev.arcade.models.WorkerListParams
-import dev.arcade.models.WorkerToolsParams
-import dev.arcade.models.WorkerUpdateParams
+import dev.arcade.models.workers.CreateWorkerRequest
+import dev.arcade.models.workers.UpdateWorkerRequest
+import dev.arcade.models.workers.WorkerUpdateParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestServerExtension::class)
-class WorkerServiceTest {
+internal class WorkerServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
+
         val workerResponse =
             workerService.create(
-                WorkerCreateParams.builder()
-                    .createWorkerRequest(
-                        CreateWorkerRequest.builder()
-                            .id("id")
-                            .enabled(true)
-                            .http(
-                                CreateWorkerRequest.Http.builder()
-                                    .retry(0L)
-                                    .secret("secret")
-                                    .timeout(1L)
-                                    .uri("uri")
-                                    .build()
-                            )
-                            .mcp(
-                                CreateWorkerRequest.Mcp.builder()
-                                    .retry(0L)
-                                    .timeout(1L)
-                                    .uri("uri")
-                                    .headers(
-                                        CreateWorkerRequest.Mcp.Headers.builder()
-                                            .putAdditionalProperty("foo", JsonValue.from("string"))
-                                            .build()
-                                    )
-                                    .oauth2(
-                                        CreateWorkerRequest.Mcp.Oauth2.builder()
-                                            .authorizationUrl("authorization_url")
-                                            .clientId("client_id")
-                                            .clientSecret("client_secret")
-                                            .externalId("external_id")
-                                            .build()
-                                    )
-                                    .secrets(
-                                        CreateWorkerRequest.Mcp.Secrets.builder()
-                                            .putAdditionalProperty("foo", JsonValue.from("string"))
-                                            .build()
-                                    )
-                                    .build()
-                            )
-                            .type("type")
+                CreateWorkerRequest.builder()
+                    .id("id")
+                    .enabled(true)
+                    .http(
+                        CreateWorkerRequest.Http.builder()
+                            .retry(0L)
+                            .secret("secret")
+                            .timeout(1L)
+                            .uri("uri")
                             .build()
                     )
+                    .mcp(
+                        CreateWorkerRequest.Mcp.builder()
+                            .retry(0L)
+                            .timeout(1L)
+                            .uri("uri")
+                            .headers(
+                                CreateWorkerRequest.Mcp.Headers.builder()
+                                    .putAdditionalProperty("foo", JsonValue.from("string"))
+                                    .build()
+                            )
+                            .oauth2(
+                                CreateWorkerRequest.Mcp.Oauth2.builder()
+                                    .authorizationUrl("authorization_url")
+                                    .clientId("client_id")
+                                    .clientSecret("client_secret")
+                                    .externalId("external_id")
+                                    .build()
+                            )
+                            .secrets(
+                                CreateWorkerRequest.Mcp.Secrets.builder()
+                                    .putAdditionalProperty("foo", JsonValue.from("string"))
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .type("type")
                     .build()
             )
-        println(workerResponse)
+
         workerResponse.validate()
     }
 
     @Test
-    fun callUpdate() {
+    fun update() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
+
         val workerResponse =
             workerService.update(
                 WorkerUpdateParams.builder()
@@ -128,73 +120,75 @@ class WorkerServiceTest {
                     )
                     .build()
             )
-        println(workerResponse)
+
         workerResponse.validate()
     }
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
-        val schemasOffsetPageSchemasWorkerResponse =
-            workerService.list(WorkerListParams.builder().build())
-        println(schemasOffsetPageSchemasWorkerResponse)
-        schemasOffsetPageSchemasWorkerResponse.items().forEach { it.validate() }
+
+        val page = workerService.list()
+
+        page.response().validate()
     }
 
     @Test
-    fun callDelete() {
+    fun delete() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
-        workerService.delete(WorkerDeleteParams.builder().id("id").build())
+
+        workerService.delete("id")
     }
 
     @Test
-    fun callGet() {
+    fun get() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
-        val workerResponse = workerService.get(WorkerGetParams.builder().id("id").build())
-        println(workerResponse)
+
+        val workerResponse = workerService.get("id")
+
         workerResponse.validate()
     }
 
     @Test
-    fun callHealth() {
+    fun health() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
-        val workerHealthResponse =
-            workerService.health(WorkerHealthParams.builder().id("id").build())
-        println(workerHealthResponse)
+
+        val workerHealthResponse = workerService.health("id")
+
         workerHealthResponse.validate()
     }
 
     @Test
-    fun callTools() {
+    fun tools() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val workerService = client.workers()
-        val schemasOffsetPageSchemasToolResponse =
-            workerService.tools(WorkerToolsParams.builder().id("id").build())
-        println(schemasOffsetPageSchemasToolResponse)
-        schemasOffsetPageSchemasToolResponse.items().forEach { it.validate() }
+
+        val page = workerService.tools("id")
+
+        page.response().validate()
     }
 }

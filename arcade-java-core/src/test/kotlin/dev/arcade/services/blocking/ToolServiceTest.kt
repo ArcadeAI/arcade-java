@@ -5,96 +5,88 @@ package dev.arcade.services.blocking
 import dev.arcade.TestServerExtension
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
 import dev.arcade.core.JsonValue
-import dev.arcade.models.AuthorizeToolRequest
-import dev.arcade.models.ExecuteToolRequest
-import dev.arcade.models.ToolAuthorizeParams
-import dev.arcade.models.ToolExecuteParams
-import dev.arcade.models.ToolGetParams
-import dev.arcade.models.ToolListParams
+import dev.arcade.models.tools.AuthorizeToolRequest
+import dev.arcade.models.tools.ExecuteToolRequest
+import dev.arcade.models.tools.ToolGetParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestServerExtension::class)
-class ToolServiceTest {
+internal class ToolServiceTest {
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val toolService = client.tools()
-        val schemasOffsetPageSchemasToolResponse =
-            toolService.list(ToolListParams.builder().build())
-        println(schemasOffsetPageSchemasToolResponse)
-        schemasOffsetPageSchemasToolResponse.items().forEach { it.validate() }
+
+        val page = toolService.list()
+
+        page.response().validate()
     }
 
     @Test
-    fun callAuthorize() {
+    fun authorize() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val toolService = client.tools()
+
         val authorizationResponse =
             toolService.authorize(
-                ToolAuthorizeParams.builder()
-                    .authorizeToolRequest(
-                        AuthorizeToolRequest.builder()
-                            .toolName("tool_name")
-                            .nextUri("next_uri")
-                            .toolVersion("tool_version")
-                            .userId("user_id")
-                            .build()
-                    )
+                AuthorizeToolRequest.builder()
+                    .toolName("tool_name")
+                    .nextUri("next_uri")
+                    .toolVersion("tool_version")
+                    .userId("user_id")
                     .build()
             )
-        println(authorizationResponse)
+
         authorizationResponse.validate()
     }
 
     @Test
-    fun callExecute() {
+    fun execute() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val toolService = client.tools()
+
         val executeToolResponse =
             toolService.execute(
-                ToolExecuteParams.builder()
-                    .executeToolRequest(
-                        ExecuteToolRequest.builder()
-                            .toolName("tool_name")
-                            .includeErrorStacktrace(true)
-                            .input(
-                                ExecuteToolRequest.Input.builder()
-                                    .putAdditionalProperty("foo", JsonValue.from("bar"))
-                                    .build()
-                            )
-                            .runAt("run_at")
-                            .toolVersion("tool_version")
-                            .userId("user_id")
+                ExecuteToolRequest.builder()
+                    .toolName("tool_name")
+                    .includeErrorStacktrace(true)
+                    .input(
+                        ExecuteToolRequest.Input.builder()
+                            .putAdditionalProperty("foo", JsonValue.from("bar"))
                             .build()
                     )
+                    .runAt("run_at")
+                    .toolVersion("tool_version")
+                    .userId("user_id")
                     .build()
             )
-        println(executeToolResponse)
+
         executeToolResponse.validate()
     }
 
     @Test
-    fun callGet() {
+    fun get() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val toolService = client.tools()
+
         val toolDefinition =
             toolService.get(
                 ToolGetParams.builder()
@@ -103,7 +95,7 @@ class ToolServiceTest {
                     .userId("user_id")
                     .build()
             )
-        println(toolDefinition)
+
         toolDefinition.validate()
     }
 }

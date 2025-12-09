@@ -1,23 +1,16 @@
+// File generated from our OpenAPI spec by Stainless.
+
 package dev.arcade.errors
 
+import dev.arcade.core.JsonValue
 import dev.arcade.core.http.Headers
 
 abstract class ArcadeServiceException
-@JvmOverloads
-constructor(
-    private val statusCode: Int,
-    private val headers: Headers,
-    private val body: String,
-    private val error: ArcadeError,
-    message: String = "$statusCode: $error",
-    cause: Throwable? = null,
-) : ArcadeException(message, cause) {
+protected constructor(message: String, cause: Throwable? = null) : ArcadeException(message, cause) {
 
-    fun statusCode(): Int = statusCode
+    abstract fun statusCode(): Int
 
-    fun headers(): Headers = headers
+    abstract fun headers(): Headers
 
-    fun body(): String = body
-
-    fun error(): ArcadeError = error
+    abstract fun body(): JsonValue
 }

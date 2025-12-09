@@ -2,14 +2,16 @@
 
 package dev.arcade.models
 
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import dev.arcade.core.JsonValue
+import dev.arcade.core.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class AuthorizationContextTest {
+internal class AuthorizationContextTest {
 
     @Test
-    fun createAuthorizationContext() {
+    fun create() {
         val authorizationContext =
             AuthorizationContext.builder()
                 .token("token")
@@ -19,7 +21,7 @@ class AuthorizationContextTest {
                         .build()
                 )
                 .build()
-        assertThat(authorizationContext).isNotNull
+
         assertThat(authorizationContext.token()).contains("token")
         assertThat(authorizationContext.userInfo())
             .contains(
@@ -27,5 +29,27 @@ class AuthorizationContextTest {
                     .putAdditionalProperty("foo", JsonValue.from("bar"))
                     .build()
             )
+    }
+
+    @Test
+    fun roundtrip() {
+        val jsonMapper = jsonMapper()
+        val authorizationContext =
+            AuthorizationContext.builder()
+                .token("token")
+                .userInfo(
+                    AuthorizationContext.UserInfo.builder()
+                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                        .build()
+                )
+                .build()
+
+        val roundtrippedAuthorizationContext =
+            jsonMapper.readValue(
+                jsonMapper.writeValueAsString(authorizationContext),
+                jacksonTypeRef<AuthorizationContext>(),
+            )
+
+        assertThat(roundtrippedAuthorizationContext).isEqualTo(authorizationContext)
     }
 }
