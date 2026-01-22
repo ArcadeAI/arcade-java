@@ -106,6 +106,12 @@ private constructor(
      */
     fun providerType(): Optional<String> = providerType.getOptional("provider_type")
 
+    /**
+     * This arbitrary value can be deserialized into a custom type using the `convert` method:
+     * ```java
+     * MyClass myObject = userConnectionResponse.providerUserInfo().convert(MyClass.class);
+     * ```
+     */
     @JsonProperty("provider_user_info")
     @ExcludeMissing
     fun _providerUserInfo(): JsonValue = providerUserInfo
