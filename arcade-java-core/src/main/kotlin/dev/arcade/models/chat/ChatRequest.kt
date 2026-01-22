@@ -212,9 +212,22 @@ private constructor(
      */
     fun temperature(): Optional<Double> = temperature.getOptional("temperature")
 
-    /** This can be either a string or an ToolChoice object. */
+    /**
+     * This can be either a string or an ToolChoice object.
+     *
+     * This arbitrary value can be deserialized into a custom type using the `convert` method:
+     * ```java
+     * MyClass myObject = chatRequest.toolChoice().convert(MyClass.class);
+     * ```
+     */
     @JsonProperty("tool_choice") @ExcludeMissing fun _toolChoice(): JsonValue = toolChoice
 
+    /**
+     * This arbitrary value can be deserialized into a custom type using the `convert` method:
+     * ```java
+     * MyClass myObject = chatRequest.tools().convert(MyClass.class);
+     * ```
+     */
     @JsonProperty("tools") @ExcludeMissing fun _tools(): JsonValue = tools
 
     /**

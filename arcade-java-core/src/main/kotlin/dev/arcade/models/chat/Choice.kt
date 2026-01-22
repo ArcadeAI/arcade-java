@@ -67,6 +67,12 @@ private constructor(
      */
     fun index(): Optional<Long> = index.getOptional("index")
 
+    /**
+     * This arbitrary value can be deserialized into a custom type using the `convert` method:
+     * ```java
+     * MyClass myObject = choice.logprobs().convert(MyClass.class);
+     * ```
+     */
     @JsonProperty("logprobs") @ExcludeMissing fun _logprobs(): JsonValue = logprobs
 
     /**

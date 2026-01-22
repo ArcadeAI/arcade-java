@@ -348,6 +348,12 @@ private constructor(
          */
         fun logs(): Optional<List<Log>> = logs.getOptional("logs")
 
+        /**
+         * This arbitrary value can be deserialized into a custom type using the `convert` method:
+         * ```java
+         * MyClass myObject = output.value().convert(MyClass.class);
+         * ```
+         */
         @JsonProperty("value") @ExcludeMissing fun _value(): JsonValue = value
 
         /**
