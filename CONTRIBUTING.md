@@ -6,7 +6,22 @@ modify the contents of the `arcade-java/lib/` and `arcade-java-examples/` direct
 
 ## Adding and running examples
 
-TODO
+Set the following environment variables:
+
+| ENV Var           | Description                                                             |
+|-------------------|-------------------------------------------------------------------------|
+| `ARCADE_USER_ID`  | Arcade user Id or email address                                         |
+| `ARCADE_API_KEY`  | [Arcade API key](https://docs.arcade.dev/en/get-started/setup/api-keys) |
+| `ARCADE_BASE_URL` | Arcade URL, defaults to: `https://api.arcade.dev`                       |
+
+Use `./gradlew :arcade-java-example:run -Pexample=<Name>` to run `<Name>Example`
+
+For example, if you have the `potify.ResumePlayback` tool configured, you can run:
+```shell
+export ARCADE_API_KEY='your-api-key'
+export ARCADE_USER_ID='your-arcade-user'
+./gradlew :arcade-java-example:run -Pexample=PlaySpotify
+```
 
 ## Building the repository from source
 
