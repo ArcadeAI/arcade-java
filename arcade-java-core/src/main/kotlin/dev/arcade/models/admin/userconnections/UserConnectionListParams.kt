@@ -14,8 +14,8 @@ class UserConnectionListParams
 private constructor(
     private val limit: Long?,
     private val offset: Long?,
-    private val provider: Provider?,
-    private val user: User?,
+    private val providerId: String?,
+    private val userId: String?,
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
@@ -26,9 +26,11 @@ private constructor(
     /** Page offset */
     fun offset(): Optional<Long> = Optional.ofNullable(offset)
 
-    fun provider(): Optional<Provider> = Optional.ofNullable(provider)
+    /** Provider ID */
+    fun providerId(): Optional<String> = Optional.ofNullable(providerId)
 
-    fun user(): Optional<User> = Optional.ofNullable(user)
+    /** User ID */
+    fun userId(): Optional<String> = Optional.ofNullable(userId)
 
     /** Additional headers to send with the request. */
     fun _additionalHeaders(): Headers = additionalHeaders
@@ -51,8 +53,8 @@ private constructor(
 
         private var limit: Long? = null
         private var offset: Long? = null
-        private var provider: Provider? = null
-        private var user: User? = null
+        private var providerId: String? = null
+        private var userId: String? = null
         private var additionalHeaders: Headers.Builder = Headers.builder()
         private var additionalQueryParams: QueryParams.Builder = QueryParams.builder()
 
@@ -60,8 +62,8 @@ private constructor(
         internal fun from(userConnectionListParams: UserConnectionListParams) = apply {
             limit = userConnectionListParams.limit
             offset = userConnectionListParams.offset
-            provider = userConnectionListParams.provider
-            user = userConnectionListParams.user
+            providerId = userConnectionListParams.providerId
+            userId = userConnectionListParams.userId
             additionalHeaders = userConnectionListParams.additionalHeaders.toBuilder()
             additionalQueryParams = userConnectionListParams.additionalQueryParams.toBuilder()
         }
@@ -92,15 +94,17 @@ private constructor(
         /** Alias for calling [Builder.offset] with `offset.orElse(null)`. */
         fun offset(offset: Optional<Long>) = offset(offset.getOrNull())
 
-        fun provider(provider: Provider?) = apply { this.provider = provider }
+        /** Provider ID */
+        fun providerId(providerId: String?) = apply { this.providerId = providerId }
 
-        /** Alias for calling [Builder.provider] with `provider.orElse(null)`. */
-        fun provider(provider: Optional<Provider>) = provider(provider.getOrNull())
+        /** Alias for calling [Builder.providerId] with `providerId.orElse(null)`. */
+        fun providerId(providerId: Optional<String>) = providerId(providerId.getOrNull())
 
-        fun user(user: User?) = apply { this.user = user }
+        /** User ID */
+        fun userId(userId: String?) = apply { this.userId = userId }
 
-        /** Alias for calling [Builder.user] with `user.orElse(null)`. */
-        fun user(user: Optional<User>) = user(user.getOrNull())
+        /** Alias for calling [Builder.userId] with `userId.orElse(null)`. */
+        fun userId(userId: Optional<String>) = userId(userId.getOrNull())
 
         fun additionalHeaders(additionalHeaders: Headers) = apply {
             this.additionalHeaders.clear()
@@ -209,8 +213,8 @@ private constructor(
             UserConnectionListParams(
                 limit,
                 offset,
-                provider,
-                user,
+                providerId,
+                userId,
                 additionalHeaders.build(),
                 additionalQueryParams.build(),
             )
@@ -223,243 +227,11 @@ private constructor(
             .apply {
                 limit?.let { put("limit", it.toString()) }
                 offset?.let { put("offset", it.toString()) }
-                provider?.let {
-                    it.id().ifPresent { put("provider[id]", it) }
-                    it._additionalProperties().keys().forEach { key ->
-                        it._additionalProperties().values(key).forEach { value ->
-                            put("provider[$key]", value)
-                        }
-                    }
-                }
-                user?.let {
-                    it.id().ifPresent { put("user[id]", it) }
-                    it._additionalProperties().keys().forEach { key ->
-                        it._additionalProperties().values(key).forEach { value ->
-                            put("user[$key]", value)
-                        }
-                    }
-                }
+                providerId?.let { put("provider_id", it) }
+                userId?.let { put("user_id", it) }
                 putAll(additionalQueryParams)
             }
             .build()
-
-    class Provider
-    private constructor(private val id: String?, private val additionalProperties: QueryParams) {
-
-        /** Provider ID */
-        fun id(): Optional<String> = Optional.ofNullable(id)
-
-        /** Query params to send with the request. */
-        fun _additionalProperties(): QueryParams = additionalProperties
-
-        fun toBuilder() = Builder().from(this)
-
-        companion object {
-
-            /** Returns a mutable builder for constructing an instance of [Provider]. */
-            @JvmStatic fun builder() = Builder()
-        }
-
-        /** A builder for [Provider]. */
-        class Builder internal constructor() {
-
-            private var id: String? = null
-            private var additionalProperties: QueryParams.Builder = QueryParams.builder()
-
-            @JvmSynthetic
-            internal fun from(provider: Provider) = apply {
-                id = provider.id
-                additionalProperties = provider.additionalProperties.toBuilder()
-            }
-
-            /** Provider ID */
-            fun id(id: String?) = apply { this.id = id }
-
-            /** Alias for calling [Builder.id] with `id.orElse(null)`. */
-            fun id(id: Optional<String>) = id(id.getOrNull())
-
-            fun additionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.clear()
-                putAllAdditionalProperties(additionalProperties)
-            }
-
-            fun additionalProperties(additionalProperties: Map<String, Iterable<String>>) = apply {
-                this.additionalProperties.clear()
-                putAllAdditionalProperties(additionalProperties)
-            }
-
-            fun putAdditionalProperty(key: String, value: String) = apply {
-                additionalProperties.put(key, value)
-            }
-
-            fun putAdditionalProperties(key: String, values: Iterable<String>) = apply {
-                additionalProperties.put(key, values)
-            }
-
-            fun putAllAdditionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.putAll(additionalProperties)
-            }
-
-            fun putAllAdditionalProperties(additionalProperties: Map<String, Iterable<String>>) =
-                apply {
-                    this.additionalProperties.putAll(additionalProperties)
-                }
-
-            fun replaceAdditionalProperties(key: String, value: String) = apply {
-                additionalProperties.replace(key, value)
-            }
-
-            fun replaceAdditionalProperties(key: String, values: Iterable<String>) = apply {
-                additionalProperties.replace(key, values)
-            }
-
-            fun replaceAllAdditionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.replaceAll(additionalProperties)
-            }
-
-            fun replaceAllAdditionalProperties(
-                additionalProperties: Map<String, Iterable<String>>
-            ) = apply { this.additionalProperties.replaceAll(additionalProperties) }
-
-            fun removeAdditionalProperties(key: String) = apply { additionalProperties.remove(key) }
-
-            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                additionalProperties.removeAll(keys)
-            }
-
-            /**
-             * Returns an immutable instance of [Provider].
-             *
-             * Further updates to this [Builder] will not mutate the returned instance.
-             */
-            fun build(): Provider = Provider(id, additionalProperties.build())
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) {
-                return true
-            }
-
-            return other is Provider &&
-                id == other.id &&
-                additionalProperties == other.additionalProperties
-        }
-
-        private val hashCode: Int by lazy { Objects.hash(id, additionalProperties) }
-
-        override fun hashCode(): Int = hashCode
-
-        override fun toString() = "Provider{id=$id, additionalProperties=$additionalProperties}"
-    }
-
-    class User
-    private constructor(private val id: String?, private val additionalProperties: QueryParams) {
-
-        /** User ID */
-        fun id(): Optional<String> = Optional.ofNullable(id)
-
-        /** Query params to send with the request. */
-        fun _additionalProperties(): QueryParams = additionalProperties
-
-        fun toBuilder() = Builder().from(this)
-
-        companion object {
-
-            /** Returns a mutable builder for constructing an instance of [User]. */
-            @JvmStatic fun builder() = Builder()
-        }
-
-        /** A builder for [User]. */
-        class Builder internal constructor() {
-
-            private var id: String? = null
-            private var additionalProperties: QueryParams.Builder = QueryParams.builder()
-
-            @JvmSynthetic
-            internal fun from(user: User) = apply {
-                id = user.id
-                additionalProperties = user.additionalProperties.toBuilder()
-            }
-
-            /** User ID */
-            fun id(id: String?) = apply { this.id = id }
-
-            /** Alias for calling [Builder.id] with `id.orElse(null)`. */
-            fun id(id: Optional<String>) = id(id.getOrNull())
-
-            fun additionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.clear()
-                putAllAdditionalProperties(additionalProperties)
-            }
-
-            fun additionalProperties(additionalProperties: Map<String, Iterable<String>>) = apply {
-                this.additionalProperties.clear()
-                putAllAdditionalProperties(additionalProperties)
-            }
-
-            fun putAdditionalProperty(key: String, value: String) = apply {
-                additionalProperties.put(key, value)
-            }
-
-            fun putAdditionalProperties(key: String, values: Iterable<String>) = apply {
-                additionalProperties.put(key, values)
-            }
-
-            fun putAllAdditionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.putAll(additionalProperties)
-            }
-
-            fun putAllAdditionalProperties(additionalProperties: Map<String, Iterable<String>>) =
-                apply {
-                    this.additionalProperties.putAll(additionalProperties)
-                }
-
-            fun replaceAdditionalProperties(key: String, value: String) = apply {
-                additionalProperties.replace(key, value)
-            }
-
-            fun replaceAdditionalProperties(key: String, values: Iterable<String>) = apply {
-                additionalProperties.replace(key, values)
-            }
-
-            fun replaceAllAdditionalProperties(additionalProperties: QueryParams) = apply {
-                this.additionalProperties.replaceAll(additionalProperties)
-            }
-
-            fun replaceAllAdditionalProperties(
-                additionalProperties: Map<String, Iterable<String>>
-            ) = apply { this.additionalProperties.replaceAll(additionalProperties) }
-
-            fun removeAdditionalProperties(key: String) = apply { additionalProperties.remove(key) }
-
-            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                additionalProperties.removeAll(keys)
-            }
-
-            /**
-             * Returns an immutable instance of [User].
-             *
-             * Further updates to this [Builder] will not mutate the returned instance.
-             */
-            fun build(): User = User(id, additionalProperties.build())
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) {
-                return true
-            }
-
-            return other is User &&
-                id == other.id &&
-                additionalProperties == other.additionalProperties
-        }
-
-        private val hashCode: Int by lazy { Objects.hash(id, additionalProperties) }
-
-        override fun hashCode(): Int = hashCode
-
-        override fun toString() = "User{id=$id, additionalProperties=$additionalProperties}"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -469,15 +241,15 @@ private constructor(
         return other is UserConnectionListParams &&
             limit == other.limit &&
             offset == other.offset &&
-            provider == other.provider &&
-            user == other.user &&
+            providerId == other.providerId &&
+            userId == other.userId &&
             additionalHeaders == other.additionalHeaders &&
             additionalQueryParams == other.additionalQueryParams
     }
 
     override fun hashCode(): Int =
-        Objects.hash(limit, offset, provider, user, additionalHeaders, additionalQueryParams)
+        Objects.hash(limit, offset, providerId, userId, additionalHeaders, additionalQueryParams)
 
     override fun toString() =
-        "UserConnectionListParams{limit=$limit, offset=$offset, provider=$provider, user=$user, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "UserConnectionListParams{limit=$limit, offset=$offset, providerId=$providerId, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }
