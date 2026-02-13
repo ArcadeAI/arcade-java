@@ -3,12 +3,16 @@
 package dev.arcade.services.async
 
 import dev.arcade.TestServerExtension
+import dev.arcade.client.okhttp.ArcadeOkHttpClient
 import dev.arcade.client.okhttp.ArcadeOkHttpClientAsync
+import dev.arcade.models.auth.AuthAuthorizeParams
 import dev.arcade.models.auth.AuthRequest
 import dev.arcade.models.auth.AuthStatusParams
 import dev.arcade.models.auth.ConfirmUserRequest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 @ExtendWith(TestServerExtension::class)
 internal class AuthServiceAsyncTest {
@@ -78,5 +82,105 @@ internal class AuthServiceAsyncTest {
 
         val authorizationResponse = authorizationResponseFuture.get()
         authorizationResponse.validate()
+    }
+
+    // -------------------------------------------------------------------------
+    // Start of manually added code
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun start() {
+        val expected =
+            AuthAuthorizeParams.builder()
+                .authRequest(
+                    AuthRequest.builder()
+                        .userId("user_id")
+                        .authRequirement(
+                            AuthRequest.AuthRequirement.builder()
+                                .providerId("provider_id")
+                                .providerType("provider_type")
+                                .oauth2(
+                                    AuthRequest.AuthRequirement.Oauth2.builder()
+                                        .scopes(listOf("scope_one", "scope_two"))
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        verifyAuthorize(expected) { auth ->
+            auth.start("user_id", "provider_id", "provider_type", listOf("scope_one", "scope_two"))
+        }
+    }
+
+    @Test
+    fun start_noScopes() {
+        val expected =
+            AuthAuthorizeParams.builder()
+                .authRequest(
+                    AuthRequest.builder()
+                        .userId("user_id")
+                        .authRequirement(
+                            AuthRequest.AuthRequirement.builder()
+                                .providerId("provider_id")
+                                .providerType("provider_type")
+                                .oauth2(
+                                    AuthRequest.AuthRequirement.Oauth2.builder()
+                                        .scopes(emptyList())
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        verifyAuthorize(expected) { auth -> auth.start("user_id", "provider_id", "provider_type") }
+    }
+
+    @Test
+    fun start_noProviderType() {
+        val expected =
+            AuthAuthorizeParams.builder()
+                .authRequest(
+                    AuthRequest.builder()
+                        .userId("user_id")
+                        .authRequirement(
+                            AuthRequest.AuthRequirement.builder()
+                                .providerId("provider_id")
+                                .providerType("oauth2")
+                                .oauth2(
+                                    AuthRequest.AuthRequirement.Oauth2.builder()
+                                        .scopes(emptyList())
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        verifyAuthorize(expected) { auth -> auth.start("user_id", "provider_id") }
+    }
+
+    private fun verifyAuthorize(
+        expected: AuthAuthorizeParams,
+        testCode: (AuthServiceAsync) -> Unit,
+    ) {
+        // given
+        val client =
+            ArcadeOkHttpClient.builder()
+                .baseUrl(TestServerExtension.BASE_URL)
+                .apiKey("My API Key")
+                .build()
+        val auth = spy(client.async().auth())
+
+        // when
+        testCode.invoke(auth)
+
+        // then
+        verify(auth).authorize(expected)
     }
 }
