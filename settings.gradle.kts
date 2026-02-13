@@ -9,6 +9,7 @@ val projectNames = rootDir.listFiles()
         file.listFiles()?.asSequence().orEmpty().any { it.name == "build.gradle.kts" }
     }
     .map { it.name }
-    .toList()
+    .toList() +
+    listOf("arcade-spring-boot-starter")
 println("projects: $projectNames")
 projectNames.forEach { include(it) }
