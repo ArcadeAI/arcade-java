@@ -177,4 +177,25 @@ interface AuthServiceAsync {
             requestOptions: RequestOptions = RequestOptions.none(),
         ): CompletableFuture<HttpResponseFor<AuthorizationResponse>>
     }
+
+    // -------------------------------------------------------------------------
+    // Start of manually added code
+    // -------------------------------------------------------------------------
+
+    /**
+     * Starts the authorization process for a given provider and scopes.
+     *
+     * @param userId The user ID for which authorization is being requested.
+     * @param provider The authorization provider (e.g., 'github', 'google', 'linkedin',
+     *   'microsoft', 'slack', 'spotify', 'x', 'zoom').
+     * @param providerType The type of authorization provider. Optional, defaults to 'oauth2'.
+     * @param scopes A list of scopes required for authorization, if any.
+     * @return A CompletableFuture containing the authorization response based on the request.
+     */
+    fun start(
+        userId: String,
+        provider: String,
+        providerType: String = "oauth2",
+        scopes: List<String> = emptyList(),
+    ): CompletableFuture<AuthorizationResponse>
 }

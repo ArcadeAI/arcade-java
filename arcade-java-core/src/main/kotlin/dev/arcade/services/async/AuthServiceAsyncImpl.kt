@@ -18,6 +18,7 @@ import dev.arcade.core.prepareAsync
 import dev.arcade.models.AuthorizationResponse
 import dev.arcade.models.auth.AuthAuthorizeParams
 import dev.arcade.models.auth.AuthConfirmUserParams
+import dev.arcade.models.auth.AuthRequest
 import dev.arcade.models.auth.AuthStatusParams
 import dev.arcade.models.auth.ConfirmUserResponse
 import java.util.concurrent.CompletableFuture
@@ -160,5 +161,37 @@ class AuthServiceAsyncImpl internal constructor(private val clientOptions: Clien
                     }
                 }
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Start of manually added code
+    // -------------------------------------------------------------------------
+
+    override fun start(
+        userId: String,
+        provider: String,
+        providerType: String,
+        scopes: List<String>,
+    ): CompletableFuture<AuthorizationResponse> {
+        return authorize(
+            AuthAuthorizeParams.builder()
+                .authRequest(
+                    AuthRequest.builder()
+                        .userId(userId)
+                        .authRequirement(
+                            AuthRequest.AuthRequirement.builder()
+                                .providerId(provider)
+                                .providerType(providerType)
+                                .oauth2(
+                                    AuthRequest.AuthRequirement.Oauth2.builder()
+                                        .scopes(scopes)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+        )
     }
 }

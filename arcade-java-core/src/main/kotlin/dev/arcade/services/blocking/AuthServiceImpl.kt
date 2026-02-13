@@ -18,11 +18,16 @@ import dev.arcade.core.prepare
 import dev.arcade.models.AuthorizationResponse
 import dev.arcade.models.auth.AuthAuthorizeParams
 import dev.arcade.models.auth.AuthConfirmUserParams
+import dev.arcade.models.auth.AuthRequest
 import dev.arcade.models.auth.AuthStatusParams
 import dev.arcade.models.auth.ConfirmUserResponse
 import java.util.function.Consumer
 
 class AuthServiceImpl internal constructor(private val clientOptions: ClientOptions) : AuthService {
+
+    companion object {
+        const val DEFAULT_LONGPOLL_WAIT_TIME = 45L
+    }
 
     private val withRawResponse: AuthService.WithRawResponse by lazy {
         WithRawResponseImpl(clientOptions)
@@ -149,5 +154,64 @@ class AuthServiceImpl internal constructor(private val clientOptions: ClientOpti
                     }
             }
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Start of manually added code
+    // -------------------------------------------------------------------------
+
+    override fun start(
+        userId: String,
+        provider: String,
+        providerType: String,
+        scopes: List<String>,
+    ): AuthorizationResponse {
+        return authorize(
+            AuthAuthorizeParams.builder()
+                .authRequest(
+                    AuthRequest.builder()
+                        .userId(userId)
+                        .authRequirement(
+                            AuthRequest.AuthRequirement.builder()
+                                .providerId(provider)
+                                .providerType(providerType)
+                                .oauth2(
+                                    AuthRequest.AuthRequirement.Oauth2.builder()
+                                        .scopes(scopes)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+        )
+    }
+
+    override fun waitForCompletion(
+        authorizationResponse: AuthorizationResponse
+    ): AuthorizationResponse {
+        var response = authorizationResponse
+        while (AuthorizationResponse.Status.COMPLETED != response.status().get()) {
+            response =
+                status(
+                    AuthStatusParams.builder()
+                        .id(response.id().get())
+                        .wait(DEFAULT_LONGPOLL_WAIT_TIME)
+                        .build()
+                )
+        }
+        return response
+    }
+
+    override fun waitForCompletion(authorizationResponseId: String): AuthorizationResponse {
+        return waitForCompletion(
+            status(
+                AuthStatusParams.builder()
+                    .id(authorizationResponseId)
+                    .wait(DEFAULT_LONGPOLL_WAIT_TIME)
+                    .build()
+            )
+        )
     }
 }

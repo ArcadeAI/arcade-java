@@ -128,6 +128,41 @@ ArcadeClient clientWithOptions = client.withOptions(optionsBuilder -> {
 
 The `withOptions()` method does not affect the original client or service.
 
+## User Authentication
+
+To initiate an OAuth 2 authenticated flow with a user, use the `AuthService.start` method:
+
+```java
+import dev.arcade.client.ArcadeClient;
+import dev.arcade.models.AuthorizationResponse;
+
+// See above on creating a client
+ArcadeClient client;
+
+// get the auth service, and call start
+AuthorizationResponse authResponse = client.auth().start(
+        "{arcade_user_id}", // email or user ID of an Arcade user
+        "{auth_provider}", // provider name
+        "oauth2", // provider type
+        List.of("{scope1}", "{scope2}")); // list of scopes
+
+// check the response status
+authResponse.status()
+    .filter(status -> status != AuthorizationResponse.Status.COMPLETED)
+    .ifPresent(status ->
+        System.out.println("Click this link to authorize: " + authResponse.url().get()));
+```
+```java
+// if the authorization is NOT complete, you can wait using the following method:
+client.auth().waitForCompletion(authResponse);
+```
+
+> [!CAUTION]
+> This method should not be used in web applications as it will block the current thread.
+> For web apps, you will need to poll the `status` endpoint by calling `client.auth.status(...)`.
+
+For more details, see the [Authorized Tool Calling](https://docs.arcade.dev/en/guides/tool-calling/custom-apps/auth-tool-calling) docs.
+
 ## Requests and responses
 
 To send a request to the Arcade API, build an instance of some `Params` class and pass it to the corresponding client method. When the response is received, it will be deserialized into an instance of a Java class.
