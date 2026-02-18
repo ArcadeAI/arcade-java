@@ -30,7 +30,6 @@ internal class WorkerResponseTest {
                                 .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                                 .editable(true)
                                 .exists(true)
-                                .hint("hint")
                                 .value("value")
                                 .build()
                         )
@@ -57,7 +56,6 @@ internal class WorkerResponseTest {
                                         )
                                         .editable(true)
                                         .exists(true)
-                                        .hint("hint")
                                         .value("value")
                                         .build()
                                 )
@@ -74,7 +72,6 @@ internal class WorkerResponseTest {
                                             "binding" to "static",
                                             "editable" to true,
                                             "exists" to true,
-                                            "hint" to "hint",
                                             "value" to "value",
                                         )
                                     ),
@@ -121,7 +118,6 @@ internal class WorkerResponseTest {
                             .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                             .editable(true)
                             .exists(true)
-                            .hint("hint")
                             .value("value")
                             .build()
                     )
@@ -147,7 +143,6 @@ internal class WorkerResponseTest {
                                     .binding(WorkerResponse.Mcp.Oauth2.ClientSecret.Binding.STATIC)
                                     .editable(true)
                                     .exists(true)
-                                    .hint("hint")
                                     .value("value")
                                     .build()
                             )
@@ -164,7 +159,6 @@ internal class WorkerResponseTest {
                                         "binding" to "static",
                                         "editable" to true,
                                         "exists" to true,
-                                        "hint" to "hint",
                                         "value" to "value",
                                     )
                                 ),
@@ -215,7 +209,6 @@ internal class WorkerResponseTest {
                                 .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                                 .editable(true)
                                 .exists(true)
-                                .hint("hint")
                                 .value("value")
                                 .build()
                         )
@@ -242,7 +235,6 @@ internal class WorkerResponseTest {
                                         )
                                         .editable(true)
                                         .exists(true)
-                                        .hint("hint")
                                         .value("value")
                                         .build()
                                 )
@@ -259,7 +251,6 @@ internal class WorkerResponseTest {
                                             "binding" to "static",
                                             "editable" to true,
                                             "exists" to true,
-                                            "hint" to "hint",
                                             "value" to "value",
                                         )
                                     ),

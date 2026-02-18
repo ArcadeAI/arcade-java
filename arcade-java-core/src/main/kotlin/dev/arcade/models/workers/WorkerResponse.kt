@@ -887,7 +887,6 @@ private constructor(
             private val binding: JsonField<Binding>,
             private val editable: JsonField<Boolean>,
             private val exists: JsonField<Boolean>,
-            private val hint: JsonField<String>,
             private val value: JsonField<String>,
             private val additionalProperties: MutableMap<String, JsonValue>,
         ) {
@@ -903,9 +902,8 @@ private constructor(
                 @JsonProperty("exists")
                 @ExcludeMissing
                 exists: JsonField<Boolean> = JsonMissing.of(),
-                @JsonProperty("hint") @ExcludeMissing hint: JsonField<String> = JsonMissing.of(),
                 @JsonProperty("value") @ExcludeMissing value: JsonField<String> = JsonMissing.of(),
-            ) : this(binding, editable, exists, hint, value, mutableMapOf())
+            ) : this(binding, editable, exists, value, mutableMapOf())
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -924,12 +922,6 @@ private constructor(
              *   the server responded with an unexpected value).
              */
             fun exists(): Optional<Boolean> = exists.getOptional("exists")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun hint(): Optional<String> = hint.getOptional("hint")
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -958,13 +950,6 @@ private constructor(
              * Unlike [exists], this method doesn't throw if the JSON field has an unexpected type.
              */
             @JsonProperty("exists") @ExcludeMissing fun _exists(): JsonField<Boolean> = exists
-
-            /**
-             * Returns the raw JSON value of [hint].
-             *
-             * Unlike [hint], this method doesn't throw if the JSON field has an unexpected type.
-             */
-            @JsonProperty("hint") @ExcludeMissing fun _hint(): JsonField<String> = hint
 
             /**
              * Returns the raw JSON value of [value].
@@ -997,7 +982,6 @@ private constructor(
                 private var binding: JsonField<Binding> = JsonMissing.of()
                 private var editable: JsonField<Boolean> = JsonMissing.of()
                 private var exists: JsonField<Boolean> = JsonMissing.of()
-                private var hint: JsonField<String> = JsonMissing.of()
                 private var value: JsonField<String> = JsonMissing.of()
                 private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
@@ -1006,7 +990,6 @@ private constructor(
                     binding = secret.binding
                     editable = secret.editable
                     exists = secret.exists
-                    hint = secret.hint
                     value = secret.value
                     additionalProperties = secret.additionalProperties.toMutableMap()
                 }
@@ -1043,17 +1026,6 @@ private constructor(
                  * yet supported value.
                  */
                 fun exists(exists: JsonField<Boolean>) = apply { this.exists = exists }
-
-                fun hint(hint: String) = hint(JsonField.of(hint))
-
-                /**
-                 * Sets [Builder.hint] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.hint] with a well-typed [String] value instead.
-                 * This method is primarily for setting the field to an undocumented or not yet
-                 * supported value.
-                 */
-                fun hint(hint: JsonField<String>) = apply { this.hint = hint }
 
                 fun value(value: String) = value(JsonField.of(value))
 
@@ -1094,14 +1066,7 @@ private constructor(
                  * Further updates to this [Builder] will not mutate the returned instance.
                  */
                 fun build(): Secret =
-                    Secret(
-                        binding,
-                        editable,
-                        exists,
-                        hint,
-                        value,
-                        additionalProperties.toMutableMap(),
-                    )
+                    Secret(binding, editable, exists, value, additionalProperties.toMutableMap())
             }
 
             private var validated: Boolean = false
@@ -1114,7 +1079,6 @@ private constructor(
                 binding().ifPresent { it.validate() }
                 editable()
                 exists()
-                hint()
                 value()
                 validated = true
             }
@@ -1138,7 +1102,6 @@ private constructor(
                 (binding.asKnown().getOrNull()?.validity() ?: 0) +
                     (if (editable.asKnown().isPresent) 1 else 0) +
                     (if (exists.asKnown().isPresent) 1 else 0) +
-                    (if (hint.asKnown().isPresent) 1 else 0) +
                     (if (value.asKnown().isPresent) 1 else 0)
 
             class Binding @JsonCreator private constructor(private val value: JsonField<String>) :
@@ -1293,19 +1256,18 @@ private constructor(
                     binding == other.binding &&
                     editable == other.editable &&
                     exists == other.exists &&
-                    hint == other.hint &&
                     value == other.value &&
                     additionalProperties == other.additionalProperties
             }
 
             private val hashCode: Int by lazy {
-                Objects.hash(binding, editable, exists, hint, value, additionalProperties)
+                Objects.hash(binding, editable, exists, value, additionalProperties)
             }
 
             override fun hashCode(): Int = hashCode
 
             override fun toString() =
-                "Secret{binding=$binding, editable=$editable, exists=$exists, hint=$hint, value=$value, additionalProperties=$additionalProperties}"
+                "Secret{binding=$binding, editable=$editable, exists=$exists, value=$value, additionalProperties=$additionalProperties}"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -1969,7 +1931,6 @@ private constructor(
                 private val binding: JsonField<Binding>,
                 private val editable: JsonField<Boolean>,
                 private val exists: JsonField<Boolean>,
-                private val hint: JsonField<String>,
                 private val value: JsonField<String>,
                 private val additionalProperties: MutableMap<String, JsonValue>,
             ) {
@@ -1985,13 +1946,10 @@ private constructor(
                     @JsonProperty("exists")
                     @ExcludeMissing
                     exists: JsonField<Boolean> = JsonMissing.of(),
-                    @JsonProperty("hint")
-                    @ExcludeMissing
-                    hint: JsonField<String> = JsonMissing.of(),
                     @JsonProperty("value")
                     @ExcludeMissing
                     value: JsonField<String> = JsonMissing.of(),
-                ) : this(binding, editable, exists, hint, value, mutableMapOf())
+                ) : this(binding, editable, exists, value, mutableMapOf())
 
                 /**
                  * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
@@ -2010,12 +1968,6 @@ private constructor(
                  *   if the server responded with an unexpected value).
                  */
                 fun exists(): Optional<Boolean> = exists.getOptional("exists")
-
-                /**
-                 * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
-                 *   if the server responded with an unexpected value).
-                 */
-                fun hint(): Optional<String> = hint.getOptional("hint")
 
                 /**
                  * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
@@ -2052,14 +2004,6 @@ private constructor(
                 @JsonProperty("exists") @ExcludeMissing fun _exists(): JsonField<Boolean> = exists
 
                 /**
-                 * Returns the raw JSON value of [hint].
-                 *
-                 * Unlike [hint], this method doesn't throw if the JSON field has an unexpected
-                 * type.
-                 */
-                @JsonProperty("hint") @ExcludeMissing fun _hint(): JsonField<String> = hint
-
-                /**
                  * Returns the raw JSON value of [value].
                  *
                  * Unlike [value], this method doesn't throw if the JSON field has an unexpected
@@ -2091,7 +2035,6 @@ private constructor(
                     private var binding: JsonField<Binding> = JsonMissing.of()
                     private var editable: JsonField<Boolean> = JsonMissing.of()
                     private var exists: JsonField<Boolean> = JsonMissing.of()
-                    private var hint: JsonField<String> = JsonMissing.of()
                     private var value: JsonField<String> = JsonMissing.of()
                     private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
@@ -2100,7 +2043,6 @@ private constructor(
                         binding = clientSecret.binding
                         editable = clientSecret.editable
                         exists = clientSecret.exists
-                        hint = clientSecret.hint
                         value = clientSecret.value
                         additionalProperties = clientSecret.additionalProperties.toMutableMap()
                     }
@@ -2137,17 +2079,6 @@ private constructor(
                      * not yet supported value.
                      */
                     fun exists(exists: JsonField<Boolean>) = apply { this.exists = exists }
-
-                    fun hint(hint: String) = hint(JsonField.of(hint))
-
-                    /**
-                     * Sets [Builder.hint] to an arbitrary JSON value.
-                     *
-                     * You should usually call [Builder.hint] with a well-typed [String] value
-                     * instead. This method is primarily for setting the field to an undocumented or
-                     * not yet supported value.
-                     */
-                    fun hint(hint: JsonField<String>) = apply { this.hint = hint }
 
                     fun value(value: String) = value(JsonField.of(value))
 
@@ -2192,7 +2123,6 @@ private constructor(
                             binding,
                             editable,
                             exists,
-                            hint,
                             value,
                             additionalProperties.toMutableMap(),
                         )
@@ -2208,7 +2138,6 @@ private constructor(
                     binding().ifPresent { it.validate() }
                     editable()
                     exists()
-                    hint()
                     value()
                     validated = true
                 }
@@ -2232,7 +2161,6 @@ private constructor(
                     (binding.asKnown().getOrNull()?.validity() ?: 0) +
                         (if (editable.asKnown().isPresent) 1 else 0) +
                         (if (exists.asKnown().isPresent) 1 else 0) +
-                        (if (hint.asKnown().isPresent) 1 else 0) +
                         (if (value.asKnown().isPresent) 1 else 0)
 
                 class Binding
@@ -2390,19 +2318,18 @@ private constructor(
                         binding == other.binding &&
                         editable == other.editable &&
                         exists == other.exists &&
-                        hint == other.hint &&
                         value == other.value &&
                         additionalProperties == other.additionalProperties
                 }
 
                 private val hashCode: Int by lazy {
-                    Objects.hash(binding, editable, exists, hint, value, additionalProperties)
+                    Objects.hash(binding, editable, exists, value, additionalProperties)
                 }
 
                 override fun hashCode(): Int = hashCode
 
                 override fun toString() =
-                    "ClientSecret{binding=$binding, editable=$editable, exists=$exists, hint=$hint, value=$value, additionalProperties=$additionalProperties}"
+                    "ClientSecret{binding=$binding, editable=$editable, exists=$exists, value=$value, additionalProperties=$additionalProperties}"
             }
 
             override fun equals(other: Any?): Boolean {
