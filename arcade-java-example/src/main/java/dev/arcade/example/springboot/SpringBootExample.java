@@ -1,4 +1,4 @@
-package dev.arcade.example;
+package dev.arcade.example.springboot;
 
 import dev.arcade.client.ArcadeClient;
 import dev.arcade.models.tools.ExecuteToolRequest;

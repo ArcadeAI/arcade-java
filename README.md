@@ -103,9 +103,9 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
 See this table for the available options:
 
 | Setter    | System property  | Environment variable | Required | Default value              |
-| --------- | ---------------- | -------------------- | -------- | -------------------------- |
+| --------- | ---------------- | -------------------- |----------| -------------------------- |
 | `apiKey`  | `arcade.apiKey`  | `ARCADE_API_KEY`     | true     | -                          |
-| `baseUrl` | `arcade.baseUrl` | `ARCADE_BASE_URL`    | true     | `"https://api.arcade.dev"` |
+| `baseUrl` | `arcade.baseUrl` | `ARCADE_BASE_URL`    | false    | `"https://api.arcade.dev"` |
 
 System properties take precedence over environment variables.
 
@@ -720,6 +720,39 @@ ArcadeClient client = ArcadeOkHttpClient.builder()
     .responseValidation(true)
     .build();
 ```
+
+## Spring Boot Integration
+
+The `dev.arcade:arcade-spring-boot-starter` provides a configured `ArcadeClient` bean if the following configuration values are set:
+
+| Spring Property    | Environment variable | Required | Default value              |
+|--------------------|----------------------|----------|--------------------------|
+| `arcade.api-key`   | `ARCADE_API_KEY`     | true     | -                          |
+| `arcade.base-url`  | `ARCADE_BASE_URL`    | false    | `"https://api.arcade.dev"` |
+
+Read the Spring Boot [Externalized Configuration](https://docs.spring.io/spring-boot/reference/features/external-config.html) docs for more ways to configure these properties.
+
+## Run the examples
+
+The examples in `arcade-java-example` can be run in your IDE or on the command line by running:
+
+```shell
+# Configure the environment variables 
+export ARCADE_API_KEY="<your-api-key>"
+export ARCADE_USER_ID="arcade-userid-or-email"
+
+# run the example
+./gradlew :arcade-java-example:run -Pexample=<example-name>
+```
+
+| Example Name            | Description                                                                                                                                                  |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `springboot.SpringBoot` | Calls an aArcade tool using Spring Boot                                                                                                                      |
+| `springai.SpringAI`     | Allows a Spring AI chat client to call Arcade Tools, you must configure an OpenAI key for this example: `export SPRING_AI_OPENAI_API_KEY=<your-open-ai-key>` |
+| `Auth`                  | Demos how to handle an OAuth authorization response                                                                                                          |
+| `PlaySpotify`           | Calls an Arcade tool without a plain Java application.                                                                                                       |
+> [!NOTE]
+> The above Spring Boot (and Spring AI) examples are not web applications, but the demonstrated logic will work the same way in a web app.
 
 ## FAQ
 

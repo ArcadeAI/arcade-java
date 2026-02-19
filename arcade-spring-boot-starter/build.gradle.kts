@@ -3,9 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("arcade.kotlin")
-    id("java")
-    id("io.spring.dependency-management") version "1.1.7"
-    application
+    id("arcade.publish")
 }
 
 dependencies {
