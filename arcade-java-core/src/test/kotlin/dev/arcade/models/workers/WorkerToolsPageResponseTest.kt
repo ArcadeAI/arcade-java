@@ -54,6 +54,29 @@ internal class WorkerToolsPageResponseTest {
                                 .putAdditionalProperty("foo", JsonValue.from("bar"))
                                 .build()
                         )
+                        .metadata(
+                            ToolDefinition.Metadata.builder()
+                                .behavior(
+                                    ToolDefinition.Metadata.Behavior.builder()
+                                        .destructive(true)
+                                        .idempotent(true)
+                                        .openWorld(true)
+                                        .addOperation("string")
+                                        .readOnly(true)
+                                        .build()
+                                )
+                                .classification(
+                                    ToolDefinition.Metadata.Classification.builder()
+                                        .addServiceDomain("string")
+                                        .build()
+                                )
+                                .extras(
+                                    ToolDefinition.Metadata.Extras.builder()
+                                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                                        .build()
+                                )
+                                .build()
+                        )
                         .output(
                             ToolDefinition.Output.builder()
                                 .addAvailableMode("string")
@@ -144,6 +167,29 @@ internal class WorkerToolsPageResponseTest {
                     .formattedSchema(
                         ToolDefinition.FormattedSchema.builder()
                             .putAdditionalProperty("foo", JsonValue.from("bar"))
+                            .build()
+                    )
+                    .metadata(
+                        ToolDefinition.Metadata.builder()
+                            .behavior(
+                                ToolDefinition.Metadata.Behavior.builder()
+                                    .destructive(true)
+                                    .idempotent(true)
+                                    .openWorld(true)
+                                    .addOperation("string")
+                                    .readOnly(true)
+                                    .build()
+                            )
+                            .classification(
+                                ToolDefinition.Metadata.Classification.builder()
+                                    .addServiceDomain("string")
+                                    .build()
+                            )
+                            .extras(
+                                ToolDefinition.Metadata.Extras.builder()
+                                    .putAdditionalProperty("foo", JsonValue.from("bar"))
+                                    .build()
+                            )
                             .build()
                     )
                     .output(
@@ -237,6 +283,29 @@ internal class WorkerToolsPageResponseTest {
                         .formattedSchema(
                             ToolDefinition.FormattedSchema.builder()
                                 .putAdditionalProperty("foo", JsonValue.from("bar"))
+                                .build()
+                        )
+                        .metadata(
+                            ToolDefinition.Metadata.builder()
+                                .behavior(
+                                    ToolDefinition.Metadata.Behavior.builder()
+                                        .destructive(true)
+                                        .idempotent(true)
+                                        .openWorld(true)
+                                        .addOperation("string")
+                                        .readOnly(true)
+                                        .build()
+                                )
+                                .classification(
+                                    ToolDefinition.Metadata.Classification.builder()
+                                        .addServiceDomain("string")
+                                        .build()
+                                )
+                                .extras(
+                                    ToolDefinition.Metadata.Extras.builder()
+                                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                                        .build()
+                                )
                                 .build()
                         )
                         .output(
