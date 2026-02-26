@@ -1683,6 +1683,7 @@ private constructor(
             private val authorizationUrl: JsonField<String>,
             private val clientId: JsonField<String>,
             private val clientSecret: JsonField<ClientSecret>,
+            private val externalId: JsonField<String>,
             private val redirectUri: JsonField<String>,
             private val supportedScopes: JsonField<List<String>>,
             private val additionalProperties: MutableMap<String, JsonValue>,
@@ -1699,6 +1700,9 @@ private constructor(
                 @JsonProperty("client_secret")
                 @ExcludeMissing
                 clientSecret: JsonField<ClientSecret> = JsonMissing.of(),
+                @JsonProperty("external_id")
+                @ExcludeMissing
+                externalId: JsonField<String> = JsonMissing.of(),
                 @JsonProperty("redirect_uri")
                 @ExcludeMissing
                 redirectUri: JsonField<String> = JsonMissing.of(),
@@ -1709,6 +1713,7 @@ private constructor(
                 authorizationUrl,
                 clientId,
                 clientSecret,
+                externalId,
                 redirectUri,
                 supportedScopes,
                 mutableMapOf(),
@@ -1732,6 +1737,12 @@ private constructor(
              *   the server responded with an unexpected value).
              */
             fun clientSecret(): Optional<ClientSecret> = clientSecret.getOptional("client_secret")
+
+            /**
+             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun externalId(): Optional<String> = externalId.getOptional("external_id")
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -1773,6 +1784,16 @@ private constructor(
             @JsonProperty("client_secret")
             @ExcludeMissing
             fun _clientSecret(): JsonField<ClientSecret> = clientSecret
+
+            /**
+             * Returns the raw JSON value of [externalId].
+             *
+             * Unlike [externalId], this method doesn't throw if the JSON field has an unexpected
+             * type.
+             */
+            @JsonProperty("external_id")
+            @ExcludeMissing
+            fun _externalId(): JsonField<String> = externalId
 
             /**
              * Returns the raw JSON value of [redirectUri].
@@ -1818,6 +1839,7 @@ private constructor(
                 private var authorizationUrl: JsonField<String> = JsonMissing.of()
                 private var clientId: JsonField<String> = JsonMissing.of()
                 private var clientSecret: JsonField<ClientSecret> = JsonMissing.of()
+                private var externalId: JsonField<String> = JsonMissing.of()
                 private var redirectUri: JsonField<String> = JsonMissing.of()
                 private var supportedScopes: JsonField<MutableList<String>>? = null
                 private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
@@ -1827,6 +1849,7 @@ private constructor(
                     authorizationUrl = oauth2.authorizationUrl
                     clientId = oauth2.clientId
                     clientSecret = oauth2.clientSecret
+                    externalId = oauth2.externalId
                     redirectUri = oauth2.redirectUri
                     supportedScopes = oauth2.supportedScopes.map { it.toMutableList() }
                     additionalProperties = oauth2.additionalProperties.toMutableMap()
@@ -1869,6 +1892,19 @@ private constructor(
                  */
                 fun clientSecret(clientSecret: JsonField<ClientSecret>) = apply {
                     this.clientSecret = clientSecret
+                }
+
+                fun externalId(externalId: String) = externalId(JsonField.of(externalId))
+
+                /**
+                 * Sets [Builder.externalId] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.externalId] with a well-typed [String] value
+                 * instead. This method is primarily for setting the field to an undocumented or not
+                 * yet supported value.
+                 */
+                fun externalId(externalId: JsonField<String>) = apply {
+                    this.externalId = externalId
                 }
 
                 fun redirectUri(redirectUri: String) = redirectUri(JsonField.of(redirectUri))
@@ -1942,6 +1978,7 @@ private constructor(
                         authorizationUrl,
                         clientId,
                         clientSecret,
+                        externalId,
                         redirectUri,
                         (supportedScopes ?: JsonMissing.of()).map { it.toImmutable() },
                         additionalProperties.toMutableMap(),
@@ -1958,6 +1995,7 @@ private constructor(
                 authorizationUrl()
                 clientId()
                 clientSecret().ifPresent { it.validate() }
+                externalId()
                 redirectUri()
                 supportedScopes()
                 validated = true
@@ -1982,6 +2020,7 @@ private constructor(
                 (if (authorizationUrl.asKnown().isPresent) 1 else 0) +
                     (if (clientId.asKnown().isPresent) 1 else 0) +
                     (clientSecret.asKnown().getOrNull()?.validity() ?: 0) +
+                    (if (externalId.asKnown().isPresent) 1 else 0) +
                     (if (redirectUri.asKnown().isPresent) 1 else 0) +
                     (supportedScopes.asKnown().getOrNull()?.size ?: 0)
 
@@ -2401,6 +2440,7 @@ private constructor(
                     authorizationUrl == other.authorizationUrl &&
                     clientId == other.clientId &&
                     clientSecret == other.clientSecret &&
+                    externalId == other.externalId &&
                     redirectUri == other.redirectUri &&
                     supportedScopes == other.supportedScopes &&
                     additionalProperties == other.additionalProperties
@@ -2411,6 +2451,7 @@ private constructor(
                     authorizationUrl,
                     clientId,
                     clientSecret,
+                    externalId,
                     redirectUri,
                     supportedScopes,
                     additionalProperties,
@@ -2420,7 +2461,7 @@ private constructor(
             override fun hashCode(): Int = hashCode
 
             override fun toString() =
-                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, redirectUri=$redirectUri, supportedScopes=$supportedScopes, additionalProperties=$additionalProperties}"
+                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, externalId=$externalId, redirectUri=$redirectUri, supportedScopes=$supportedScopes, additionalProperties=$additionalProperties}"
         }
 
         class Secrets
