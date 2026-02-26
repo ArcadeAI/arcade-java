@@ -11,6 +11,7 @@ import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonField
 import dev.arcade.core.JsonMissing
 import dev.arcade.core.JsonValue
+import dev.arcade.core.checkKnown
 import dev.arcade.core.toImmutable
 import dev.arcade.errors.ArcadeInvalidDataException
 import java.util.Collections
@@ -1683,6 +1684,7 @@ private constructor(
             private val clientId: JsonField<String>,
             private val clientSecret: JsonField<ClientSecret>,
             private val redirectUri: JsonField<String>,
+            private val supportedScopes: JsonField<List<String>>,
             private val additionalProperties: MutableMap<String, JsonValue>,
         ) {
 
@@ -1700,7 +1702,17 @@ private constructor(
                 @JsonProperty("redirect_uri")
                 @ExcludeMissing
                 redirectUri: JsonField<String> = JsonMissing.of(),
-            ) : this(authorizationUrl, clientId, clientSecret, redirectUri, mutableMapOf())
+                @JsonProperty("supported_scopes")
+                @ExcludeMissing
+                supportedScopes: JsonField<List<String>> = JsonMissing.of(),
+            ) : this(
+                authorizationUrl,
+                clientId,
+                clientSecret,
+                redirectUri,
+                supportedScopes,
+                mutableMapOf(),
+            )
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -1726,6 +1738,13 @@ private constructor(
              *   the server responded with an unexpected value).
              */
             fun redirectUri(): Optional<String> = redirectUri.getOptional("redirect_uri")
+
+            /**
+             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun supportedScopes(): Optional<List<String>> =
+                supportedScopes.getOptional("supported_scopes")
 
             /**
              * Returns the raw JSON value of [authorizationUrl].
@@ -1765,6 +1784,16 @@ private constructor(
             @ExcludeMissing
             fun _redirectUri(): JsonField<String> = redirectUri
 
+            /**
+             * Returns the raw JSON value of [supportedScopes].
+             *
+             * Unlike [supportedScopes], this method doesn't throw if the JSON field has an
+             * unexpected type.
+             */
+            @JsonProperty("supported_scopes")
+            @ExcludeMissing
+            fun _supportedScopes(): JsonField<List<String>> = supportedScopes
+
             @JsonAnySetter
             private fun putAdditionalProperty(key: String, value: JsonValue) {
                 additionalProperties.put(key, value)
@@ -1790,6 +1819,7 @@ private constructor(
                 private var clientId: JsonField<String> = JsonMissing.of()
                 private var clientSecret: JsonField<ClientSecret> = JsonMissing.of()
                 private var redirectUri: JsonField<String> = JsonMissing.of()
+                private var supportedScopes: JsonField<MutableList<String>>? = null
                 private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
                 @JvmSynthetic
@@ -1798,6 +1828,7 @@ private constructor(
                     clientId = oauth2.clientId
                     clientSecret = oauth2.clientSecret
                     redirectUri = oauth2.redirectUri
+                    supportedScopes = oauth2.supportedScopes.map { it.toMutableList() }
                     additionalProperties = oauth2.additionalProperties.toMutableMap()
                 }
 
@@ -1853,6 +1884,32 @@ private constructor(
                     this.redirectUri = redirectUri
                 }
 
+                fun supportedScopes(supportedScopes: List<String>) =
+                    supportedScopes(JsonField.of(supportedScopes))
+
+                /**
+                 * Sets [Builder.supportedScopes] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.supportedScopes] with a well-typed
+                 * `List<String>` value instead. This method is primarily for setting the field to
+                 * an undocumented or not yet supported value.
+                 */
+                fun supportedScopes(supportedScopes: JsonField<List<String>>) = apply {
+                    this.supportedScopes = supportedScopes.map { it.toMutableList() }
+                }
+
+                /**
+                 * Adds a single [String] to [supportedScopes].
+                 *
+                 * @throws IllegalStateException if the field was previously set to a non-list.
+                 */
+                fun addSupportedScope(supportedScope: String) = apply {
+                    supportedScopes =
+                        (supportedScopes ?: JsonField.of(mutableListOf())).also {
+                            checkKnown("supportedScopes", it).add(supportedScope)
+                        }
+                }
+
                 fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
                     this.additionalProperties.clear()
                     putAllAdditionalProperties(additionalProperties)
@@ -1886,6 +1943,7 @@ private constructor(
                         clientId,
                         clientSecret,
                         redirectUri,
+                        (supportedScopes ?: JsonMissing.of()).map { it.toImmutable() },
                         additionalProperties.toMutableMap(),
                     )
             }
@@ -1901,6 +1959,7 @@ private constructor(
                 clientId()
                 clientSecret().ifPresent { it.validate() }
                 redirectUri()
+                supportedScopes()
                 validated = true
             }
 
@@ -1923,7 +1982,8 @@ private constructor(
                 (if (authorizationUrl.asKnown().isPresent) 1 else 0) +
                     (if (clientId.asKnown().isPresent) 1 else 0) +
                     (clientSecret.asKnown().getOrNull()?.validity() ?: 0) +
-                    (if (redirectUri.asKnown().isPresent) 1 else 0)
+                    (if (redirectUri.asKnown().isPresent) 1 else 0) +
+                    (supportedScopes.asKnown().getOrNull()?.size ?: 0)
 
             class ClientSecret
             @JsonCreator(mode = JsonCreator.Mode.DISABLED)
@@ -2342,6 +2402,7 @@ private constructor(
                     clientId == other.clientId &&
                     clientSecret == other.clientSecret &&
                     redirectUri == other.redirectUri &&
+                    supportedScopes == other.supportedScopes &&
                     additionalProperties == other.additionalProperties
             }
 
@@ -2351,6 +2412,7 @@ private constructor(
                     clientId,
                     clientSecret,
                     redirectUri,
+                    supportedScopes,
                     additionalProperties,
                 )
             }
@@ -2358,7 +2420,7 @@ private constructor(
             override fun hashCode(): Int = hashCode
 
             override fun toString() =
-                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, redirectUri=$redirectUri, additionalProperties=$additionalProperties}"
+                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, redirectUri=$redirectUri, supportedScopes=$supportedScopes, additionalProperties=$additionalProperties}"
         }
 
         class Secrets
