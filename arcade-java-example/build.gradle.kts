@@ -18,6 +18,12 @@ dependencies {
     // only needed for SpringAIExample
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.6")
+
+    // Only needed for GmailExample
+    implementation("com.google.api-client:google-api-client:2.9.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.39.0")
+    implementation("com.google.apis:google-api-services-gmail:v1-rev20260112-2.0.0")
+
 }
 
 // only needed for SpringAIExample
