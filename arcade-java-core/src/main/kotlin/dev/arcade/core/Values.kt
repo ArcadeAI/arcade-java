@@ -274,6 +274,42 @@ sealed class JsonValue : JsonField<Nothing>() {
 
     fun <R : Any> convert(type: Class<R>): R? = JSON_MAPPER.convertValue(this, type)
 
+    // -------------------------------------------------------------------------
+    // Start of manually added code
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns this value's map representation, or an empty map if this value is not a JSON object.
+     *
+     * Example usage:
+     * ```java
+     * Map<String, JsonValue> map = jsonValue.toMapOrEmpty();
+     * ```
+     */
+    fun toMapOrEmpty(): Map<String, JsonValue> =
+        when (this) {
+            is JsonObject -> values
+            else -> emptyMap()
+        }
+
+    /**
+     * Returns this value's list representation, or an empty list if this value is not a JSON array.
+     *
+     * Example usage:
+     * ```java
+     * List<JsonValue> items = jsonValue.toListOrEmpty();
+     * ```
+     */
+    fun toListOrEmpty(): List<JsonValue> =
+        when (this) {
+            is JsonArray -> values
+            else -> emptyList()
+        }
+
+    // -------------------------------------------------------------------------
+    // End of manually added code
+    // -------------------------------------------------------------------------
+
     /** Returns the result of calling the [visitor] method corresponding to this value's variant. */
     fun <R> accept(visitor: Visitor<R>): R =
         when (this) {

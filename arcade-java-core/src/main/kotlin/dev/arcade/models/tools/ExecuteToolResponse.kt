@@ -8,8 +8,10 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import dev.arcade.core.Enum
 import dev.arcade.core.ExcludeMissing
+import dev.arcade.core.JsonArray
 import dev.arcade.core.JsonField
 import dev.arcade.core.JsonMissing
+import dev.arcade.core.JsonObject
 import dev.arcade.core.JsonValue
 import dev.arcade.core.checkKnown
 import dev.arcade.core.checkRequired
@@ -466,6 +468,78 @@ private constructor(
          * ```
          */
         @JsonProperty("value") @ExcludeMissing fun _value(): JsonValue = value
+
+        // -------------------------------------------------------------------------
+        // Start of manually added code
+        // -------------------------------------------------------------------------
+
+        /**
+         * Returns an [Optional] containing the output value as a `Map<String, JsonValue>`, or an
+         * empty [Optional] if the value is not a JSON object.
+         *
+         * Example usage:
+         * ```java
+         * Map<String, JsonValue> result = response.output()
+         *     .flatMap(Output::valueAsObject)
+         *     .orElse(Map.of());
+         * ```
+         */
+        fun valueAsObject(): Optional<Map<String, JsonValue>> =
+            when (value) {
+                is JsonObject -> Optional.of(value.values)
+                else -> Optional.empty()
+            }
+
+        /**
+         * Returns the output value as a `Map<String, JsonValue>`, or an empty map if the value is
+         * not a JSON object.
+         *
+         * Example usage:
+         * ```java
+         * Map<String, JsonValue> result = output.valueAsObjectOrEmpty();
+         * ```
+         */
+        fun valueAsObjectOrEmpty(): Map<String, JsonValue> =
+            when (value) {
+                is JsonObject -> value.values
+                else -> emptyMap()
+            }
+
+        /**
+         * Returns an [Optional] containing the output value as a `List<JsonValue>`, or an empty
+         * [Optional] if the value is not a JSON array.
+         *
+         * Example usage:
+         * ```java
+         * List<JsonValue> items = response.output()
+         *     .flatMap(Output::valueAsArray)
+         *     .orElse(List.of());
+         * ```
+         */
+        fun valueAsArray(): Optional<List<JsonValue>> =
+            when (value) {
+                is JsonArray -> Optional.of(value.values)
+                else -> Optional.empty()
+            }
+
+        /**
+         * Returns the output value as a `List<JsonValue>`, or an empty list if the value is not a
+         * JSON array.
+         *
+         * Example usage:
+         * ```java
+         * List<JsonValue> items = output.valueAsArrayOrEmpty();
+         * ```
+         */
+        fun valueAsArrayOrEmpty(): List<JsonValue> =
+            when (value) {
+                is JsonArray -> value.values
+                else -> emptyList()
+            }
+
+        // -------------------------------------------------------------------------
+        // End of manually added code
+        // -------------------------------------------------------------------------
 
         /**
          * Returns the raw JSON value of [authorization].

@@ -216,6 +216,9 @@ private constructor(
         /** JSON input to the tool, if any */
         fun input(input: Input) = input(JsonField.of(input))
 
+        /** JSON input to the tool, if any */
+        fun input(input: Map<String, Any?>) = input(Input.from(input))
+
         /**
          * Sets [Builder.input] to an arbitrary JSON value.
          *
@@ -359,6 +362,11 @@ private constructor(
 
             /** Returns a mutable builder for constructing an instance of [Input]. */
             @JvmStatic fun builder() = Builder()
+
+            /** Converts a Map of input objects to an [Input] Map<String, JsonValue>. */
+            @JvmStatic
+            fun from(input: Map<String, Any?>) =
+                Input(input.mapValues { (_, value) -> JsonValue.from(value) })
         }
 
         /** A builder for [Input]. */
