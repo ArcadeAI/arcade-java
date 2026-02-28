@@ -4,19 +4,20 @@ import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 import dev.arcade.models.tools.ExecuteToolRequest;
 import dev.arcade.models.tools.ExecuteToolResponse;
-import dev.arcade.models.tools.ToolExecuteParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example of calling a tool using the Arcade Java SDK.
+ * <p>
+ * Both the {@code ARCADE_USER_ID} and {@code ARCADE_API_KEY} environment variables must be set.
+ * See the <a href="https://docs.arcade.dev/en/get-started/setup/api-keys">Getting Your API Key</a> guide to create an API Key.
+ * Your username can be found in the lower left corner of your <a href="https://app.arcade.dev/home">Arcade console</a>.
  */
 public class PlaySpotifyExample {
 
-    /**
-     * Executes the Spotify.ResumePlayback, both the <code>ARCADE_USER_ID</code> and <code>ARCADE_API_KEY</code> environment variables must be set.
-     * See the <a href="https://docs.arcade.dev/en/get-started/setup/api-keys">Getting Your API Key</a> guide to create an API Key.
-     * Your username can be found in the lower left corner of your <a href="https://app.arcade.dev/home">Arcade console</a>.
-     * @param args Not used.
-     */
+    private static final Logger logger = LoggerFactory.getLogger(PlaySpotifyExample.class);
+
     public static void main(String[] args) {
 
         String userId = System.getenv("ARCADE_USER_ID"); // the Spotify tool requires a userId
@@ -27,17 +28,15 @@ public class PlaySpotifyExample {
         // Configures using the `ARCADE_API_KEY` environment variable
         ArcadeClient client = ArcadeOkHttpClient.fromEnv();
 
-        ToolExecuteParams params = ToolExecuteParams.builder()
-                .executeToolRequest(ExecuteToolRequest.builder()
+        ExecuteToolResponse response = client.tools()
+                .execute(ExecuteToolRequest.builder()
                         .toolName("Spotify.ResumePlayback@1.0.2")
                         .userId(userId)
-                        .build())
-                .build();
-        ExecuteToolResponse executeToolResponse = client.tools().execute(params);
-        executeToolResponse
-                .output()
+                        .build());
+
+        response.output()
                 .ifPresentOrElse(
-                        output -> System.out.println("Tool output: " + output._value()),
-                        () -> System.out.println("No output for this tool"));
+                        output -> logger.info("Tool output: {}", output._value()),
+                        () -> logger.info("No output for this tool"));
     }
 }

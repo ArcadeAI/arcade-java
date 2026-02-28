@@ -1,13 +1,11 @@
 package dev.arcade.example.springai;
 
 import dev.arcade.client.ArcadeClient;
-import dev.arcade.core.JsonValue;
 import dev.arcade.models.AuthorizationResponse;
 import dev.arcade.models.tools.AuthorizeToolRequest;
 import dev.arcade.models.tools.ExecuteToolRequest;
 import dev.arcade.models.tools.ExecuteToolResponse;
-import dev.arcade.models.tools.ToolAuthorizeParams;
-import dev.arcade.models.tools.ToolExecuteParams;
+import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,7 @@ public class SpringAIExample {
         Error Handling: If a song fails to play or the tool returns an error, check the state again to see if the player is disconnected or if the track simply wasn't found.
         Tone: Be concise, upbeat, and music-focused.
         Chain of Thought: When a user asks for a song, your internal logic should be: Check State -> Inform User -> Execute Play.
-    """;
+        """;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringAIExample.class, args);
@@ -80,13 +78,7 @@ public class SpringAIExample {
                 name = "play_song",
                 description = "Plays a song by an artist and queues four more songs by the same artist")
         String play(@ToolParam(description = "The name of the artist to play") String name) {
-            return executeTool(
-                    "Spotify.PlayArtistByName",
-                    ExecuteToolRequest.Input.builder()
-
-                            // map the above input as "additional Properties"
-                            .putAdditionalProperty("name", JsonValue.from(name))
-                            .build());
+            return executeTool("Spotify.PlayArtistByName", Map.of("name", name));
         }
 
         /**
@@ -103,30 +95,25 @@ public class SpringAIExample {
                 This tool does not perform any actions. Use other tools to control playback.
                 """)
         String playbackState() {
-            return executeTool(
-                    "Spotify.GetPlaybackState",
-                    ExecuteToolRequest.Input.builder().build()); // this tool has no inputs
+            return executeTool("Spotify.GetPlaybackState", Map.of());
         }
 
         /**
-         * Executes the specified tool with the provided input.
+         * Executes the specified tool with the provided input. Handles authorization and errors.
          *
          * @param toolName the name of the tool to be executed
          * @param input the input parameters required for tool execution
          * @return the result of the tool execution as a string; the result may include
          *         the output of the tool, an error message, or an authorization requirement
          */
-        private String executeTool(String toolName, ExecuteToolRequest.Input input) {
+        private String executeTool(String toolName, Map<String, Object> input) {
             log.debug("Executing tool {}, with input: {}", toolName, input);
             try {
-                // call the tool
                 ExecuteToolResponse response = client.tools()
-                        .execute(ToolExecuteParams.builder()
-                                .executeToolRequest(ExecuteToolRequest.builder()
-                                        .toolName(toolName)
-                                        .userId(userId)
-                                        .input(input)
-                                        .build())
+                        .execute(ExecuteToolRequest.builder()
+                                .toolName(toolName)
+                                .userId(userId)
+                                .input(input)
                                 .build());
 
                 log.debug(
@@ -138,8 +125,7 @@ public class SpringAIExample {
                 if (response.success().orElse(false)) {
                     String result =
                             response.output().map(o -> o._value().toString()).orElse("{}");
-
-                    log.debug("Tool {} returned", result);
+                    log.debug("Tool {} returned: {}", toolName, result);
                     return result;
                 }
 
@@ -151,8 +137,8 @@ public class SpringAIExample {
 
                     if (errorMessage.contains("authorization required")) {
                         AuthorizationResult auth = requestAuthorization(toolName);
-                        if (auth.url() != null) {
-                            log.debug("Tool requires {} authorization, open a browser to {}", toolName, auth.url());
+                        if (auth.requiresAction()) {
+                            log.debug("Tool {} requires authorization, open a browser to {}", toolName, auth.url());
                             return String.format(
                                     "The '%s' tool requires authorization, open a browser to %s to continue.",
                                     toolName, auth.url());
@@ -167,8 +153,8 @@ public class SpringAIExample {
                 String message = e.getMessage();
                 if (message != null && message.contains("authorization")) {
                     AuthorizationResult auth = requestAuthorization(toolName);
-                    if (auth.url() != null) {
-                        log.debug("Tool requires {} authorization, open a browser to {}", toolName, auth.url());
+                    if (auth.requiresAction()) {
+                        log.debug("Tool {} requires authorization, open a browser to {}", toolName, auth.url());
                         return String.format(
                                 "The '%s' tool requires authorization, open a browser to %s to continue.",
                                 toolName, auth.url());
@@ -184,19 +170,15 @@ public class SpringAIExample {
          */
         public AuthorizationResult requestAuthorization(String toolName) {
             try {
-                AuthorizeToolRequest authRequest = AuthorizeToolRequest.builder()
-                        .toolName(toolName)
-                        .userId(userId)
-                        .build();
-
                 AuthorizationResponse response = client.tools()
-                        .authorize(ToolAuthorizeParams.builder()
-                                .authorizeToolRequest(authRequest)
+                        .authorize(AuthorizeToolRequest.builder()
+                                .toolName(toolName)
+                                .userId(userId)
                                 .build());
 
                 Optional<String> url = response.url();
-                Optional<AuthorizationResponse.Status> status = response.status();
-                String statusValue = status.map(s -> s.value().name()).orElse("unknown");
+                String statusValue =
+                        response.status().map(s -> s.value().name()).orElse("unknown");
 
                 if ("PENDING".equalsIgnoreCase(statusValue) && url.isPresent()) {
                     return new AuthorizationResult(toolName, url.get(), statusValue);
@@ -212,16 +194,6 @@ public class SpringAIExample {
             public boolean requiresAction() {
                 return url != null && "PENDING".equalsIgnoreCase(status);
             }
-        }
-
-        public enum ResultType {
-            album,
-            artist,
-            playlist,
-            track,
-            show,
-            episode,
-            audiobook
         }
     }
 }
