@@ -1,6 +1,15 @@
 rootProject.name = "arcade-java-root"
 
-include("arcade-java")
-include("arcade-java-client-okhttp")
-include("arcade-java-core")
-include("arcade-java-example")
+val projectNames = rootDir.listFiles()
+    ?.asSequence()
+    .orEmpty()
+    .filter { file ->
+        file.isDirectory &&
+        file.name.startsWith("arcade-java") &&
+        file.listFiles()?.asSequence().orEmpty().any { it.name == "build.gradle.kts" }
+    }
+    .map { it.name }
+    .toList() +
+    listOf("arcade-spring-boot-starter")
+println("projects: $projectNames")
+projectNames.forEach { include(it) }

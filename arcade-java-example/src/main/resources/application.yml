@@ -1,0 +1,8 @@
+spring:
+  main:
+    web-application-type: none
+  config:
+    import: optional:application-local.yml
+logging:
+  level:
+    dev.arcade.example: DEBUG

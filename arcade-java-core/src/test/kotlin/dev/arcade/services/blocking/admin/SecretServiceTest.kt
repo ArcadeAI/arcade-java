@@ -4,56 +4,57 @@ package dev.arcade.services.blocking.admin
 
 import dev.arcade.TestServerExtension
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
-import dev.arcade.models.AdminSecretCreateParams
-import dev.arcade.models.AdminSecretDeleteParams
-import dev.arcade.models.AdminSecretListParams
+import dev.arcade.models.admin.secrets.SecretCreateParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestServerExtension::class)
-class SecretServiceTest {
+internal class SecretServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val secretService = client.admin().secrets()
+
         val secretResponse =
             secretService.create(
-                AdminSecretCreateParams.builder()
+                SecretCreateParams.builder()
                     .secretKey("secret_key")
                     .value("value")
                     .description("description")
                     .build()
             )
-        println(secretResponse)
+
         secretResponse.validate()
     }
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val secretService = client.admin().secrets()
-        val adminSecretListResponse = secretService.list(AdminSecretListParams.builder().build())
-        println(adminSecretListResponse)
-        adminSecretListResponse.validate()
+
+        val secrets = secretService.list()
+
+        secrets.validate()
     }
 
     @Test
-    fun callDelete() {
+    fun delete() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val secretService = client.admin().secrets()
-        secretService.delete(AdminSecretDeleteParams.builder().secretId("secret_id").build())
+
+        secretService.delete("secret_id")
     }
 }

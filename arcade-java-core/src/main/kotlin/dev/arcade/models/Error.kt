@@ -10,51 +10,66 @@ import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonField
 import dev.arcade.core.JsonMissing
 import dev.arcade.core.JsonValue
-import dev.arcade.core.NoAutoDetect
-import dev.arcade.core.immutableEmptyMap
-import dev.arcade.core.toImmutable
+import dev.arcade.errors.ArcadeInvalidDataException
+import java.util.Collections
 import java.util.Objects
 import java.util.Optional
 
-@NoAutoDetect
 class Error
-@JsonCreator
+@JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
-    @JsonProperty("message")
-    @ExcludeMissing
-    private val message: JsonField<String> = JsonMissing.of(),
-    @JsonProperty("name") @ExcludeMissing private val name: JsonField<String> = JsonMissing.of(),
-    @JsonAnySetter private val additionalProperties: Map<String, JsonValue> = immutableEmptyMap(),
+    private val message: JsonField<String>,
+    private val name: JsonField<String>,
+    private val additionalProperties: MutableMap<String, JsonValue>,
 ) {
 
-    fun message(): Optional<String> = Optional.ofNullable(message.getNullable("message"))
+    @JsonCreator
+    private constructor(
+        @JsonProperty("message") @ExcludeMissing message: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("name") @ExcludeMissing name: JsonField<String> = JsonMissing.of(),
+    ) : this(message, name, mutableMapOf())
 
-    fun name(): Optional<String> = Optional.ofNullable(name.getNullable("name"))
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun message(): Optional<String> = message.getOptional("message")
 
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun name(): Optional<String> = name.getOptional("name")
+
+    /**
+     * Returns the raw JSON value of [message].
+     *
+     * Unlike [message], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("message") @ExcludeMissing fun _message(): JsonField<String> = message
 
+    /**
+     * Returns the raw JSON value of [name].
+     *
+     * Unlike [name], this method doesn't throw if the JSON field has an unexpected type.
+     */
     @JsonProperty("name") @ExcludeMissing fun _name(): JsonField<String> = name
+
+    @JsonAnySetter
+    private fun putAdditionalProperty(key: String, value: JsonValue) {
+        additionalProperties.put(key, value)
+    }
 
     @JsonAnyGetter
     @ExcludeMissing
-    fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
-
-    private var validated: Boolean = false
-
-    fun validate(): Error = apply {
-        if (validated) {
-            return@apply
-        }
-
-        message()
-        name()
-        validated = true
-    }
+    fun _additionalProperties(): Map<String, JsonValue> =
+        Collections.unmodifiableMap(additionalProperties)
 
     fun toBuilder() = Builder().from(this)
 
     companion object {
 
+        /** Returns a mutable builder for constructing an instance of [Error]. */
         @JvmStatic fun builder() = Builder()
     }
 
@@ -74,10 +89,22 @@ private constructor(
 
         fun message(message: String) = message(JsonField.of(message))
 
+        /**
+         * Sets [Builder.message] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.message] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun message(message: JsonField<String>) = apply { this.message = message }
 
         fun name(name: String) = name(JsonField.of(name))
 
+        /**
+         * Sets [Builder.name] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.name] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
         fun name(name: JsonField<String>) = apply { this.name = name }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
@@ -99,20 +126,55 @@ private constructor(
             keys.forEach(::removeAdditionalProperty)
         }
 
-        fun build(): Error = Error(message, name, additionalProperties.toImmutable())
+        /**
+         * Returns an immutable instance of [Error].
+         *
+         * Further updates to this [Builder] will not mutate the returned instance.
+         */
+        fun build(): Error = Error(message, name, additionalProperties.toMutableMap())
     }
+
+    private var validated: Boolean = false
+
+    fun validate(): Error = apply {
+        if (validated) {
+            return@apply
+        }
+
+        message()
+        name()
+        validated = true
+    }
+
+    fun isValid(): Boolean =
+        try {
+            validate()
+            true
+        } catch (e: ArcadeInvalidDataException) {
+            false
+        }
+
+    /**
+     * Returns a score indicating how many valid values are contained in this object recursively.
+     *
+     * Used for best match union deserialization.
+     */
+    @JvmSynthetic
+    internal fun validity(): Int =
+        (if (message.asKnown().isPresent) 1 else 0) + (if (name.asKnown().isPresent) 1 else 0)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true
         }
 
-        return /* spotless:off */ other is Error && message == other.message && name == other.name && additionalProperties == other.additionalProperties /* spotless:on */
+        return other is Error &&
+            message == other.message &&
+            name == other.name &&
+            additionalProperties == other.additionalProperties
     }
 
-    /* spotless:off */
     private val hashCode: Int by lazy { Objects.hash(message, name, additionalProperties) }
-    /* spotless:on */
 
     override fun hashCode(): Int = hashCode
 

@@ -1,0 +1,46 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package dev.arcade.models.tools.formatted
+
+import dev.arcade.core.http.QueryParams
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+
+internal class FormattedGetParamsTest {
+
+    @Test
+    fun create() {
+        FormattedGetParams.builder().name("name").format("format").userId("user_id").build()
+    }
+
+    @Test
+    fun pathParams() {
+        val params = FormattedGetParams.builder().name("name").build()
+
+        assertThat(params._pathParam(0)).isEqualTo("name")
+        // out-of-bound path param
+        assertThat(params._pathParam(1)).isEqualTo("")
+    }
+
+    @Test
+    fun queryParams() {
+        val params =
+            FormattedGetParams.builder().name("name").format("format").userId("user_id").build()
+
+        val queryParams = params._queryParams()
+
+        assertThat(queryParams)
+            .isEqualTo(
+                QueryParams.builder().put("format", "format").put("user_id", "user_id").build()
+            )
+    }
+
+    @Test
+    fun queryParamsWithoutOptionalFields() {
+        val params = FormattedGetParams.builder().name("name").build()
+
+        val queryParams = params._queryParams()
+
+        assertThat(queryParams).isEqualTo(QueryParams.builder().build())
+    }
+}

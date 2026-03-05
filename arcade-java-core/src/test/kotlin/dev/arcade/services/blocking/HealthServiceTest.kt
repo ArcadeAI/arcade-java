@@ -4,23 +4,23 @@ package dev.arcade.services.blocking
 
 import dev.arcade.TestServerExtension
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
-import dev.arcade.models.HealthCheckParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestServerExtension::class)
-class HealthServiceTest {
+internal class HealthServiceTest {
 
     @Test
-    fun callCheck() {
+    fun check() {
         val client =
             ArcadeOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("My API Key")
                 .build()
         val healthService = client.health()
-        val healthSchema = healthService.check(HealthCheckParams.builder().build())
-        println(healthSchema)
+
+        val healthSchema = healthService.check()
+
         healthSchema.validate()
     }
 }

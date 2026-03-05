@@ -2,7 +2,6 @@
 
 package dev.arcade.services
 
-import com.fasterxml.jackson.databind.json.JsonMapper
 import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.ok
@@ -15,25 +14,18 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import dev.arcade.client.ArcadeClient
 import dev.arcade.client.okhttp.ArcadeOkHttpClient
 import dev.arcade.core.JsonValue
-import dev.arcade.core.jsonMapper
-import dev.arcade.models.AuthorizationContext
-import dev.arcade.models.AuthorizationResponse
-import dev.arcade.models.ChatCompletionCreateParams
-import dev.arcade.models.ChatMessage
-import dev.arcade.models.ChatRequest
-import dev.arcade.models.ChatResponse
-import dev.arcade.models.Choice
-import dev.arcade.models.ExecuteToolRequest
-import dev.arcade.models.ExecuteToolResponse
-import dev.arcade.models.ToolExecuteParams
-import dev.arcade.models.Usage
+import dev.arcade.models.chat.ChatMessage
+import dev.arcade.models.chat.ChatRequest
+import dev.arcade.models.chat.completions.CompletionCreateParams
+import dev.arcade.models.tools.ExecuteToolRequest
+import dev.arcade.models.tools.ToolExecuteParams
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.ResourceLock
 
 @WireMockTest
-class ServiceParamsTest {
-
-    private val JSON_MAPPER: JsonMapper = jsonMapper()
+@ResourceLock("https://github.com/wiremock/wiremock/issues/169")
+internal class ServiceParamsTest {
 
     private lateinit var client: ArcadeClient
 
@@ -41,23 +33,18 @@ class ServiceParamsTest {
     fun beforeEach(wmRuntimeInfo: WireMockRuntimeInfo) {
         client =
             ArcadeOkHttpClient.builder()
+                .baseUrl(wmRuntimeInfo.httpBaseUrl)
                 .apiKey("My API Key")
-                .baseUrl(wmRuntimeInfo.getHttpBaseUrl())
                 .build()
     }
 
     @Test
-    fun completionsCreateWithAdditionalParams() {
-        val additionalHeaders = mutableMapOf<String, List<String>>()
+    fun create() {
+        val completionService = client.chat().completions()
+        stubFor(post(anyUrl()).willReturn(ok("{}")))
 
-        additionalHeaders.put("x-test-header", listOf("abc1234"))
-
-        val additionalQueryParams = mutableMapOf<String, List<String>>()
-
-        additionalQueryParams.put("test_query_param", listOf("def567"))
-
-        val params =
-            ChatCompletionCreateParams.builder()
+        completionService.create(
+            CompletionCreateParams.builder()
                 .chatRequest(
                     ChatRequest.builder()
                         .frequencyPenalty(0.0)
@@ -111,112 +98,24 @@ class ServiceParamsTest {
                         .user("user")
                         .build()
                 )
-                .additionalHeaders(additionalHeaders)
-                .additionalQueryParams(additionalQueryParams)
+                .putAdditionalHeader("Secret-Header", "42")
+                .putAdditionalQueryParam("secret_query_param", "42")
                 .build()
-
-        val apiResponse =
-            ChatResponse.builder()
-                .id("id")
-                .addChoice(
-                    Choice.builder()
-                        .finishReason("finish_reason")
-                        .index(0L)
-                        .logprobs(JsonValue.from(mapOf<String, Any>()))
-                        .message(
-                            ChatMessage.builder()
-                                .content("content")
-                                .role("role")
-                                .name("name")
-                                .toolCallId("tool_call_id")
-                                .addToolCall(
-                                    ChatMessage.ToolCall.builder()
-                                        .id("id")
-                                        .function(
-                                            ChatMessage.ToolCall.Function.builder()
-                                                .arguments("arguments")
-                                                .name("name")
-                                                .build()
-                                        )
-                                        .type(ChatMessage.ToolCall.Type.FUNCTION)
-                                        .build()
-                                )
-                                .build()
-                        )
-                        .addToolAuthorization(
-                            AuthorizationResponse.builder()
-                                .id("id")
-                                .context(
-                                    AuthorizationContext.builder()
-                                        .token("token")
-                                        .userInfo(
-                                            AuthorizationContext.UserInfo.builder()
-                                                .putAdditionalProperty("foo", JsonValue.from("bar"))
-                                                .build()
-                                        )
-                                        .build()
-                                )
-                                .providerId("provider_id")
-                                .addScope("string")
-                                .status(AuthorizationResponse.Status.NOT_STARTED)
-                                .url("url")
-                                .userId("user_id")
-                                .build()
-                        )
-                        .addToolMessage(
-                            ChatMessage.builder()
-                                .content("content")
-                                .role("role")
-                                .name("name")
-                                .toolCallId("tool_call_id")
-                                .addToolCall(
-                                    ChatMessage.ToolCall.builder()
-                                        .id("id")
-                                        .function(
-                                            ChatMessage.ToolCall.Function.builder()
-                                                .arguments("arguments")
-                                                .name("name")
-                                                .build()
-                                        )
-                                        .type(ChatMessage.ToolCall.Type.FUNCTION)
-                                        .build()
-                                )
-                                .build()
-                        )
-                        .build()
-                )
-                .created(0L)
-                .model("model")
-                .object_("object")
-                .systemFingerprint("system_fingerprint")
-                .usage(
-                    Usage.builder().completionTokens(0L).promptTokens(0L).totalTokens(0L).build()
-                )
-                .build()
-
-        stubFor(
-            post(anyUrl())
-                .withHeader("x-test-header", equalTo("abc1234"))
-                .withQueryParam("test_query_param", equalTo("def567"))
-                .willReturn(ok(JSON_MAPPER.writeValueAsString(apiResponse)))
         )
 
-        client.chat().completions().create(params)
-
-        verify(postRequestedFor(anyUrl()))
+        verify(
+            postRequestedFor(anyUrl())
+                .withHeader("Secret-Header", equalTo("42"))
+                .withQueryParam("secret_query_param", equalTo("42"))
+        )
     }
 
     @Test
-    fun toolsExecuteWithAdditionalParams() {
-        val additionalHeaders = mutableMapOf<String, List<String>>()
+    fun execute() {
+        val toolService = client.tools()
+        stubFor(post(anyUrl()).willReturn(ok("{}")))
 
-        additionalHeaders.put("x-test-header", listOf("abc1234"))
-
-        val additionalQueryParams = mutableMapOf<String, List<String>>()
-
-        additionalQueryParams.put("test_query_param", listOf("def567"))
-
-        val params =
+        toolService.execute(
             ToolExecuteParams.builder()
                 .executeToolRequest(
                     ExecuteToolRequest.builder()
@@ -232,80 +131,15 @@ class ServiceParamsTest {
                         .userId("user_id")
                         .build()
                 )
-                .additionalHeaders(additionalHeaders)
-                .additionalQueryParams(additionalQueryParams)
+                .putAdditionalHeader("Secret-Header", "42")
+                .putAdditionalQueryParam("secret_query_param", "42")
                 .build()
-
-        val apiResponse =
-            ExecuteToolResponse.builder()
-                .id("id")
-                .duration(0.0)
-                .executionId("execution_id")
-                .executionType("execution_type")
-                .finishedAt("finished_at")
-                .output(
-                    ExecuteToolResponse.Output.builder()
-                        .authorization(
-                            AuthorizationResponse.builder()
-                                .id("id")
-                                .context(
-                                    AuthorizationContext.builder()
-                                        .token("token")
-                                        .userInfo(
-                                            AuthorizationContext.UserInfo.builder()
-                                                .putAdditionalProperty("foo", JsonValue.from("bar"))
-                                                .build()
-                                        )
-                                        .build()
-                                )
-                                .providerId("provider_id")
-                                .addScope("string")
-                                .status(AuthorizationResponse.Status.NOT_STARTED)
-                                .url("url")
-                                .userId("user_id")
-                                .build()
-                        )
-                        .error(
-                            ExecuteToolResponse.Output.Error.builder()
-                                .canRetry(true)
-                                .kind(ExecuteToolResponse.Output.Error.Kind.TOOLKIT_LOAD_FAILED)
-                                .message("message")
-                                .additionalPromptContent("additional_prompt_content")
-                                .developerMessage("developer_message")
-                                .extra(
-                                    ExecuteToolResponse.Output.Error.Extra.builder()
-                                        .putAdditionalProperty("foo", JsonValue.from("bar"))
-                                        .build()
-                                )
-                                .retryAfterMs(0L)
-                                .stacktrace("stacktrace")
-                                .statusCode(0L)
-                                .build()
-                        )
-                        .addLog(
-                            ExecuteToolResponse.Output.Log.builder()
-                                .level("level")
-                                .message("message")
-                                .subtype("subtype")
-                                .build()
-                        )
-                        .value(JsonValue.from(mapOf<String, Any>()))
-                        .build()
-                )
-                .runAt("run_at")
-                .status("status")
-                .success(true)
-                .build()
-
-        stubFor(
-            post(anyUrl())
-                .withHeader("x-test-header", equalTo("abc1234"))
-                .withQueryParam("test_query_param", equalTo("def567"))
-                .willReturn(ok(JSON_MAPPER.writeValueAsString(apiResponse)))
         )
 
-        client.tools().execute(params)
-
-        verify(postRequestedFor(anyUrl()))
+        verify(
+            postRequestedFor(anyUrl())
+                .withHeader("Secret-Header", equalTo("42"))
+                .withQueryParam("secret_query_param", equalTo("42"))
+        )
     }
 }
