@@ -30,7 +30,6 @@ private constructor(
     private val toolkit: JsonField<Toolkit>,
     private val description: JsonField<String>,
     private val formattedSchema: JsonField<FormattedSchema>,
-    private val metadata: JsonField<Metadata>,
     private val output: JsonField<Output>,
     private val requirements: JsonField<Requirements>,
     private val additionalProperties: MutableMap<String, JsonValue>,
@@ -53,7 +52,6 @@ private constructor(
         @JsonProperty("formatted_schema")
         @ExcludeMissing
         formattedSchema: JsonField<FormattedSchema> = JsonMissing.of(),
-        @JsonProperty("metadata") @ExcludeMissing metadata: JsonField<Metadata> = JsonMissing.of(),
         @JsonProperty("output") @ExcludeMissing output: JsonField<Output> = JsonMissing.of(),
         @JsonProperty("requirements")
         @ExcludeMissing
@@ -66,7 +64,6 @@ private constructor(
         toolkit,
         description,
         formattedSchema,
-        metadata,
         output,
         requirements,
         mutableMapOf(),
@@ -114,12 +111,6 @@ private constructor(
      */
     fun formattedSchema(): Optional<FormattedSchema> =
         formattedSchema.getOptional("formatted_schema")
-
-    /**
-     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
-     *   server responded with an unexpected value).
-     */
-    fun metadata(): Optional<Metadata> = metadata.getOptional("metadata")
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -190,13 +181,6 @@ private constructor(
     fun _formattedSchema(): JsonField<FormattedSchema> = formattedSchema
 
     /**
-     * Returns the raw JSON value of [metadata].
-     *
-     * Unlike [metadata], this method doesn't throw if the JSON field has an unexpected type.
-     */
-    @JsonProperty("metadata") @ExcludeMissing fun _metadata(): JsonField<Metadata> = metadata
-
-    /**
      * Returns the raw JSON value of [output].
      *
      * Unlike [output], this method doesn't throw if the JSON field has an unexpected type.
@@ -251,7 +235,6 @@ private constructor(
         private var toolkit: JsonField<Toolkit>? = null
         private var description: JsonField<String> = JsonMissing.of()
         private var formattedSchema: JsonField<FormattedSchema> = JsonMissing.of()
-        private var metadata: JsonField<Metadata> = JsonMissing.of()
         private var output: JsonField<Output> = JsonMissing.of()
         private var requirements: JsonField<Requirements> = JsonMissing.of()
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
@@ -265,7 +248,6 @@ private constructor(
             toolkit = toolDefinition.toolkit
             description = toolDefinition.description
             formattedSchema = toolDefinition.formattedSchema
-            metadata = toolDefinition.metadata
             output = toolDefinition.output
             requirements = toolDefinition.requirements
             additionalProperties = toolDefinition.additionalProperties.toMutableMap()
@@ -353,17 +335,6 @@ private constructor(
             this.formattedSchema = formattedSchema
         }
 
-        fun metadata(metadata: Metadata) = metadata(JsonField.of(metadata))
-
-        /**
-         * Sets [Builder.metadata] to an arbitrary JSON value.
-         *
-         * You should usually call [Builder.metadata] with a well-typed [Metadata] value instead.
-         * This method is primarily for setting the field to an undocumented or not yet supported
-         * value.
-         */
-        fun metadata(metadata: JsonField<Metadata>) = apply { this.metadata = metadata }
-
         fun output(output: Output) = output(JsonField.of(output))
 
         /**
@@ -431,7 +402,6 @@ private constructor(
                 checkRequired("toolkit", toolkit),
                 description,
                 formattedSchema,
-                metadata,
                 output,
                 requirements,
                 additionalProperties.toMutableMap(),
@@ -452,7 +422,6 @@ private constructor(
         toolkit().validate()
         description()
         formattedSchema().ifPresent { it.validate() }
-        metadata().ifPresent { it.validate() }
         output().ifPresent { it.validate() }
         requirements().ifPresent { it.validate() }
         validated = true
@@ -480,7 +449,6 @@ private constructor(
             (toolkit.asKnown().getOrNull()?.validity() ?: 0) +
             (if (description.asKnown().isPresent) 1 else 0) +
             (formattedSchema.asKnown().getOrNull()?.validity() ?: 0) +
-            (metadata.asKnown().getOrNull()?.validity() ?: 0) +
             (output.asKnown().getOrNull()?.validity() ?: 0) +
             (requirements.asKnown().getOrNull()?.validity() ?: 0)
 
@@ -1299,818 +1267,6 @@ private constructor(
         override fun hashCode(): Int = hashCode
 
         override fun toString() = "FormattedSchema{additionalProperties=$additionalProperties}"
-    }
-
-    class Metadata
-    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
-    private constructor(
-        private val behavior: JsonField<Behavior>,
-        private val classification: JsonField<Classification>,
-        private val extras: JsonField<Extras>,
-        private val additionalProperties: MutableMap<String, JsonValue>,
-    ) {
-
-        @JsonCreator
-        private constructor(
-            @JsonProperty("behavior")
-            @ExcludeMissing
-            behavior: JsonField<Behavior> = JsonMissing.of(),
-            @JsonProperty("classification")
-            @ExcludeMissing
-            classification: JsonField<Classification> = JsonMissing.of(),
-            @JsonProperty("extras") @ExcludeMissing extras: JsonField<Extras> = JsonMissing.of(),
-        ) : this(behavior, classification, extras, mutableMapOf())
-
-        /**
-         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
-         *   server responded with an unexpected value).
-         */
-        fun behavior(): Optional<Behavior> = behavior.getOptional("behavior")
-
-        /**
-         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
-         *   server responded with an unexpected value).
-         */
-        fun classification(): Optional<Classification> =
-            classification.getOptional("classification")
-
-        /**
-         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
-         *   server responded with an unexpected value).
-         */
-        fun extras(): Optional<Extras> = extras.getOptional("extras")
-
-        /**
-         * Returns the raw JSON value of [behavior].
-         *
-         * Unlike [behavior], this method doesn't throw if the JSON field has an unexpected type.
-         */
-        @JsonProperty("behavior") @ExcludeMissing fun _behavior(): JsonField<Behavior> = behavior
-
-        /**
-         * Returns the raw JSON value of [classification].
-         *
-         * Unlike [classification], this method doesn't throw if the JSON field has an unexpected
-         * type.
-         */
-        @JsonProperty("classification")
-        @ExcludeMissing
-        fun _classification(): JsonField<Classification> = classification
-
-        /**
-         * Returns the raw JSON value of [extras].
-         *
-         * Unlike [extras], this method doesn't throw if the JSON field has an unexpected type.
-         */
-        @JsonProperty("extras") @ExcludeMissing fun _extras(): JsonField<Extras> = extras
-
-        @JsonAnySetter
-        private fun putAdditionalProperty(key: String, value: JsonValue) {
-            additionalProperties.put(key, value)
-        }
-
-        @JsonAnyGetter
-        @ExcludeMissing
-        fun _additionalProperties(): Map<String, JsonValue> =
-            Collections.unmodifiableMap(additionalProperties)
-
-        fun toBuilder() = Builder().from(this)
-
-        companion object {
-
-            /** Returns a mutable builder for constructing an instance of [Metadata]. */
-            @JvmStatic fun builder() = Builder()
-        }
-
-        /** A builder for [Metadata]. */
-        class Builder internal constructor() {
-
-            private var behavior: JsonField<Behavior> = JsonMissing.of()
-            private var classification: JsonField<Classification> = JsonMissing.of()
-            private var extras: JsonField<Extras> = JsonMissing.of()
-            private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
-
-            @JvmSynthetic
-            internal fun from(metadata: Metadata) = apply {
-                behavior = metadata.behavior
-                classification = metadata.classification
-                extras = metadata.extras
-                additionalProperties = metadata.additionalProperties.toMutableMap()
-            }
-
-            fun behavior(behavior: Behavior) = behavior(JsonField.of(behavior))
-
-            /**
-             * Sets [Builder.behavior] to an arbitrary JSON value.
-             *
-             * You should usually call [Builder.behavior] with a well-typed [Behavior] value
-             * instead. This method is primarily for setting the field to an undocumented or not yet
-             * supported value.
-             */
-            fun behavior(behavior: JsonField<Behavior>) = apply { this.behavior = behavior }
-
-            fun classification(classification: Classification) =
-                classification(JsonField.of(classification))
-
-            /**
-             * Sets [Builder.classification] to an arbitrary JSON value.
-             *
-             * You should usually call [Builder.classification] with a well-typed [Classification]
-             * value instead. This method is primarily for setting the field to an undocumented or
-             * not yet supported value.
-             */
-            fun classification(classification: JsonField<Classification>) = apply {
-                this.classification = classification
-            }
-
-            fun extras(extras: Extras) = extras(JsonField.of(extras))
-
-            /**
-             * Sets [Builder.extras] to an arbitrary JSON value.
-             *
-             * You should usually call [Builder.extras] with a well-typed [Extras] value instead.
-             * This method is primarily for setting the field to an undocumented or not yet
-             * supported value.
-             */
-            fun extras(extras: JsonField<Extras>) = apply { this.extras = extras }
-
-            fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
-                this.additionalProperties.clear()
-                putAllAdditionalProperties(additionalProperties)
-            }
-
-            fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-                additionalProperties.put(key, value)
-            }
-
-            fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
-                this.additionalProperties.putAll(additionalProperties)
-            }
-
-            fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
-
-            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                keys.forEach(::removeAdditionalProperty)
-            }
-
-            /**
-             * Returns an immutable instance of [Metadata].
-             *
-             * Further updates to this [Builder] will not mutate the returned instance.
-             */
-            fun build(): Metadata =
-                Metadata(behavior, classification, extras, additionalProperties.toMutableMap())
-        }
-
-        private var validated: Boolean = false
-
-        fun validate(): Metadata = apply {
-            if (validated) {
-                return@apply
-            }
-
-            behavior().ifPresent { it.validate() }
-            classification().ifPresent { it.validate() }
-            extras().ifPresent { it.validate() }
-            validated = true
-        }
-
-        fun isValid(): Boolean =
-            try {
-                validate()
-                true
-            } catch (e: ArcadeInvalidDataException) {
-                false
-            }
-
-        /**
-         * Returns a score indicating how many valid values are contained in this object
-         * recursively.
-         *
-         * Used for best match union deserialization.
-         */
-        @JvmSynthetic
-        internal fun validity(): Int =
-            (behavior.asKnown().getOrNull()?.validity() ?: 0) +
-                (classification.asKnown().getOrNull()?.validity() ?: 0) +
-                (extras.asKnown().getOrNull()?.validity() ?: 0)
-
-        class Behavior
-        @JsonCreator(mode = JsonCreator.Mode.DISABLED)
-        private constructor(
-            private val destructive: JsonField<Boolean>,
-            private val idempotent: JsonField<Boolean>,
-            private val openWorld: JsonField<Boolean>,
-            private val operations: JsonField<List<String>>,
-            private val readOnly: JsonField<Boolean>,
-            private val additionalProperties: MutableMap<String, JsonValue>,
-        ) {
-
-            @JsonCreator
-            private constructor(
-                @JsonProperty("destructive")
-                @ExcludeMissing
-                destructive: JsonField<Boolean> = JsonMissing.of(),
-                @JsonProperty("idempotent")
-                @ExcludeMissing
-                idempotent: JsonField<Boolean> = JsonMissing.of(),
-                @JsonProperty("open_world")
-                @ExcludeMissing
-                openWorld: JsonField<Boolean> = JsonMissing.of(),
-                @JsonProperty("operations")
-                @ExcludeMissing
-                operations: JsonField<List<String>> = JsonMissing.of(),
-                @JsonProperty("read_only")
-                @ExcludeMissing
-                readOnly: JsonField<Boolean> = JsonMissing.of(),
-            ) : this(destructive, idempotent, openWorld, operations, readOnly, mutableMapOf())
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun destructive(): Optional<Boolean> = destructive.getOptional("destructive")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun idempotent(): Optional<Boolean> = idempotent.getOptional("idempotent")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun openWorld(): Optional<Boolean> = openWorld.getOptional("open_world")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun operations(): Optional<List<String>> = operations.getOptional("operations")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun readOnly(): Optional<Boolean> = readOnly.getOptional("read_only")
-
-            /**
-             * Returns the raw JSON value of [destructive].
-             *
-             * Unlike [destructive], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("destructive")
-            @ExcludeMissing
-            fun _destructive(): JsonField<Boolean> = destructive
-
-            /**
-             * Returns the raw JSON value of [idempotent].
-             *
-             * Unlike [idempotent], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("idempotent")
-            @ExcludeMissing
-            fun _idempotent(): JsonField<Boolean> = idempotent
-
-            /**
-             * Returns the raw JSON value of [openWorld].
-             *
-             * Unlike [openWorld], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("open_world")
-            @ExcludeMissing
-            fun _openWorld(): JsonField<Boolean> = openWorld
-
-            /**
-             * Returns the raw JSON value of [operations].
-             *
-             * Unlike [operations], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("operations")
-            @ExcludeMissing
-            fun _operations(): JsonField<List<String>> = operations
-
-            /**
-             * Returns the raw JSON value of [readOnly].
-             *
-             * Unlike [readOnly], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("read_only")
-            @ExcludeMissing
-            fun _readOnly(): JsonField<Boolean> = readOnly
-
-            @JsonAnySetter
-            private fun putAdditionalProperty(key: String, value: JsonValue) {
-                additionalProperties.put(key, value)
-            }
-
-            @JsonAnyGetter
-            @ExcludeMissing
-            fun _additionalProperties(): Map<String, JsonValue> =
-                Collections.unmodifiableMap(additionalProperties)
-
-            fun toBuilder() = Builder().from(this)
-
-            companion object {
-
-                /** Returns a mutable builder for constructing an instance of [Behavior]. */
-                @JvmStatic fun builder() = Builder()
-            }
-
-            /** A builder for [Behavior]. */
-            class Builder internal constructor() {
-
-                private var destructive: JsonField<Boolean> = JsonMissing.of()
-                private var idempotent: JsonField<Boolean> = JsonMissing.of()
-                private var openWorld: JsonField<Boolean> = JsonMissing.of()
-                private var operations: JsonField<MutableList<String>>? = null
-                private var readOnly: JsonField<Boolean> = JsonMissing.of()
-                private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
-
-                @JvmSynthetic
-                internal fun from(behavior: Behavior) = apply {
-                    destructive = behavior.destructive
-                    idempotent = behavior.idempotent
-                    openWorld = behavior.openWorld
-                    operations = behavior.operations.map { it.toMutableList() }
-                    readOnly = behavior.readOnly
-                    additionalProperties = behavior.additionalProperties.toMutableMap()
-                }
-
-                fun destructive(destructive: Boolean) = destructive(JsonField.of(destructive))
-
-                /**
-                 * Sets [Builder.destructive] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.destructive] with a well-typed [Boolean] value
-                 * instead. This method is primarily for setting the field to an undocumented or not
-                 * yet supported value.
-                 */
-                fun destructive(destructive: JsonField<Boolean>) = apply {
-                    this.destructive = destructive
-                }
-
-                fun idempotent(idempotent: Boolean) = idempotent(JsonField.of(idempotent))
-
-                /**
-                 * Sets [Builder.idempotent] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.idempotent] with a well-typed [Boolean] value
-                 * instead. This method is primarily for setting the field to an undocumented or not
-                 * yet supported value.
-                 */
-                fun idempotent(idempotent: JsonField<Boolean>) = apply {
-                    this.idempotent = idempotent
-                }
-
-                fun openWorld(openWorld: Boolean) = openWorld(JsonField.of(openWorld))
-
-                /**
-                 * Sets [Builder.openWorld] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.openWorld] with a well-typed [Boolean] value
-                 * instead. This method is primarily for setting the field to an undocumented or not
-                 * yet supported value.
-                 */
-                fun openWorld(openWorld: JsonField<Boolean>) = apply { this.openWorld = openWorld }
-
-                fun operations(operations: List<String>) = operations(JsonField.of(operations))
-
-                /**
-                 * Sets [Builder.operations] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.operations] with a well-typed `List<String>`
-                 * value instead. This method is primarily for setting the field to an undocumented
-                 * or not yet supported value.
-                 */
-                fun operations(operations: JsonField<List<String>>) = apply {
-                    this.operations = operations.map { it.toMutableList() }
-                }
-
-                /**
-                 * Adds a single [String] to [operations].
-                 *
-                 * @throws IllegalStateException if the field was previously set to a non-list.
-                 */
-                fun addOperation(operation: String) = apply {
-                    operations =
-                        (operations ?: JsonField.of(mutableListOf())).also {
-                            checkKnown("operations", it).add(operation)
-                        }
-                }
-
-                fun readOnly(readOnly: Boolean) = readOnly(JsonField.of(readOnly))
-
-                /**
-                 * Sets [Builder.readOnly] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.readOnly] with a well-typed [Boolean] value
-                 * instead. This method is primarily for setting the field to an undocumented or not
-                 * yet supported value.
-                 */
-                fun readOnly(readOnly: JsonField<Boolean>) = apply { this.readOnly = readOnly }
-
-                fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
-                    this.additionalProperties.clear()
-                    putAllAdditionalProperties(additionalProperties)
-                }
-
-                fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-                    additionalProperties.put(key, value)
-                }
-
-                fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) =
-                    apply {
-                        this.additionalProperties.putAll(additionalProperties)
-                    }
-
-                fun removeAdditionalProperty(key: String) = apply {
-                    additionalProperties.remove(key)
-                }
-
-                fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                    keys.forEach(::removeAdditionalProperty)
-                }
-
-                /**
-                 * Returns an immutable instance of [Behavior].
-                 *
-                 * Further updates to this [Builder] will not mutate the returned instance.
-                 */
-                fun build(): Behavior =
-                    Behavior(
-                        destructive,
-                        idempotent,
-                        openWorld,
-                        (operations ?: JsonMissing.of()).map { it.toImmutable() },
-                        readOnly,
-                        additionalProperties.toMutableMap(),
-                    )
-            }
-
-            private var validated: Boolean = false
-
-            fun validate(): Behavior = apply {
-                if (validated) {
-                    return@apply
-                }
-
-                destructive()
-                idempotent()
-                openWorld()
-                operations()
-                readOnly()
-                validated = true
-            }
-
-            fun isValid(): Boolean =
-                try {
-                    validate()
-                    true
-                } catch (e: ArcadeInvalidDataException) {
-                    false
-                }
-
-            /**
-             * Returns a score indicating how many valid values are contained in this object
-             * recursively.
-             *
-             * Used for best match union deserialization.
-             */
-            @JvmSynthetic
-            internal fun validity(): Int =
-                (if (destructive.asKnown().isPresent) 1 else 0) +
-                    (if (idempotent.asKnown().isPresent) 1 else 0) +
-                    (if (openWorld.asKnown().isPresent) 1 else 0) +
-                    (operations.asKnown().getOrNull()?.size ?: 0) +
-                    (if (readOnly.asKnown().isPresent) 1 else 0)
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) {
-                    return true
-                }
-
-                return other is Behavior &&
-                    destructive == other.destructive &&
-                    idempotent == other.idempotent &&
-                    openWorld == other.openWorld &&
-                    operations == other.operations &&
-                    readOnly == other.readOnly &&
-                    additionalProperties == other.additionalProperties
-            }
-
-            private val hashCode: Int by lazy {
-                Objects.hash(
-                    destructive,
-                    idempotent,
-                    openWorld,
-                    operations,
-                    readOnly,
-                    additionalProperties,
-                )
-            }
-
-            override fun hashCode(): Int = hashCode
-
-            override fun toString() =
-                "Behavior{destructive=$destructive, idempotent=$idempotent, openWorld=$openWorld, operations=$operations, readOnly=$readOnly, additionalProperties=$additionalProperties}"
-        }
-
-        class Classification
-        @JsonCreator(mode = JsonCreator.Mode.DISABLED)
-        private constructor(
-            private val serviceDomains: JsonField<List<String>>,
-            private val additionalProperties: MutableMap<String, JsonValue>,
-        ) {
-
-            @JsonCreator
-            private constructor(
-                @JsonProperty("service_domains")
-                @ExcludeMissing
-                serviceDomains: JsonField<List<String>> = JsonMissing.of()
-            ) : this(serviceDomains, mutableMapOf())
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun serviceDomains(): Optional<List<String>> =
-                serviceDomains.getOptional("service_domains")
-
-            /**
-             * Returns the raw JSON value of [serviceDomains].
-             *
-             * Unlike [serviceDomains], this method doesn't throw if the JSON field has an
-             * unexpected type.
-             */
-            @JsonProperty("service_domains")
-            @ExcludeMissing
-            fun _serviceDomains(): JsonField<List<String>> = serviceDomains
-
-            @JsonAnySetter
-            private fun putAdditionalProperty(key: String, value: JsonValue) {
-                additionalProperties.put(key, value)
-            }
-
-            @JsonAnyGetter
-            @ExcludeMissing
-            fun _additionalProperties(): Map<String, JsonValue> =
-                Collections.unmodifiableMap(additionalProperties)
-
-            fun toBuilder() = Builder().from(this)
-
-            companion object {
-
-                /** Returns a mutable builder for constructing an instance of [Classification]. */
-                @JvmStatic fun builder() = Builder()
-            }
-
-            /** A builder for [Classification]. */
-            class Builder internal constructor() {
-
-                private var serviceDomains: JsonField<MutableList<String>>? = null
-                private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
-
-                @JvmSynthetic
-                internal fun from(classification: Classification) = apply {
-                    serviceDomains = classification.serviceDomains.map { it.toMutableList() }
-                    additionalProperties = classification.additionalProperties.toMutableMap()
-                }
-
-                fun serviceDomains(serviceDomains: List<String>) =
-                    serviceDomains(JsonField.of(serviceDomains))
-
-                /**
-                 * Sets [Builder.serviceDomains] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.serviceDomains] with a well-typed `List<String>`
-                 * value instead. This method is primarily for setting the field to an undocumented
-                 * or not yet supported value.
-                 */
-                fun serviceDomains(serviceDomains: JsonField<List<String>>) = apply {
-                    this.serviceDomains = serviceDomains.map { it.toMutableList() }
-                }
-
-                /**
-                 * Adds a single [String] to [serviceDomains].
-                 *
-                 * @throws IllegalStateException if the field was previously set to a non-list.
-                 */
-                fun addServiceDomain(serviceDomain: String) = apply {
-                    serviceDomains =
-                        (serviceDomains ?: JsonField.of(mutableListOf())).also {
-                            checkKnown("serviceDomains", it).add(serviceDomain)
-                        }
-                }
-
-                fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
-                    this.additionalProperties.clear()
-                    putAllAdditionalProperties(additionalProperties)
-                }
-
-                fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-                    additionalProperties.put(key, value)
-                }
-
-                fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) =
-                    apply {
-                        this.additionalProperties.putAll(additionalProperties)
-                    }
-
-                fun removeAdditionalProperty(key: String) = apply {
-                    additionalProperties.remove(key)
-                }
-
-                fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                    keys.forEach(::removeAdditionalProperty)
-                }
-
-                /**
-                 * Returns an immutable instance of [Classification].
-                 *
-                 * Further updates to this [Builder] will not mutate the returned instance.
-                 */
-                fun build(): Classification =
-                    Classification(
-                        (serviceDomains ?: JsonMissing.of()).map { it.toImmutable() },
-                        additionalProperties.toMutableMap(),
-                    )
-            }
-
-            private var validated: Boolean = false
-
-            fun validate(): Classification = apply {
-                if (validated) {
-                    return@apply
-                }
-
-                serviceDomains()
-                validated = true
-            }
-
-            fun isValid(): Boolean =
-                try {
-                    validate()
-                    true
-                } catch (e: ArcadeInvalidDataException) {
-                    false
-                }
-
-            /**
-             * Returns a score indicating how many valid values are contained in this object
-             * recursively.
-             *
-             * Used for best match union deserialization.
-             */
-            @JvmSynthetic
-            internal fun validity(): Int = (serviceDomains.asKnown().getOrNull()?.size ?: 0)
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) {
-                    return true
-                }
-
-                return other is Classification &&
-                    serviceDomains == other.serviceDomains &&
-                    additionalProperties == other.additionalProperties
-            }
-
-            private val hashCode: Int by lazy { Objects.hash(serviceDomains, additionalProperties) }
-
-            override fun hashCode(): Int = hashCode
-
-            override fun toString() =
-                "Classification{serviceDomains=$serviceDomains, additionalProperties=$additionalProperties}"
-        }
-
-        class Extras
-        @JsonCreator
-        private constructor(
-            @com.fasterxml.jackson.annotation.JsonValue
-            private val additionalProperties: Map<String, JsonValue>
-        ) {
-
-            @JsonAnyGetter
-            @ExcludeMissing
-            fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
-
-            fun toBuilder() = Builder().from(this)
-
-            companion object {
-
-                /** Returns a mutable builder for constructing an instance of [Extras]. */
-                @JvmStatic fun builder() = Builder()
-            }
-
-            /** A builder for [Extras]. */
-            class Builder internal constructor() {
-
-                private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
-
-                @JvmSynthetic
-                internal fun from(extras: Extras) = apply {
-                    additionalProperties = extras.additionalProperties.toMutableMap()
-                }
-
-                fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
-                    this.additionalProperties.clear()
-                    putAllAdditionalProperties(additionalProperties)
-                }
-
-                fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-                    additionalProperties.put(key, value)
-                }
-
-                fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) =
-                    apply {
-                        this.additionalProperties.putAll(additionalProperties)
-                    }
-
-                fun removeAdditionalProperty(key: String) = apply {
-                    additionalProperties.remove(key)
-                }
-
-                fun removeAllAdditionalProperties(keys: Set<String>) = apply {
-                    keys.forEach(::removeAdditionalProperty)
-                }
-
-                /**
-                 * Returns an immutable instance of [Extras].
-                 *
-                 * Further updates to this [Builder] will not mutate the returned instance.
-                 */
-                fun build(): Extras = Extras(additionalProperties.toImmutable())
-            }
-
-            private var validated: Boolean = false
-
-            fun validate(): Extras = apply {
-                if (validated) {
-                    return@apply
-                }
-
-                validated = true
-            }
-
-            fun isValid(): Boolean =
-                try {
-                    validate()
-                    true
-                } catch (e: ArcadeInvalidDataException) {
-                    false
-                }
-
-            /**
-             * Returns a score indicating how many valid values are contained in this object
-             * recursively.
-             *
-             * Used for best match union deserialization.
-             */
-            @JvmSynthetic
-            internal fun validity(): Int =
-                additionalProperties.count { (_, value) -> !value.isNull() && !value.isMissing() }
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) {
-                    return true
-                }
-
-                return other is Extras && additionalProperties == other.additionalProperties
-            }
-
-            private val hashCode: Int by lazy { Objects.hash(additionalProperties) }
-
-            override fun hashCode(): Int = hashCode
-
-            override fun toString() = "Extras{additionalProperties=$additionalProperties}"
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) {
-                return true
-            }
-
-            return other is Metadata &&
-                behavior == other.behavior &&
-                classification == other.classification &&
-                extras == other.extras &&
-                additionalProperties == other.additionalProperties
-        }
-
-        private val hashCode: Int by lazy {
-            Objects.hash(behavior, classification, extras, additionalProperties)
-        }
-
-        override fun hashCode(): Int = hashCode
-
-        override fun toString() =
-            "Metadata{behavior=$behavior, classification=$classification, extras=$extras, additionalProperties=$additionalProperties}"
     }
 
     class Output
@@ -3668,7 +2824,6 @@ private constructor(
             toolkit == other.toolkit &&
             description == other.description &&
             formattedSchema == other.formattedSchema &&
-            metadata == other.metadata &&
             output == other.output &&
             requirements == other.requirements &&
             additionalProperties == other.additionalProperties
@@ -3683,7 +2838,6 @@ private constructor(
             toolkit,
             description,
             formattedSchema,
-            metadata,
             output,
             requirements,
             additionalProperties,
@@ -3693,5 +2847,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "ToolDefinition{fullyQualifiedName=$fullyQualifiedName, input=$input, name=$name, qualifiedName=$qualifiedName, toolkit=$toolkit, description=$description, formattedSchema=$formattedSchema, metadata=$metadata, output=$output, requirements=$requirements, additionalProperties=$additionalProperties}"
+        "ToolDefinition{fullyQualifiedName=$fullyQualifiedName, input=$input, name=$name, qualifiedName=$qualifiedName, toolkit=$toolkit, description=$description, formattedSchema=$formattedSchema, output=$output, requirements=$requirements, additionalProperties=$additionalProperties}"
 }

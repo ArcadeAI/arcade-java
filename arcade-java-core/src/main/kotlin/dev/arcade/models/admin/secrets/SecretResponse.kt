@@ -24,6 +24,7 @@ private constructor(
     private val binding: JsonField<Binding>,
     private val createdAt: JsonField<String>,
     private val description: JsonField<String>,
+    private val hint: JsonField<String>,
     private val key: JsonField<String>,
     private val lastAccessedAt: JsonField<String>,
     private val updatedAt: JsonField<String>,
@@ -38,12 +39,23 @@ private constructor(
         @JsonProperty("description")
         @ExcludeMissing
         description: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("hint") @ExcludeMissing hint: JsonField<String> = JsonMissing.of(),
         @JsonProperty("key") @ExcludeMissing key: JsonField<String> = JsonMissing.of(),
         @JsonProperty("last_accessed_at")
         @ExcludeMissing
         lastAccessedAt: JsonField<String> = JsonMissing.of(),
         @JsonProperty("updated_at") @ExcludeMissing updatedAt: JsonField<String> = JsonMissing.of(),
-    ) : this(id, binding, createdAt, description, key, lastAccessedAt, updatedAt, mutableMapOf())
+    ) : this(
+        id,
+        binding,
+        createdAt,
+        description,
+        hint,
+        key,
+        lastAccessedAt,
+        updatedAt,
+        mutableMapOf(),
+    )
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -68,6 +80,12 @@ private constructor(
      *   server responded with an unexpected value).
      */
     fun description(): Optional<String> = description.getOptional("description")
+
+    /**
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun hint(): Optional<String> = hint.getOptional("hint")
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -114,6 +132,13 @@ private constructor(
      * Unlike [description], this method doesn't throw if the JSON field has an unexpected type.
      */
     @JsonProperty("description") @ExcludeMissing fun _description(): JsonField<String> = description
+
+    /**
+     * Returns the raw JSON value of [hint].
+     *
+     * Unlike [hint], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    @JsonProperty("hint") @ExcludeMissing fun _hint(): JsonField<String> = hint
 
     /**
      * Returns the raw JSON value of [key].
@@ -163,6 +188,7 @@ private constructor(
         private var binding: JsonField<Binding> = JsonMissing.of()
         private var createdAt: JsonField<String> = JsonMissing.of()
         private var description: JsonField<String> = JsonMissing.of()
+        private var hint: JsonField<String> = JsonMissing.of()
         private var key: JsonField<String> = JsonMissing.of()
         private var lastAccessedAt: JsonField<String> = JsonMissing.of()
         private var updatedAt: JsonField<String> = JsonMissing.of()
@@ -174,6 +200,7 @@ private constructor(
             binding = secretResponse.binding
             createdAt = secretResponse.createdAt
             description = secretResponse.description
+            hint = secretResponse.hint
             key = secretResponse.key
             lastAccessedAt = secretResponse.lastAccessedAt
             updatedAt = secretResponse.updatedAt
@@ -221,6 +248,16 @@ private constructor(
          * value.
          */
         fun description(description: JsonField<String>) = apply { this.description = description }
+
+        fun hint(hint: String) = hint(JsonField.of(hint))
+
+        /**
+         * Sets [Builder.hint] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.hint] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
+        fun hint(hint: JsonField<String>) = apply { this.hint = hint }
 
         fun key(key: String) = key(JsonField.of(key))
 
@@ -286,6 +323,7 @@ private constructor(
                 binding,
                 createdAt,
                 description,
+                hint,
                 key,
                 lastAccessedAt,
                 updatedAt,
@@ -304,6 +342,7 @@ private constructor(
         binding().ifPresent { it.validate() }
         createdAt()
         description()
+        hint()
         key()
         lastAccessedAt()
         updatedAt()
@@ -329,6 +368,7 @@ private constructor(
             (binding.asKnown().getOrNull()?.validity() ?: 0) +
             (if (createdAt.asKnown().isPresent) 1 else 0) +
             (if (description.asKnown().isPresent) 1 else 0) +
+            (if (hint.asKnown().isPresent) 1 else 0) +
             (if (key.asKnown().isPresent) 1 else 0) +
             (if (lastAccessedAt.asKnown().isPresent) 1 else 0) +
             (if (updatedAt.asKnown().isPresent) 1 else 0)
@@ -652,6 +692,7 @@ private constructor(
             binding == other.binding &&
             createdAt == other.createdAt &&
             description == other.description &&
+            hint == other.hint &&
             key == other.key &&
             lastAccessedAt == other.lastAccessedAt &&
             updatedAt == other.updatedAt &&
@@ -664,6 +705,7 @@ private constructor(
             binding,
             createdAt,
             description,
+            hint,
             key,
             lastAccessedAt,
             updatedAt,
@@ -674,5 +716,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "SecretResponse{id=$id, binding=$binding, createdAt=$createdAt, description=$description, key=$key, lastAccessedAt=$lastAccessedAt, updatedAt=$updatedAt, additionalProperties=$additionalProperties}"
+        "SecretResponse{id=$id, binding=$binding, createdAt=$createdAt, description=$description, hint=$hint, key=$key, lastAccessedAt=$lastAccessedAt, updatedAt=$updatedAt, additionalProperties=$additionalProperties}"
 }

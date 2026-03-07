@@ -1137,10 +1137,6 @@ private constructor(
 
                     @JvmField val TOOL_RUNTIME_FATAL = of("TOOL_RUNTIME_FATAL")
 
-                    @JvmField val CONTEXT_CHECK_FAILED = of("CONTEXT_CHECK_FAILED")
-
-                    @JvmField val CONTEXT_DENIED = of("CONTEXT_DENIED")
-
                     @JvmField val UPSTREAM_RUNTIME_BAD_REQUEST = of("UPSTREAM_RUNTIME_BAD_REQUEST")
 
                     @JvmField val UPSTREAM_RUNTIME_AUTH_ERROR = of("UPSTREAM_RUNTIME_AUTH_ERROR")
@@ -1174,8 +1170,6 @@ private constructor(
                     TOOL_RUNTIME_RETRY,
                     TOOL_RUNTIME_CONTEXT_REQUIRED,
                     TOOL_RUNTIME_FATAL,
-                    CONTEXT_CHECK_FAILED,
-                    CONTEXT_DENIED,
                     UPSTREAM_RUNTIME_BAD_REQUEST,
                     UPSTREAM_RUNTIME_AUTH_ERROR,
                     UPSTREAM_RUNTIME_NOT_FOUND,
@@ -1206,8 +1200,6 @@ private constructor(
                     TOOL_RUNTIME_RETRY,
                     TOOL_RUNTIME_CONTEXT_REQUIRED,
                     TOOL_RUNTIME_FATAL,
-                    CONTEXT_CHECK_FAILED,
-                    CONTEXT_DENIED,
                     UPSTREAM_RUNTIME_BAD_REQUEST,
                     UPSTREAM_RUNTIME_AUTH_ERROR,
                     UPSTREAM_RUNTIME_NOT_FOUND,
@@ -1241,8 +1233,6 @@ private constructor(
                         TOOL_RUNTIME_RETRY -> Value.TOOL_RUNTIME_RETRY
                         TOOL_RUNTIME_CONTEXT_REQUIRED -> Value.TOOL_RUNTIME_CONTEXT_REQUIRED
                         TOOL_RUNTIME_FATAL -> Value.TOOL_RUNTIME_FATAL
-                        CONTEXT_CHECK_FAILED -> Value.CONTEXT_CHECK_FAILED
-                        CONTEXT_DENIED -> Value.CONTEXT_DENIED
                         UPSTREAM_RUNTIME_BAD_REQUEST -> Value.UPSTREAM_RUNTIME_BAD_REQUEST
                         UPSTREAM_RUNTIME_AUTH_ERROR -> Value.UPSTREAM_RUNTIME_AUTH_ERROR
                         UPSTREAM_RUNTIME_NOT_FOUND -> Value.UPSTREAM_RUNTIME_NOT_FOUND
@@ -1275,8 +1265,6 @@ private constructor(
                         TOOL_RUNTIME_RETRY -> Known.TOOL_RUNTIME_RETRY
                         TOOL_RUNTIME_CONTEXT_REQUIRED -> Known.TOOL_RUNTIME_CONTEXT_REQUIRED
                         TOOL_RUNTIME_FATAL -> Known.TOOL_RUNTIME_FATAL
-                        CONTEXT_CHECK_FAILED -> Known.CONTEXT_CHECK_FAILED
-                        CONTEXT_DENIED -> Known.CONTEXT_DENIED
                         UPSTREAM_RUNTIME_BAD_REQUEST -> Known.UPSTREAM_RUNTIME_BAD_REQUEST
                         UPSTREAM_RUNTIME_AUTH_ERROR -> Known.UPSTREAM_RUNTIME_AUTH_ERROR
                         UPSTREAM_RUNTIME_NOT_FOUND -> Known.UPSTREAM_RUNTIME_NOT_FOUND

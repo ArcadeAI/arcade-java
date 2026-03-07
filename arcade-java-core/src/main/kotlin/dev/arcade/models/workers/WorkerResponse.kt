@@ -11,7 +11,6 @@ import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonField
 import dev.arcade.core.JsonMissing
 import dev.arcade.core.JsonValue
-import dev.arcade.core.checkKnown
 import dev.arcade.core.toImmutable
 import dev.arcade.errors.ArcadeInvalidDataException
 import java.util.Collections
@@ -888,6 +887,7 @@ private constructor(
             private val binding: JsonField<Binding>,
             private val editable: JsonField<Boolean>,
             private val exists: JsonField<Boolean>,
+            private val hint: JsonField<String>,
             private val value: JsonField<String>,
             private val additionalProperties: MutableMap<String, JsonValue>,
         ) {
@@ -903,8 +903,9 @@ private constructor(
                 @JsonProperty("exists")
                 @ExcludeMissing
                 exists: JsonField<Boolean> = JsonMissing.of(),
+                @JsonProperty("hint") @ExcludeMissing hint: JsonField<String> = JsonMissing.of(),
                 @JsonProperty("value") @ExcludeMissing value: JsonField<String> = JsonMissing.of(),
-            ) : this(binding, editable, exists, value, mutableMapOf())
+            ) : this(binding, editable, exists, hint, value, mutableMapOf())
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -923,6 +924,12 @@ private constructor(
              *   the server responded with an unexpected value).
              */
             fun exists(): Optional<Boolean> = exists.getOptional("exists")
+
+            /**
+             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun hint(): Optional<String> = hint.getOptional("hint")
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -951,6 +958,13 @@ private constructor(
              * Unlike [exists], this method doesn't throw if the JSON field has an unexpected type.
              */
             @JsonProperty("exists") @ExcludeMissing fun _exists(): JsonField<Boolean> = exists
+
+            /**
+             * Returns the raw JSON value of [hint].
+             *
+             * Unlike [hint], this method doesn't throw if the JSON field has an unexpected type.
+             */
+            @JsonProperty("hint") @ExcludeMissing fun _hint(): JsonField<String> = hint
 
             /**
              * Returns the raw JSON value of [value].
@@ -983,6 +997,7 @@ private constructor(
                 private var binding: JsonField<Binding> = JsonMissing.of()
                 private var editable: JsonField<Boolean> = JsonMissing.of()
                 private var exists: JsonField<Boolean> = JsonMissing.of()
+                private var hint: JsonField<String> = JsonMissing.of()
                 private var value: JsonField<String> = JsonMissing.of()
                 private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
@@ -991,6 +1006,7 @@ private constructor(
                     binding = secret.binding
                     editable = secret.editable
                     exists = secret.exists
+                    hint = secret.hint
                     value = secret.value
                     additionalProperties = secret.additionalProperties.toMutableMap()
                 }
@@ -1027,6 +1043,17 @@ private constructor(
                  * yet supported value.
                  */
                 fun exists(exists: JsonField<Boolean>) = apply { this.exists = exists }
+
+                fun hint(hint: String) = hint(JsonField.of(hint))
+
+                /**
+                 * Sets [Builder.hint] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.hint] with a well-typed [String] value instead.
+                 * This method is primarily for setting the field to an undocumented or not yet
+                 * supported value.
+                 */
+                fun hint(hint: JsonField<String>) = apply { this.hint = hint }
 
                 fun value(value: String) = value(JsonField.of(value))
 
@@ -1067,7 +1094,14 @@ private constructor(
                  * Further updates to this [Builder] will not mutate the returned instance.
                  */
                 fun build(): Secret =
-                    Secret(binding, editable, exists, value, additionalProperties.toMutableMap())
+                    Secret(
+                        binding,
+                        editable,
+                        exists,
+                        hint,
+                        value,
+                        additionalProperties.toMutableMap(),
+                    )
             }
 
             private var validated: Boolean = false
@@ -1080,6 +1114,7 @@ private constructor(
                 binding().ifPresent { it.validate() }
                 editable()
                 exists()
+                hint()
                 value()
                 validated = true
             }
@@ -1103,6 +1138,7 @@ private constructor(
                 (binding.asKnown().getOrNull()?.validity() ?: 0) +
                     (if (editable.asKnown().isPresent) 1 else 0) +
                     (if (exists.asKnown().isPresent) 1 else 0) +
+                    (if (hint.asKnown().isPresent) 1 else 0) +
                     (if (value.asKnown().isPresent) 1 else 0)
 
             class Binding @JsonCreator private constructor(private val value: JsonField<String>) :
@@ -1257,18 +1293,19 @@ private constructor(
                     binding == other.binding &&
                     editable == other.editable &&
                     exists == other.exists &&
+                    hint == other.hint &&
                     value == other.value &&
                     additionalProperties == other.additionalProperties
             }
 
             private val hashCode: Int by lazy {
-                Objects.hash(binding, editable, exists, value, additionalProperties)
+                Objects.hash(binding, editable, exists, hint, value, additionalProperties)
             }
 
             override fun hashCode(): Int = hashCode
 
             override fun toString() =
-                "Secret{binding=$binding, editable=$editable, exists=$exists, value=$value, additionalProperties=$additionalProperties}"
+                "Secret{binding=$binding, editable=$editable, exists=$exists, hint=$hint, value=$value, additionalProperties=$additionalProperties}"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -1683,9 +1720,7 @@ private constructor(
             private val authorizationUrl: JsonField<String>,
             private val clientId: JsonField<String>,
             private val clientSecret: JsonField<ClientSecret>,
-            private val externalId: JsonField<String>,
             private val redirectUri: JsonField<String>,
-            private val supportedScopes: JsonField<List<String>>,
             private val additionalProperties: MutableMap<String, JsonValue>,
         ) {
 
@@ -1700,24 +1735,10 @@ private constructor(
                 @JsonProperty("client_secret")
                 @ExcludeMissing
                 clientSecret: JsonField<ClientSecret> = JsonMissing.of(),
-                @JsonProperty("external_id")
-                @ExcludeMissing
-                externalId: JsonField<String> = JsonMissing.of(),
                 @JsonProperty("redirect_uri")
                 @ExcludeMissing
                 redirectUri: JsonField<String> = JsonMissing.of(),
-                @JsonProperty("supported_scopes")
-                @ExcludeMissing
-                supportedScopes: JsonField<List<String>> = JsonMissing.of(),
-            ) : this(
-                authorizationUrl,
-                clientId,
-                clientSecret,
-                externalId,
-                redirectUri,
-                supportedScopes,
-                mutableMapOf(),
-            )
+            ) : this(authorizationUrl, clientId, clientSecret, redirectUri, mutableMapOf())
 
             /**
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
@@ -1742,20 +1763,7 @@ private constructor(
              * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
              *   the server responded with an unexpected value).
              */
-            fun externalId(): Optional<String> = externalId.getOptional("external_id")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
             fun redirectUri(): Optional<String> = redirectUri.getOptional("redirect_uri")
-
-            /**
-             * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if
-             *   the server responded with an unexpected value).
-             */
-            fun supportedScopes(): Optional<List<String>> =
-                supportedScopes.getOptional("supported_scopes")
 
             /**
              * Returns the raw JSON value of [authorizationUrl].
@@ -1786,16 +1794,6 @@ private constructor(
             fun _clientSecret(): JsonField<ClientSecret> = clientSecret
 
             /**
-             * Returns the raw JSON value of [externalId].
-             *
-             * Unlike [externalId], this method doesn't throw if the JSON field has an unexpected
-             * type.
-             */
-            @JsonProperty("external_id")
-            @ExcludeMissing
-            fun _externalId(): JsonField<String> = externalId
-
-            /**
              * Returns the raw JSON value of [redirectUri].
              *
              * Unlike [redirectUri], this method doesn't throw if the JSON field has an unexpected
@@ -1804,16 +1802,6 @@ private constructor(
             @JsonProperty("redirect_uri")
             @ExcludeMissing
             fun _redirectUri(): JsonField<String> = redirectUri
-
-            /**
-             * Returns the raw JSON value of [supportedScopes].
-             *
-             * Unlike [supportedScopes], this method doesn't throw if the JSON field has an
-             * unexpected type.
-             */
-            @JsonProperty("supported_scopes")
-            @ExcludeMissing
-            fun _supportedScopes(): JsonField<List<String>> = supportedScopes
 
             @JsonAnySetter
             private fun putAdditionalProperty(key: String, value: JsonValue) {
@@ -1839,9 +1827,7 @@ private constructor(
                 private var authorizationUrl: JsonField<String> = JsonMissing.of()
                 private var clientId: JsonField<String> = JsonMissing.of()
                 private var clientSecret: JsonField<ClientSecret> = JsonMissing.of()
-                private var externalId: JsonField<String> = JsonMissing.of()
                 private var redirectUri: JsonField<String> = JsonMissing.of()
-                private var supportedScopes: JsonField<MutableList<String>>? = null
                 private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
                 @JvmSynthetic
@@ -1849,9 +1835,7 @@ private constructor(
                     authorizationUrl = oauth2.authorizationUrl
                     clientId = oauth2.clientId
                     clientSecret = oauth2.clientSecret
-                    externalId = oauth2.externalId
                     redirectUri = oauth2.redirectUri
-                    supportedScopes = oauth2.supportedScopes.map { it.toMutableList() }
                     additionalProperties = oauth2.additionalProperties.toMutableMap()
                 }
 
@@ -1894,19 +1878,6 @@ private constructor(
                     this.clientSecret = clientSecret
                 }
 
-                fun externalId(externalId: String) = externalId(JsonField.of(externalId))
-
-                /**
-                 * Sets [Builder.externalId] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.externalId] with a well-typed [String] value
-                 * instead. This method is primarily for setting the field to an undocumented or not
-                 * yet supported value.
-                 */
-                fun externalId(externalId: JsonField<String>) = apply {
-                    this.externalId = externalId
-                }
-
                 fun redirectUri(redirectUri: String) = redirectUri(JsonField.of(redirectUri))
 
                 /**
@@ -1918,32 +1889,6 @@ private constructor(
                  */
                 fun redirectUri(redirectUri: JsonField<String>) = apply {
                     this.redirectUri = redirectUri
-                }
-
-                fun supportedScopes(supportedScopes: List<String>) =
-                    supportedScopes(JsonField.of(supportedScopes))
-
-                /**
-                 * Sets [Builder.supportedScopes] to an arbitrary JSON value.
-                 *
-                 * You should usually call [Builder.supportedScopes] with a well-typed
-                 * `List<String>` value instead. This method is primarily for setting the field to
-                 * an undocumented or not yet supported value.
-                 */
-                fun supportedScopes(supportedScopes: JsonField<List<String>>) = apply {
-                    this.supportedScopes = supportedScopes.map { it.toMutableList() }
-                }
-
-                /**
-                 * Adds a single [String] to [supportedScopes].
-                 *
-                 * @throws IllegalStateException if the field was previously set to a non-list.
-                 */
-                fun addSupportedScope(supportedScope: String) = apply {
-                    supportedScopes =
-                        (supportedScopes ?: JsonField.of(mutableListOf())).also {
-                            checkKnown("supportedScopes", it).add(supportedScope)
-                        }
                 }
 
                 fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
@@ -1978,9 +1923,7 @@ private constructor(
                         authorizationUrl,
                         clientId,
                         clientSecret,
-                        externalId,
                         redirectUri,
-                        (supportedScopes ?: JsonMissing.of()).map { it.toImmutable() },
                         additionalProperties.toMutableMap(),
                     )
             }
@@ -1995,9 +1938,7 @@ private constructor(
                 authorizationUrl()
                 clientId()
                 clientSecret().ifPresent { it.validate() }
-                externalId()
                 redirectUri()
-                supportedScopes()
                 validated = true
             }
 
@@ -2020,9 +1961,7 @@ private constructor(
                 (if (authorizationUrl.asKnown().isPresent) 1 else 0) +
                     (if (clientId.asKnown().isPresent) 1 else 0) +
                     (clientSecret.asKnown().getOrNull()?.validity() ?: 0) +
-                    (if (externalId.asKnown().isPresent) 1 else 0) +
-                    (if (redirectUri.asKnown().isPresent) 1 else 0) +
-                    (supportedScopes.asKnown().getOrNull()?.size ?: 0)
+                    (if (redirectUri.asKnown().isPresent) 1 else 0)
 
             class ClientSecret
             @JsonCreator(mode = JsonCreator.Mode.DISABLED)
@@ -2030,6 +1969,7 @@ private constructor(
                 private val binding: JsonField<Binding>,
                 private val editable: JsonField<Boolean>,
                 private val exists: JsonField<Boolean>,
+                private val hint: JsonField<String>,
                 private val value: JsonField<String>,
                 private val additionalProperties: MutableMap<String, JsonValue>,
             ) {
@@ -2045,10 +1985,13 @@ private constructor(
                     @JsonProperty("exists")
                     @ExcludeMissing
                     exists: JsonField<Boolean> = JsonMissing.of(),
+                    @JsonProperty("hint")
+                    @ExcludeMissing
+                    hint: JsonField<String> = JsonMissing.of(),
                     @JsonProperty("value")
                     @ExcludeMissing
                     value: JsonField<String> = JsonMissing.of(),
-                ) : this(binding, editable, exists, value, mutableMapOf())
+                ) : this(binding, editable, exists, hint, value, mutableMapOf())
 
                 /**
                  * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
@@ -2067,6 +2010,12 @@ private constructor(
                  *   if the server responded with an unexpected value).
                  */
                 fun exists(): Optional<Boolean> = exists.getOptional("exists")
+
+                /**
+                 * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
+                 *   if the server responded with an unexpected value).
+                 */
+                fun hint(): Optional<String> = hint.getOptional("hint")
 
                 /**
                  * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g.
@@ -2103,6 +2052,14 @@ private constructor(
                 @JsonProperty("exists") @ExcludeMissing fun _exists(): JsonField<Boolean> = exists
 
                 /**
+                 * Returns the raw JSON value of [hint].
+                 *
+                 * Unlike [hint], this method doesn't throw if the JSON field has an unexpected
+                 * type.
+                 */
+                @JsonProperty("hint") @ExcludeMissing fun _hint(): JsonField<String> = hint
+
+                /**
                  * Returns the raw JSON value of [value].
                  *
                  * Unlike [value], this method doesn't throw if the JSON field has an unexpected
@@ -2134,6 +2091,7 @@ private constructor(
                     private var binding: JsonField<Binding> = JsonMissing.of()
                     private var editable: JsonField<Boolean> = JsonMissing.of()
                     private var exists: JsonField<Boolean> = JsonMissing.of()
+                    private var hint: JsonField<String> = JsonMissing.of()
                     private var value: JsonField<String> = JsonMissing.of()
                     private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
@@ -2142,6 +2100,7 @@ private constructor(
                         binding = clientSecret.binding
                         editable = clientSecret.editable
                         exists = clientSecret.exists
+                        hint = clientSecret.hint
                         value = clientSecret.value
                         additionalProperties = clientSecret.additionalProperties.toMutableMap()
                     }
@@ -2178,6 +2137,17 @@ private constructor(
                      * not yet supported value.
                      */
                     fun exists(exists: JsonField<Boolean>) = apply { this.exists = exists }
+
+                    fun hint(hint: String) = hint(JsonField.of(hint))
+
+                    /**
+                     * Sets [Builder.hint] to an arbitrary JSON value.
+                     *
+                     * You should usually call [Builder.hint] with a well-typed [String] value
+                     * instead. This method is primarily for setting the field to an undocumented or
+                     * not yet supported value.
+                     */
+                    fun hint(hint: JsonField<String>) = apply { this.hint = hint }
 
                     fun value(value: String) = value(JsonField.of(value))
 
@@ -2222,6 +2192,7 @@ private constructor(
                             binding,
                             editable,
                             exists,
+                            hint,
                             value,
                             additionalProperties.toMutableMap(),
                         )
@@ -2237,6 +2208,7 @@ private constructor(
                     binding().ifPresent { it.validate() }
                     editable()
                     exists()
+                    hint()
                     value()
                     validated = true
                 }
@@ -2260,6 +2232,7 @@ private constructor(
                     (binding.asKnown().getOrNull()?.validity() ?: 0) +
                         (if (editable.asKnown().isPresent) 1 else 0) +
                         (if (exists.asKnown().isPresent) 1 else 0) +
+                        (if (hint.asKnown().isPresent) 1 else 0) +
                         (if (value.asKnown().isPresent) 1 else 0)
 
                 class Binding
@@ -2417,18 +2390,19 @@ private constructor(
                         binding == other.binding &&
                         editable == other.editable &&
                         exists == other.exists &&
+                        hint == other.hint &&
                         value == other.value &&
                         additionalProperties == other.additionalProperties
                 }
 
                 private val hashCode: Int by lazy {
-                    Objects.hash(binding, editable, exists, value, additionalProperties)
+                    Objects.hash(binding, editable, exists, hint, value, additionalProperties)
                 }
 
                 override fun hashCode(): Int = hashCode
 
                 override fun toString() =
-                    "ClientSecret{binding=$binding, editable=$editable, exists=$exists, value=$value, additionalProperties=$additionalProperties}"
+                    "ClientSecret{binding=$binding, editable=$editable, exists=$exists, hint=$hint, value=$value, additionalProperties=$additionalProperties}"
             }
 
             override fun equals(other: Any?): Boolean {
@@ -2440,9 +2414,7 @@ private constructor(
                     authorizationUrl == other.authorizationUrl &&
                     clientId == other.clientId &&
                     clientSecret == other.clientSecret &&
-                    externalId == other.externalId &&
                     redirectUri == other.redirectUri &&
-                    supportedScopes == other.supportedScopes &&
                     additionalProperties == other.additionalProperties
             }
 
@@ -2451,9 +2423,7 @@ private constructor(
                     authorizationUrl,
                     clientId,
                     clientSecret,
-                    externalId,
                     redirectUri,
-                    supportedScopes,
                     additionalProperties,
                 )
             }
@@ -2461,7 +2431,7 @@ private constructor(
             override fun hashCode(): Int = hashCode
 
             override fun toString() =
-                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, externalId=$externalId, redirectUri=$redirectUri, supportedScopes=$supportedScopes, additionalProperties=$additionalProperties}"
+                "Oauth2{authorizationUrl=$authorizationUrl, clientId=$clientId, clientSecret=$clientSecret, redirectUri=$redirectUri, additionalProperties=$additionalProperties}"
         }
 
         class Secrets

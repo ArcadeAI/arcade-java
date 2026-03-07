@@ -11,16 +11,15 @@ internal class HealthSchemaTest {
 
     @Test
     fun create() {
-        val healthSchema = HealthSchema.builder().healthy(true).reason("reason").build()
+        val healthSchema = HealthSchema.builder().healthy(true).build()
 
         assertThat(healthSchema.healthy()).contains(true)
-        assertThat(healthSchema.reason()).contains("reason")
     }
 
     @Test
     fun roundtrip() {
         val jsonMapper = jsonMapper()
-        val healthSchema = HealthSchema.builder().healthy(true).reason("reason").build()
+        val healthSchema = HealthSchema.builder().healthy(true).build()
 
         val roundtrippedHealthSchema =
             jsonMapper.readValue(

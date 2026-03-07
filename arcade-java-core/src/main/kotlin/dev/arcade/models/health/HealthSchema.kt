@@ -19,15 +19,13 @@ class HealthSchema
 @JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
     private val healthy: JsonField<Boolean>,
-    private val reason: JsonField<String>,
     private val additionalProperties: MutableMap<String, JsonValue>,
 ) {
 
     @JsonCreator
     private constructor(
-        @JsonProperty("healthy") @ExcludeMissing healthy: JsonField<Boolean> = JsonMissing.of(),
-        @JsonProperty("reason") @ExcludeMissing reason: JsonField<String> = JsonMissing.of(),
-    ) : this(healthy, reason, mutableMapOf())
+        @JsonProperty("healthy") @ExcludeMissing healthy: JsonField<Boolean> = JsonMissing.of()
+    ) : this(healthy, mutableMapOf())
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -36,26 +34,11 @@ private constructor(
     fun healthy(): Optional<Boolean> = healthy.getOptional("healthy")
 
     /**
-     * Optional: explains why unhealthy
-     *
-     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
-     *   server responded with an unexpected value).
-     */
-    fun reason(): Optional<String> = reason.getOptional("reason")
-
-    /**
      * Returns the raw JSON value of [healthy].
      *
      * Unlike [healthy], this method doesn't throw if the JSON field has an unexpected type.
      */
     @JsonProperty("healthy") @ExcludeMissing fun _healthy(): JsonField<Boolean> = healthy
-
-    /**
-     * Returns the raw JSON value of [reason].
-     *
-     * Unlike [reason], this method doesn't throw if the JSON field has an unexpected type.
-     */
-    @JsonProperty("reason") @ExcludeMissing fun _reason(): JsonField<String> = reason
 
     @JsonAnySetter
     private fun putAdditionalProperty(key: String, value: JsonValue) {
@@ -79,13 +62,11 @@ private constructor(
     class Builder internal constructor() {
 
         private var healthy: JsonField<Boolean> = JsonMissing.of()
-        private var reason: JsonField<String> = JsonMissing.of()
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
         @JvmSynthetic
         internal fun from(healthSchema: HealthSchema) = apply {
             healthy = healthSchema.healthy
-            reason = healthSchema.reason
             additionalProperties = healthSchema.additionalProperties.toMutableMap()
         }
 
@@ -98,17 +79,6 @@ private constructor(
          * method is primarily for setting the field to an undocumented or not yet supported value.
          */
         fun healthy(healthy: JsonField<Boolean>) = apply { this.healthy = healthy }
-
-        /** Optional: explains why unhealthy */
-        fun reason(reason: String) = reason(JsonField.of(reason))
-
-        /**
-         * Sets [Builder.reason] to an arbitrary JSON value.
-         *
-         * You should usually call [Builder.reason] with a well-typed [String] value instead. This
-         * method is primarily for setting the field to an undocumented or not yet supported value.
-         */
-        fun reason(reason: JsonField<String>) = apply { this.reason = reason }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.clear()
@@ -134,8 +104,7 @@ private constructor(
          *
          * Further updates to this [Builder] will not mutate the returned instance.
          */
-        fun build(): HealthSchema =
-            HealthSchema(healthy, reason, additionalProperties.toMutableMap())
+        fun build(): HealthSchema = HealthSchema(healthy, additionalProperties.toMutableMap())
     }
 
     private var validated: Boolean = false
@@ -146,7 +115,6 @@ private constructor(
         }
 
         healthy()
-        reason()
         validated = true
     }
 
@@ -163,9 +131,7 @@ private constructor(
      *
      * Used for best match union deserialization.
      */
-    @JvmSynthetic
-    internal fun validity(): Int =
-        (if (healthy.asKnown().isPresent) 1 else 0) + (if (reason.asKnown().isPresent) 1 else 0)
+    @JvmSynthetic internal fun validity(): Int = (if (healthy.asKnown().isPresent) 1 else 0)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -174,14 +140,13 @@ private constructor(
 
         return other is HealthSchema &&
             healthy == other.healthy &&
-            reason == other.reason &&
             additionalProperties == other.additionalProperties
     }
 
-    private val hashCode: Int by lazy { Objects.hash(healthy, reason, additionalProperties) }
+    private val hashCode: Int by lazy { Objects.hash(healthy, additionalProperties) }
 
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "HealthSchema{healthy=$healthy, reason=$reason, additionalProperties=$additionalProperties}"
+        "HealthSchema{healthy=$healthy, additionalProperties=$additionalProperties}"
 }
