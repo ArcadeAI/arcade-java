@@ -13,8 +13,8 @@ internal class UserConnectionListParamsTest {
         UserConnectionListParams.builder()
             .limit(0L)
             .offset(0L)
-            .providerId("provider_id")
-            .userId("user_id")
+            .provider(UserConnectionListParams.Provider.builder().id("id").build())
+            .user(UserConnectionListParams.User.builder().id("id").build())
             .build()
     }
 
@@ -24,8 +24,8 @@ internal class UserConnectionListParamsTest {
             UserConnectionListParams.builder()
                 .limit(0L)
                 .offset(0L)
-                .providerId("provider_id")
-                .userId("user_id")
+                .provider(UserConnectionListParams.Provider.builder().id("id").build())
+                .user(UserConnectionListParams.User.builder().id("id").build())
                 .build()
 
         val queryParams = params._queryParams()
@@ -35,8 +35,8 @@ internal class UserConnectionListParamsTest {
                 QueryParams.builder()
                     .put("limit", "0")
                     .put("offset", "0")
-                    .put("provider_id", "provider_id")
-                    .put("user_id", "user_id")
+                    .put("provider[id]", "id")
+                    .put("user[id]", "id")
                     .build()
             )
     }

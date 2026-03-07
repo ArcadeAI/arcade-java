@@ -3,23 +3,29 @@
 package dev.arcade.models.tools.formatted
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter
+import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonCreator
 import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonValue
-import dev.arcade.core.toImmutable
 import dev.arcade.errors.ArcadeInvalidDataException
+import java.util.Collections
 import java.util.Objects
 
 class FormattedGetResponse
-@JsonCreator
-private constructor(
-    @com.fasterxml.jackson.annotation.JsonValue
-    private val additionalProperties: Map<String, JsonValue>
-) {
+@JsonCreator(mode = JsonCreator.Mode.DISABLED)
+private constructor(private val additionalProperties: MutableMap<String, JsonValue>) {
+
+    @JsonCreator private constructor() : this(mutableMapOf())
+
+    @JsonAnySetter
+    private fun putAdditionalProperty(key: String, value: JsonValue) {
+        additionalProperties.put(key, value)
+    }
 
     @JsonAnyGetter
     @ExcludeMissing
-    fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
+    fun _additionalProperties(): Map<String, JsonValue> =
+        Collections.unmodifiableMap(additionalProperties)
 
     fun toBuilder() = Builder().from(this)
 
@@ -63,7 +69,8 @@ private constructor(
          *
          * Further updates to this [Builder] will not mutate the returned instance.
          */
-        fun build(): FormattedGetResponse = FormattedGetResponse(additionalProperties.toImmutable())
+        fun build(): FormattedGetResponse =
+            FormattedGetResponse(additionalProperties.toMutableMap())
     }
 
     private var validated: Boolean = false
@@ -89,9 +96,7 @@ private constructor(
      *
      * Used for best match union deserialization.
      */
-    @JvmSynthetic
-    internal fun validity(): Int =
-        additionalProperties.count { (_, value) -> !value.isNull() && !value.isMissing() }
+    @JvmSynthetic internal fun validity(): Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {

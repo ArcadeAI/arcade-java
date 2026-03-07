@@ -33,6 +33,7 @@ internal class WorkerListPageResponseTest {
                                         .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                                         .editable(true)
                                         .exists(true)
+                                        .hint("hint")
                                         .value("value")
                                         .build()
                                 )
@@ -60,12 +61,11 @@ internal class WorkerListPageResponseTest {
                                                 )
                                                 .editable(true)
                                                 .exists(true)
+                                                .hint("hint")
                                                 .value("value")
                                                 .build()
                                         )
-                                        .externalId("external_id")
                                         .redirectUri("redirect_uri")
-                                        .addSupportedScope("string")
                                         .build()
                                 )
                                 .retry(0L)
@@ -78,6 +78,7 @@ internal class WorkerListPageResponseTest {
                                                     "binding" to "static",
                                                     "editable" to true,
                                                     "exists" to true,
+                                                    "hint" to "hint",
                                                     "value" to "value",
                                                 )
                                             ),
@@ -132,6 +133,7 @@ internal class WorkerListPageResponseTest {
                                     .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                                     .editable(true)
                                     .exists(true)
+                                    .hint("hint")
                                     .value("value")
                                     .build()
                             )
@@ -159,12 +161,11 @@ internal class WorkerListPageResponseTest {
                                             )
                                             .editable(true)
                                             .exists(true)
+                                            .hint("hint")
                                             .value("value")
                                             .build()
                                     )
-                                    .externalId("external_id")
                                     .redirectUri("redirect_uri")
-                                    .addSupportedScope("string")
                                     .build()
                             )
                             .retry(0L)
@@ -177,6 +178,7 @@ internal class WorkerListPageResponseTest {
                                                 "binding" to "static",
                                                 "editable" to true,
                                                 "exists" to true,
+                                                "hint" to "hint",
                                                 "value" to "value",
                                             )
                                         ),
@@ -234,6 +236,7 @@ internal class WorkerListPageResponseTest {
                                         .binding(WorkerResponse.Http.Secret.Binding.STATIC)
                                         .editable(true)
                                         .exists(true)
+                                        .hint("hint")
                                         .value("value")
                                         .build()
                                 )
@@ -261,12 +264,11 @@ internal class WorkerListPageResponseTest {
                                                 )
                                                 .editable(true)
                                                 .exists(true)
+                                                .hint("hint")
                                                 .value("value")
                                                 .build()
                                         )
-                                        .externalId("external_id")
                                         .redirectUri("redirect_uri")
-                                        .addSupportedScope("string")
                                         .build()
                                 )
                                 .retry(0L)
@@ -279,6 +281,7 @@ internal class WorkerListPageResponseTest {
                                                     "binding" to "static",
                                                     "editable" to true,
                                                     "exists" to true,
+                                                    "hint" to "hint",
                                                     "value" to "value",
                                                 )
                                             ),

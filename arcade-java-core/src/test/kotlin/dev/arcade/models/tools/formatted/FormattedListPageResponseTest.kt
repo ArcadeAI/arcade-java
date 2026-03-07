@@ -3,7 +3,6 @@
 package dev.arcade.models.tools.formatted
 
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import dev.arcade.core.JsonValue
 import dev.arcade.core.jsonMapper
 import kotlin.jvm.optionals.getOrNull
 import org.assertj.core.api.Assertions.assertThat
@@ -15,11 +14,7 @@ internal class FormattedListPageResponseTest {
     fun create() {
         val formattedListPageResponse =
             FormattedListPageResponse.builder()
-                .addItem(
-                    FormattedListResponse.builder()
-                        .putAdditionalProperty("foo", JsonValue.from("bar"))
-                        .build()
-                )
+                .addItem(FormattedListResponse.builder().build())
                 .limit(0L)
                 .offset(0L)
                 .pageCount(0L)
@@ -27,11 +22,7 @@ internal class FormattedListPageResponseTest {
                 .build()
 
         assertThat(formattedListPageResponse.items().getOrNull())
-            .containsExactly(
-                FormattedListResponse.builder()
-                    .putAdditionalProperty("foo", JsonValue.from("bar"))
-                    .build()
-            )
+            .containsExactly(FormattedListResponse.builder().build())
         assertThat(formattedListPageResponse.limit()).contains(0L)
         assertThat(formattedListPageResponse.offset()).contains(0L)
         assertThat(formattedListPageResponse.pageCount()).contains(0L)
@@ -43,11 +34,7 @@ internal class FormattedListPageResponseTest {
         val jsonMapper = jsonMapper()
         val formattedListPageResponse =
             FormattedListPageResponse.builder()
-                .addItem(
-                    FormattedListResponse.builder()
-                        .putAdditionalProperty("foo", JsonValue.from("bar"))
-                        .build()
-                )
+                .addItem(FormattedListResponse.builder().build())
                 .limit(0L)
                 .offset(0L)
                 .pageCount(0L)
