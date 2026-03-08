@@ -3,29 +3,23 @@
 package dev.arcade.models.tools.formatted
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter
-import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonCreator
 import dev.arcade.core.ExcludeMissing
 import dev.arcade.core.JsonValue
+import dev.arcade.core.toImmutable
 import dev.arcade.errors.ArcadeInvalidDataException
-import java.util.Collections
 import java.util.Objects
 
 class FormattedListResponse
-@JsonCreator(mode = JsonCreator.Mode.DISABLED)
-private constructor(private val additionalProperties: MutableMap<String, JsonValue>) {
-
-    @JsonCreator private constructor() : this(mutableMapOf())
-
-    @JsonAnySetter
-    private fun putAdditionalProperty(key: String, value: JsonValue) {
-        additionalProperties.put(key, value)
-    }
+@JsonCreator
+private constructor(
+    @com.fasterxml.jackson.annotation.JsonValue
+    private val additionalProperties: Map<String, JsonValue>
+) {
 
     @JsonAnyGetter
     @ExcludeMissing
-    fun _additionalProperties(): Map<String, JsonValue> =
-        Collections.unmodifiableMap(additionalProperties)
+    fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
 
     fun toBuilder() = Builder().from(this)
 
@@ -70,7 +64,7 @@ private constructor(private val additionalProperties: MutableMap<String, JsonVal
          * Further updates to this [Builder] will not mutate the returned instance.
          */
         fun build(): FormattedListResponse =
-            FormattedListResponse(additionalProperties.toMutableMap())
+            FormattedListResponse(additionalProperties.toImmutable())
     }
 
     private var validated: Boolean = false
@@ -96,7 +90,9 @@ private constructor(private val additionalProperties: MutableMap<String, JsonVal
      *
      * Used for best match union deserialization.
      */
-    @JvmSynthetic internal fun validity(): Int = 0
+    @JvmSynthetic
+    internal fun validity(): Int =
+        additionalProperties.count { (_, value) -> !value.isNull() && !value.isMissing() }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
