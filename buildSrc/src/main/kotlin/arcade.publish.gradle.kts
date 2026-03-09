@@ -1,72 +1,69 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinJvm
-import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
-    id("com.vanniktech.maven.publish")
+    `maven-publish`
+    signing
 }
 
-publishing {
-  repositories {
-      if (project.hasProperty("publishLocal")) {
-          maven {
-              name = "LocalFileSystem"
-              url = uri("${rootProject.layout.buildDirectory.get()}/local-maven-repo")
-          }
-      }
-  }
-}
+configure<PublishingExtension> {
+    publications {
+        register<MavenPublication>("maven") {
+            from(components["java"])
 
-repositories {
-    gradlePluginPortal()
-    mavenCentral()
-}
+            pom {
+                name.set("Arcade API")
+                description.set("Reference Documentation for Arcade Engine API")
+                url.set("https://docs.arcade.dev")
 
-extra["signingInMemoryKey"] = System.getenv("GPG_SIGNING_KEY")
-extra["signingInMemoryKeyId"] = System.getenv("GPG_SIGNING_KEY_ID")
-extra["signingInMemoryKeyPassword"] = System.getenv("GPG_SIGNING_PASSWORD")
+                licenses {
+                    license {
+                        name.set("MIT")
+                    }
+                }
 
-configure<MavenPublishBaseExtension> {
-    if (!project.hasProperty("publishLocal")) {
-        signAllPublications()
-        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+                developers {
+                    developer {
+                        name.set("Arcade")
+                        email.set("dev@arcade.dev")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
+                    developerConnection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
+                    url.set("https://github.com/ArcadeAI/arcade-java")
+                }
+
+                versionMapping {
+                    allVariants {
+                        fromResolutionResult()
+                    }
+                }
+            }
+        }
     }
+    repositories {
+        if (project.hasProperty("publishLocal")) {
+            maven {
+                name = "LocalFileSystem"
+                url = uri("${rootProject.layout.buildDirectory.get()}/local-maven-repo")
+            }
+        }
+    }
+}
 
-    coordinates(project.group.toString(), project.name, project.version.toString())
-    configure(
-        KotlinJvm(
-            javadocJar = JavadocJar.Dokka("dokkaJavadoc"),
-            sourcesJar = true,
+signing {
+    val signingKeyId = System.getenv("GPG_SIGNING_KEY_ID")?.ifBlank { null }
+    val signingKey = System.getenv("GPG_SIGNING_KEY")?.ifBlank { null }
+    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD")?.ifBlank { null }
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(
+            signingKeyId,
+            signingKey,
+            signingPassword,
         )
-    )
-
-    pom {
-        name.set("Arcade API")
-        description.set("Reference Documentation for Arcade Engine API")
-        url.set("https://docs.arcade.dev")
-
-        licenses {
-            license {
-                name.set("MIT")
-            }
-        }
-
-        developers {
-            developer {
-                name.set("Arcade")
-                email.set("dev@arcade.dev")
-            }
-        }
-
-        scm {
-            connection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
-            developerConnection.set("scm:git:git://github.com/ArcadeAI/arcade-java.git")
-            url.set("https://github.com/ArcadeAI/arcade-java")
-        }
+        sign(publishing.publications["maven"])
     }
 }
 
-tasks.withType<Zip>().configureEach {
-    isZip64 = true
+tasks.named("publish") {
+    dependsOn(":closeAndReleaseSonatypeStagingRepository")
 }
