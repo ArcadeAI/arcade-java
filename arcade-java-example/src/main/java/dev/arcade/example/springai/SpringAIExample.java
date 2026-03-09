@@ -22,8 +22,7 @@ import org.springframework.stereotype.Service;
 @SpringBootApplication
 public class SpringAIExample {
 
-    private static final String SYSTEM_PROMPT =
-            """
+    private static final String SYSTEM_PROMPT = """
         You are a specialized Music Assistant with access to two MCP tools: get_spotify_state and play_song.
         Your goal is to provide a seamless, proactive audio experience. Follow these operational guidelines:
         Context Awareness: Before playing any music, always use get_spotify_state to see if music is already playing. If it is, acknowledge what is currently playing before switching to the new track.
@@ -86,14 +85,11 @@ public class SpringAIExample {
          *
          * @return A string object of the playback state.
          */
-        @Tool(
-                name = "get_spotify_state",
-                description =
-                        """
-                Get information about the user's current playback state,
-                including track or episode, and active device.
-                This tool does not perform any actions. Use other tools to control playback.
-                """)
+        @Tool(name = "get_spotify_state", description = """
+            Get information about the user's current playback state,
+            including track or episode, and active device.
+            This tool does not perform any actions. Use other tools to control playback.
+            """)
         String playbackState() {
             return executeTool("Spotify.GetPlaybackState", Map.of());
         }

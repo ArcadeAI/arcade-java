@@ -67,19 +67,16 @@ public class QuickStartExample {
                 userId);
 
         // Print the response from the tool call
-        logger.info(
-                """
-                Success! Check your email at {}
+        logger.info("""
+            Success! Check your email at {}
 
-                You just chained 3 tools together:
-                  1. Searched Google News for stories about MCP URL mode elicitation
-                  2. Created a Google Doc with the results
-                  3. Sent yourself an email with the document link
+            You just chained 3 tools together:
+              1. Searched Google News for stories about MCP URL mode elicitation
+              2. Created a Google Doc with the results
+              3. Sent yourself an email with the document link
 
-                Email metadata: {}
-                """,
-                userId,
-                sendEmailResult);
+            Email metadata: {}
+            """, userId, sendEmailResult);
     }
 
     /**
@@ -101,14 +98,11 @@ public class QuickStartExample {
                 .status()
                 .filter(status -> status != AuthorizationResponse.Status.COMPLETED)
                 .flatMap(status -> authResponse.url())
-                .ifPresent(url -> logger.info(
-                        """
-                        Click this link to authorize {}:
-                        {}.
-                        The process will continue once you have authorized the app.
-                        """,
-                        toolName,
-                        url));
+                .ifPresent(url -> logger.info("""
+                    Click this link to authorize {}:
+                    {}.
+                    The process will continue once you have authorized the app.
+                    """, toolName, url));
         client.auth().waitForCompletion(authResponse);
 
         // Execute the tool and extract the output as a Map
