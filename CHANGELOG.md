@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.0-alpha.3 (2026-03-09)
+
+Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
+
+### Features
+
+* **api:** api update ([4a4a38b](https://github.com/ArcadeAI/arcade-java/commit/4a4a38bd6eb8848183c7a553ab23d28f44a7ca6e))
+* **api:** api update ([b62bebe](https://github.com/ArcadeAI/arcade-java/commit/b62bebeaa3c5341aed692f28cdb76c24ef4588d7))
+* **api:** api update ([ab083dc](https://github.com/ArcadeAI/arcade-java/commit/ab083dc5b22c66bd1a216107ed5d427270f7535f))
+* **api:** api update ([a9067a6](https://github.com/ArcadeAI/arcade-java/commit/a9067a6b9e05ec27d0a4c3bd5a50b5fd568a617f))
+* **api:** Enable publishing for Java SDK ([4e1dd23](https://github.com/ArcadeAI/arcade-java/commit/4e1dd23facb1daf92135fde91bbeb1fefc9e1b76))
+
+
+### Chores
+
+* **ci:** skip uploading artifacts on stainless-internal branches ([e37cb5d](https://github.com/ArcadeAI/arcade-java/commit/e37cb5d7f6f23e6be986ae5e3784898e3854a79c))
+* **internal:** bump palantir-java-format ([b1ebae8](https://github.com/ArcadeAI/arcade-java/commit/b1ebae8ff127b1402785df354f2687408ff248b0))
+* **internal:** codegen related update ([8837560](https://github.com/ArcadeAI/arcade-java/commit/883756053127934e8dc3d1ee90148f51c0a48f28))
+* **test:** do not count install time for mock server timeout ([4432b39](https://github.com/ArcadeAI/arcade-java/commit/4432b393c3ce20da89bb217f019dbf3221d41d0e))
+
 ## 0.1.0-alpha.2 (2026-02-28)
 
 Full Changelog: [v0.1.0-alpha.1...v0.1.0-alpha.2](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.1...v0.1.0-alpha.2)
