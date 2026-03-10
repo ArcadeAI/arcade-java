@@ -9,7 +9,7 @@ repositories {
 
 allprojects {
     group = "dev.arcade"
-    version = "0.1.0-alpha.3" // x-release-please-version
+    version = "0.1.0-alpha.4" // x-release-please-version
 }
 
 subprojects {
@@ -39,8 +39,8 @@ tasks.named("dokkaJavadocCollector").configure {
 nexusPublishing {
     repositories {
         sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
 
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))

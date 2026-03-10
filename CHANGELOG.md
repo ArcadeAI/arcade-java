@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2026-03-10)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
 ## 0.1.0-alpha.3 (2026-03-09)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
