@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.5 (2026-03-16)
+
+Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
+
+### Bug Fixes
+
+* **client:** incorrect `Retry-After` parsing ([5894ea9](https://github.com/ArcadeAI/arcade-java/commit/5894ea94e51105eaeacc5efb8daed34b9ccab3e5))
+
 ## 0.1.0-alpha.4 (2026-03-10)
 
 Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
