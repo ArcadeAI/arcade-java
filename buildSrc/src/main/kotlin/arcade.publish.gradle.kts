@@ -10,7 +10,7 @@ configure<PublishingExtension> {
 
             pom {
                 name.set("Arcade API")
-                description.set("Reference Documentation for Arcade Engine API")
+                description.set("The Arcade SDK provides convenient access to the Arcade REST API from applications running on the JVM.")
                 url.set("https://docs.arcade.dev")
 
                 licenses {
