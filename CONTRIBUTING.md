@@ -40,7 +40,7 @@ Most tests require you to [run a mock server](https://github.com/stoplightio/pri
 ./scripts/mock --daemon
 ```
 
-The mock serer will run in the background allowing you to run tests from the command line `./gradlew test` or from your IDE.
+The mock server will run in the background allowing you to run tests from the command line `./gradlew test` or from your IDE.
 
 To stop the mock server run:
 ```shell
@@ -62,3 +62,22 @@ To format and fix all issues automatically:
 ```sh
 $ ./scripts/format
 ```
+
+## Release and pull request process
+
+As mentioned above, most of the code in this repository is generated. So the pull requests process may different from what you are expecting. Here are the steps:
+
+- Custom code changes should target the `next` branch in [`ArcadeAI/arcade-java`](https://github.com/arcadeai/arcade-java).
+- Be selective on what you are changing, as this may cause [merge conflicts](https://www.stainless.com/docs/sdks/configure/custom-code) with the generated code.
+- Create a new pull request against `next`, CI will build and test it.
+- Once it is merged to `next`, and when there have been upstream changes to the OpenAPI spec, you will see a pull request titled "release: <version>" (where `<version>` is the next version to be released)
+- Review it, most of the changes will have been generated, make sure the changes from your pull request are included.
+- Approve the PR, and merge it.
+  - The `next` branch will be rebased to `main`, so you will need to rewrite the branch, something like: `git fetch origin next && git reset --hard origin/next`
+- Once changes are merged to `main` a CI job will deploy the version to [Maven Central](https://central.sonatype.com/search?q=arcade-java). There may be a delay between the time it is published until the time it shows up in the Maven Central search results.
+
+## Troubleshooting tips
+
+If you are running into issues deploying to Maven Central, run the [`Release Doctor`](https://github.com/ArcadeAI/arcade-java/actions/workflows/release-doctor.yml) CI job, this will check that the required environment variables are set correctly.
+
+The [`CI` workflow](https://github.com/ArcadeAI/arcade-java/blob/main/.github/workflows/ci.yml), includes a couple of `if` statments that look like: `github.repository == 'stainless-sdks/arcade-engine-java'`. These are ONLY used for pre-release builds when the Stainless SDK code is generated. These are NOT used currently (in the future if there are multiple Java project repositories, this Maven repository could be used to test nightly builds). Otherwise, [build from source](#building-the-repository-from-source).
