@@ -14,9 +14,13 @@ import java.util.Objects
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
-/** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+/**
+ * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+ * metadata
+ */
 class ToolListParams
 private constructor(
+    private val filter: String?,
     private val includeAllVersions: Boolean?,
     private val includeFormat: List<IncludeFormat>?,
     private val limit: Long?,
@@ -26,6 +30,13 @@ private constructor(
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
+
+    /**
+     * JSON metadata filter. Array fields (service_domains, operations): shorthand array or object
+     * with any_of/all_of/none_of operators (case-insensitive). Boolean fields: read_only,
+     * destructive, idempotent, open_world. Extras: case-sensitive key-value subset match.
+     */
+    fun filter(): Optional<String> = Optional.ofNullable(filter)
 
     /** Include all versions of each tool */
     fun includeAllVersions(): Optional<Boolean> = Optional.ofNullable(includeAllVersions)
@@ -64,6 +75,7 @@ private constructor(
     /** A builder for [ToolListParams]. */
     class Builder internal constructor() {
 
+        private var filter: String? = null
         private var includeAllVersions: Boolean? = null
         private var includeFormat: MutableList<IncludeFormat>? = null
         private var limit: Long? = null
@@ -75,6 +87,7 @@ private constructor(
 
         @JvmSynthetic
         internal fun from(toolListParams: ToolListParams) = apply {
+            filter = toolListParams.filter
             includeAllVersions = toolListParams.includeAllVersions
             includeFormat = toolListParams.includeFormat?.toMutableList()
             limit = toolListParams.limit
@@ -84,6 +97,17 @@ private constructor(
             additionalHeaders = toolListParams.additionalHeaders.toBuilder()
             additionalQueryParams = toolListParams.additionalQueryParams.toBuilder()
         }
+
+        /**
+         * JSON metadata filter. Array fields (service_domains, operations): shorthand array or
+         * object with any_of/all_of/none_of operators (case-insensitive). Boolean fields:
+         * read_only, destructive, idempotent, open_world. Extras: case-sensitive key-value subset
+         * match.
+         */
+        fun filter(filter: String?) = apply { this.filter = filter }
+
+        /** Alias for calling [Builder.filter] with `filter.orElse(null)`. */
+        fun filter(filter: Optional<String>) = filter(filter.getOrNull())
 
         /** Include all versions of each tool */
         fun includeAllVersions(includeAllVersions: Boolean?) = apply {
@@ -266,6 +290,7 @@ private constructor(
          */
         fun build(): ToolListParams =
             ToolListParams(
+                filter,
                 includeAllVersions,
                 includeFormat?.toImmutable(),
                 limit,
@@ -282,6 +307,7 @@ private constructor(
     override fun _queryParams(): QueryParams =
         QueryParams.builder()
             .apply {
+                filter?.let { put("filter", it) }
                 includeAllVersions?.let { put("include_all_versions", it.toString()) }
                 includeFormat?.let { put("include_format", it.joinToString(",") { it.toString() }) }
                 limit?.let { put("limit", it.toString()) }
@@ -433,6 +459,7 @@ private constructor(
         }
 
         return other is ToolListParams &&
+            filter == other.filter &&
             includeAllVersions == other.includeAllVersions &&
             includeFormat == other.includeFormat &&
             limit == other.limit &&
@@ -445,6 +472,7 @@ private constructor(
 
     override fun hashCode(): Int =
         Objects.hash(
+            filter,
             includeAllVersions,
             includeFormat,
             limit,
@@ -456,5 +484,5 @@ private constructor(
         )
 
     override fun toString() =
-        "ToolListParams{includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "ToolListParams{filter=$filter, includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }

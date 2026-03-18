@@ -11,6 +11,7 @@ internal class ToolListParamsTest {
     @Test
     fun create() {
         ToolListParams.builder()
+            .filter("filter")
             .includeAllVersions(true)
             .addIncludeFormat(ToolListParams.IncludeFormat.ARCADE)
             .limit(0L)
@@ -24,6 +25,7 @@ internal class ToolListParamsTest {
     fun queryParams() {
         val params =
             ToolListParams.builder()
+                .filter("filter")
                 .includeAllVersions(true)
                 .addIncludeFormat(ToolListParams.IncludeFormat.ARCADE)
                 .limit(0L)
@@ -37,6 +39,7 @@ internal class ToolListParamsTest {
         assertThat(queryParams)
             .isEqualTo(
                 QueryParams.builder()
+                    .put("filter", "filter")
                     .put("include_all_versions", "true")
                     .put("include_format", listOf("arcade").joinToString(","))
                     .put("limit", "0")
