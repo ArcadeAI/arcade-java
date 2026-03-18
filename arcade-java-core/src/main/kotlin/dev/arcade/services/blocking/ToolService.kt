@@ -38,7 +38,10 @@ interface ToolService {
 
     fun formatted(): FormattedService
 
-    /** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+    /**
+     * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+     * metadata
+     */
     fun list(): ToolListPage = list(ToolListParams.none())
 
     /** @see list */

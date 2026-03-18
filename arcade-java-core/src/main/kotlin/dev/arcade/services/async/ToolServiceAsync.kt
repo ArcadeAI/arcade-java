@@ -38,7 +38,10 @@ interface ToolServiceAsync {
 
     fun formatted(): FormattedServiceAsync
 
-    /** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+    /**
+     * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+     * metadata
+     */
     fun list(): CompletableFuture<ToolListPageAsync> = list(ToolListParams.none())
 
     /** @see list */

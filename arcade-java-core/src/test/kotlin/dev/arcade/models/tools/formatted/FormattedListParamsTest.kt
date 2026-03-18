@@ -11,6 +11,7 @@ internal class FormattedListParamsTest {
     @Test
     fun create() {
         FormattedListParams.builder()
+            .filter("filter")
             .format("format")
             .includeAllVersions(true)
             .limit(0L)
@@ -24,6 +25,7 @@ internal class FormattedListParamsTest {
     fun queryParams() {
         val params =
             FormattedListParams.builder()
+                .filter("filter")
                 .format("format")
                 .includeAllVersions(true)
                 .limit(0L)
@@ -37,6 +39,7 @@ internal class FormattedListParamsTest {
         assertThat(queryParams)
             .isEqualTo(
                 QueryParams.builder()
+                    .put("filter", "filter")
                     .put("format", "format")
                     .put("include_all_versions", "true")
                     .put("limit", "0")
