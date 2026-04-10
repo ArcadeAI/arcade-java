@@ -40,6 +40,7 @@ internal class WorkerResponseTest {
                 .managed(true)
                 .mcp(
                     WorkerResponse.Mcp.builder()
+                        .externalId("external_id")
                         .headers(
                             WorkerResponse.Mcp.Headers.builder()
                                 .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -64,6 +65,7 @@ internal class WorkerResponseTest {
                                 .addSupportedScope("string")
                                 .build()
                         )
+                        .redirectUri("redirect_uri")
                         .retry(0L)
                         .secrets(
                             WorkerResponse.Mcp.Secrets.builder()
@@ -131,6 +133,7 @@ internal class WorkerResponseTest {
         assertThat(workerResponse.mcp())
             .contains(
                 WorkerResponse.Mcp.builder()
+                    .externalId("external_id")
                     .headers(
                         WorkerResponse.Mcp.Headers.builder()
                             .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -153,6 +156,7 @@ internal class WorkerResponseTest {
                             .addSupportedScope("string")
                             .build()
                     )
+                    .redirectUri("redirect_uri")
                     .retry(0L)
                     .secrets(
                         WorkerResponse.Mcp.Secrets.builder()
@@ -223,6 +227,7 @@ internal class WorkerResponseTest {
                 .managed(true)
                 .mcp(
                     WorkerResponse.Mcp.builder()
+                        .externalId("external_id")
                         .headers(
                             WorkerResponse.Mcp.Headers.builder()
                                 .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -247,6 +252,7 @@ internal class WorkerResponseTest {
                                 .addSupportedScope("string")
                                 .build()
                         )
+                        .redirectUri("redirect_uri")
                         .retry(0L)
                         .secrets(
                             WorkerResponse.Mcp.Secrets.builder()
