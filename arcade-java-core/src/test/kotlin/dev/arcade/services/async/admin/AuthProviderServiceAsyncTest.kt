@@ -373,6 +373,58 @@ internal class AuthProviderServiceAsyncTest {
                                     .scopeDelimiter(
                                         AuthProviderUpdateRequest.Oauth2.ScopeDelimiter.Unknown2
                                     )
+                                    .tokenIntrospectionRequest(
+                                        AuthProviderUpdateRequest.Oauth2.TokenIntrospectionRequest
+                                            .builder()
+                                            .authHeaderValueFormat("auth_header_value_format")
+                                            .authMethod("auth_method")
+                                            .endpoint("endpoint")
+                                            .method("method")
+                                            .params(
+                                                AuthProviderUpdateRequest.Oauth2
+                                                    .TokenIntrospectionRequest
+                                                    .Params
+                                                    .builder()
+                                                    .putAdditionalProperty(
+                                                        "foo",
+                                                        JsonValue.from("string"),
+                                                    )
+                                                    .build()
+                                            )
+                                            .requestContentType(
+                                                AuthProviderUpdateRequest.Oauth2
+                                                    .TokenIntrospectionRequest
+                                                    .RequestContentType
+                                                    .APPLICATION_X_WWW_FORM_URLENCODED
+                                            )
+                                            .responseContentType(
+                                                AuthProviderUpdateRequest.Oauth2
+                                                    .TokenIntrospectionRequest
+                                                    .ResponseContentType
+                                                    .APPLICATION_X_WWW_FORM_URLENCODED
+                                            )
+                                            .responseMap(
+                                                AuthProviderUpdateRequest.Oauth2
+                                                    .TokenIntrospectionRequest
+                                                    .ResponseMap
+                                                    .builder()
+                                                    .putAdditionalProperty(
+                                                        "foo",
+                                                        JsonValue.from("string"),
+                                                    )
+                                                    .build()
+                                            )
+                                            .triggers(
+                                                AuthProviderUpdateRequest.Oauth2
+                                                    .TokenIntrospectionRequest
+                                                    .Triggers
+                                                    .builder()
+                                                    .onTokenGrant(true)
+                                                    .onTokenRefresh(true)
+                                                    .build()
+                                            )
+                                            .build()
+                                    )
                                     .tokenRequest(
                                         AuthProviderUpdateRequest.Oauth2.TokenRequest.builder()
                                             .authHeaderValueFormat("auth_header_value_format")
