@@ -50,7 +50,6 @@ import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 import dev.arcade.models.tools.ExecuteToolRequest;
 import dev.arcade.models.tools.ExecuteToolResponse;
-import dev.arcade.models.tools.ToolExecuteParams;
 
 // Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
 // Or configures using the `ARCADE_API_KEY` and `ARCADE_BASE_URL` environment variables
@@ -151,7 +150,6 @@ import dev.arcade.client.ArcadeClient;
 import dev.arcade.client.okhttp.ArcadeOkHttpClient;
 import dev.arcade.models.tools.ExecuteToolRequest;
 import dev.arcade.models.tools.ExecuteToolResponse;
-import dev.arcade.models.tools.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
 // Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
@@ -171,7 +169,6 @@ import dev.arcade.client.ArcadeClientAsync;
 import dev.arcade.client.okhttp.ArcadeOkHttpClientAsync;
 import dev.arcade.models.tools.ExecuteToolRequest;
 import dev.arcade.models.tools.ExecuteToolResponse;
-import dev.arcade.models.tools.ToolExecuteParams;
 import java.util.concurrent.CompletableFuture;
 
 // Configures using the `arcade.apiKey` and `arcade.baseUrl` system properties
@@ -197,7 +194,6 @@ import dev.arcade.core.http.Headers;
 import dev.arcade.core.http.HttpResponseFor;
 import dev.arcade.models.chat.ChatRequest;
 import dev.arcade.models.chat.ChatResponse;
-import dev.arcade.models.chat.completions.CompletionCreateParams;
 
 ChatRequest params = ChatRequest.builder().build();
 HttpResponseFor<ChatResponse> chatResponse = client.chat().completions().withRawResponse().create(params);
