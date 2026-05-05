@@ -5,12 +5,16 @@ package dev.arcade.errors
 import dev.arcade.core.JsonValue
 import dev.arcade.core.checkRequired
 import dev.arcade.core.http.Headers
+import dev.arcade.core.jsonMapper
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 class UnprocessableEntityException
 private constructor(private val headers: Headers, private val body: JsonValue, cause: Throwable?) :
-    ArcadeServiceException("422: $body", cause) {
+    ArcadeServiceException(
+        "422: ${if (body.isMissing()) "Unknown" else jsonMapper().writeValueAsString(body)}",
+        cause,
+    ) {
 
     override fun statusCode(): Int = 422
 
