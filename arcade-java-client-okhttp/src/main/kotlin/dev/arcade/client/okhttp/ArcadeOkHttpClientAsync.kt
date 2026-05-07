@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import dev.arcade.client.ArcadeClientAsync
 import dev.arcade.client.ArcadeClientAsyncImpl
 import dev.arcade.core.ClientOptions
+import dev.arcade.core.LogLevel
 import dev.arcade.core.Sleeper
 import dev.arcade.core.Timeout
 import dev.arcade.core.http.AsyncStreamResponse
@@ -289,6 +290,15 @@ class ArcadeOkHttpClientAsync private constructor() {
          * Defaults to 2.
          */
         fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
+
+        /**
+         * The level at which to log request and response information.
+         *
+         * [fromEnv] will set the level from environment variables. See [LogLevel.fromEnv].
+         *
+         * Defaults to [LogLevel.fromEnv].
+         */
+        fun logLevel(logLevel: LogLevel) = apply { clientOptions.logLevel(logLevel) }
 
         /** API key used for authorization in header */
         fun apiKey(apiKey: String) = apply { clientOptions.apiKey(apiKey) }
