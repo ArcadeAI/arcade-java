@@ -20,14 +20,14 @@ internal class CreateWorkerRequestTest {
                     CreateWorkerRequest.Http.builder()
                         .retry(0L)
                         .secret("secret")
-                        .timeout(1L)
+                        .timeout(0L)
                         .uri("uri")
                         .build()
                 )
                 .mcp(
                     CreateWorkerRequest.Mcp.builder()
                         .retry(0L)
-                        .timeout(1L)
+                        .timeout(0L)
                         .uri("uri")
                         .headers(
                             CreateWorkerRequest.Mcp.Headers.builder()
@@ -59,7 +59,7 @@ internal class CreateWorkerRequestTest {
                 CreateWorkerRequest.Http.builder()
                     .retry(0L)
                     .secret("secret")
-                    .timeout(1L)
+                    .timeout(0L)
                     .uri("uri")
                     .build()
             )
@@ -67,7 +67,7 @@ internal class CreateWorkerRequestTest {
             .contains(
                 CreateWorkerRequest.Mcp.builder()
                     .retry(0L)
-                    .timeout(1L)
+                    .timeout(0L)
                     .uri("uri")
                     .headers(
                         CreateWorkerRequest.Mcp.Headers.builder()
@@ -103,14 +103,14 @@ internal class CreateWorkerRequestTest {
                     CreateWorkerRequest.Http.builder()
                         .retry(0L)
                         .secret("secret")
-                        .timeout(1L)
+                        .timeout(0L)
                         .uri("uri")
                         .build()
                 )
                 .mcp(
                     CreateWorkerRequest.Mcp.builder()
                         .retry(0L)
-                        .timeout(1L)
+                        .timeout(0L)
                         .uri("uri")
                         .headers(
                             CreateWorkerRequest.Mcp.Headers.builder()
