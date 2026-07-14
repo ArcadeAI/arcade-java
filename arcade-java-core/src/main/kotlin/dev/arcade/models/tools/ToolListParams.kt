@@ -339,6 +339,8 @@ private constructor(
 
             @JvmField val ANTHROPIC = of("anthropic")
 
+            @JvmField val MCP = of("mcp")
+
             @JvmStatic fun of(value: String) = IncludeFormat(JsonField.of(value))
         }
 
@@ -347,6 +349,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
         }
 
         /**
@@ -362,6 +365,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
             /**
              * An enum member indicating that [IncludeFormat] was instantiated with an unknown
              * value.
@@ -381,6 +385,7 @@ private constructor(
                 ARCADE -> Value.ARCADE
                 OPENAI -> Value.OPENAI
                 ANTHROPIC -> Value.ANTHROPIC
+                MCP -> Value.MCP
                 else -> Value._UNKNOWN
             }
 
@@ -398,6 +403,7 @@ private constructor(
                 ARCADE -> Known.ARCADE
                 OPENAI -> Known.OPENAI
                 ANTHROPIC -> Known.ANTHROPIC
+                MCP -> Known.MCP
                 else -> throw ArcadeInvalidDataException("Unknown IncludeFormat: $value")
             }
 
