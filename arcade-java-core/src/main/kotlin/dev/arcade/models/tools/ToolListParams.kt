@@ -25,6 +25,7 @@ private constructor(
     private val includeFormat: List<IncludeFormat>?,
     private val limit: Long?,
     private val offset: Long?,
+    private val search: String?,
     private val toolkit: String?,
     private val userId: String?,
     private val additionalHeaders: Headers,
@@ -49,6 +50,13 @@ private constructor(
 
     /** Offset from the start of the list (default: 0) */
     fun offset(): Optional<Long> = Optional.ofNullable(offset)
+
+    /**
+     * Case-insensitive literal substring matched against each tool's name, MCP server name,
+     * qualified name, and description; multiple whitespace-separated terms must all match. Max 2000
+     * characters.
+     */
+    fun search(): Optional<String> = Optional.ofNullable(search)
 
     /** Toolkit name */
     fun toolkit(): Optional<String> = Optional.ofNullable(toolkit)
@@ -80,6 +88,7 @@ private constructor(
         private var includeFormat: MutableList<IncludeFormat>? = null
         private var limit: Long? = null
         private var offset: Long? = null
+        private var search: String? = null
         private var toolkit: String? = null
         private var userId: String? = null
         private var additionalHeaders: Headers.Builder = Headers.builder()
@@ -92,6 +101,7 @@ private constructor(
             includeFormat = toolListParams.includeFormat?.toMutableList()
             limit = toolListParams.limit
             offset = toolListParams.offset
+            search = toolListParams.search
             toolkit = toolListParams.toolkit
             userId = toolListParams.userId
             additionalHeaders = toolListParams.additionalHeaders.toBuilder()
@@ -172,6 +182,16 @@ private constructor(
 
         /** Alias for calling [Builder.offset] with `offset.orElse(null)`. */
         fun offset(offset: Optional<Long>) = offset(offset.getOrNull())
+
+        /**
+         * Case-insensitive literal substring matched against each tool's name, MCP server name,
+         * qualified name, and description; multiple whitespace-separated terms must all match. Max
+         * 2000 characters.
+         */
+        fun search(search: String?) = apply { this.search = search }
+
+        /** Alias for calling [Builder.search] with `search.orElse(null)`. */
+        fun search(search: Optional<String>) = search(search.getOrNull())
 
         /** Toolkit name */
         fun toolkit(toolkit: String?) = apply { this.toolkit = toolkit }
@@ -295,6 +315,7 @@ private constructor(
                 includeFormat?.toImmutable(),
                 limit,
                 offset,
+                search,
                 toolkit,
                 userId,
                 additionalHeaders.build(),
@@ -312,6 +333,7 @@ private constructor(
                 includeFormat?.let { put("include_format", it.joinToString(",") { it.toString() }) }
                 limit?.let { put("limit", it.toString()) }
                 offset?.let { put("offset", it.toString()) }
+                search?.let { put("search", it) }
                 toolkit?.let { put("toolkit", it) }
                 userId?.let { put("user_id", it) }
                 putAll(additionalQueryParams)
@@ -479,6 +501,7 @@ private constructor(
             includeFormat == other.includeFormat &&
             limit == other.limit &&
             offset == other.offset &&
+            search == other.search &&
             toolkit == other.toolkit &&
             userId == other.userId &&
             additionalHeaders == other.additionalHeaders &&
@@ -492,6 +515,7 @@ private constructor(
             includeFormat,
             limit,
             offset,
+            search,
             toolkit,
             userId,
             additionalHeaders,
@@ -499,5 +523,5 @@ private constructor(
         )
 
     override fun toString() =
-        "ToolListParams{filter=$filter, includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "ToolListParams{filter=$filter, includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, search=$search, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }
