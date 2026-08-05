@@ -24,6 +24,7 @@ private constructor(
     private val toolName: JsonField<String>,
     private val includeErrorStacktrace: JsonField<Boolean>,
     private val input: JsonField<Input>,
+    private val queryId: JsonField<String>,
     private val runAt: JsonField<String>,
     private val toolVersion: JsonField<String>,
     private val userId: JsonField<String>,
@@ -37,12 +38,22 @@ private constructor(
         @ExcludeMissing
         includeErrorStacktrace: JsonField<Boolean> = JsonMissing.of(),
         @JsonProperty("input") @ExcludeMissing input: JsonField<Input> = JsonMissing.of(),
+        @JsonProperty("query_id") @ExcludeMissing queryId: JsonField<String> = JsonMissing.of(),
         @JsonProperty("run_at") @ExcludeMissing runAt: JsonField<String> = JsonMissing.of(),
         @JsonProperty("tool_version")
         @ExcludeMissing
         toolVersion: JsonField<String> = JsonMissing.of(),
         @JsonProperty("user_id") @ExcludeMissing userId: JsonField<String> = JsonMissing.of(),
-    ) : this(toolName, includeErrorStacktrace, input, runAt, toolVersion, userId, mutableMapOf())
+    ) : this(
+        toolName,
+        includeErrorStacktrace,
+        input,
+        queryId,
+        runAt,
+        toolVersion,
+        userId,
+        mutableMapOf(),
+    )
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type or is
@@ -67,6 +78,15 @@ private constructor(
      *   server responded with an unexpected value).
      */
     fun input(): Optional<Input> = input.getOptional("input")
+
+    /**
+     * Optional Condex selection query_id that surfaced this tool. When set, the execution is
+     * correlated to the selection query as training data. Ignored if empty.
+     *
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun queryId(): Optional<String> = queryId.getOptional("query_id")
 
     /**
      * The time at which the tool should be run (optional). If not provided, the tool is run
@@ -114,6 +134,13 @@ private constructor(
      * Unlike [input], this method doesn't throw if the JSON field has an unexpected type.
      */
     @JsonProperty("input") @ExcludeMissing fun _input(): JsonField<Input> = input
+
+    /**
+     * Returns the raw JSON value of [queryId].
+     *
+     * Unlike [queryId], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    @JsonProperty("query_id") @ExcludeMissing fun _queryId(): JsonField<String> = queryId
 
     /**
      * Returns the raw JSON value of [runAt].
@@ -169,6 +196,7 @@ private constructor(
         private var toolName: JsonField<String>? = null
         private var includeErrorStacktrace: JsonField<Boolean> = JsonMissing.of()
         private var input: JsonField<Input> = JsonMissing.of()
+        private var queryId: JsonField<String> = JsonMissing.of()
         private var runAt: JsonField<String> = JsonMissing.of()
         private var toolVersion: JsonField<String> = JsonMissing.of()
         private var userId: JsonField<String> = JsonMissing.of()
@@ -179,6 +207,7 @@ private constructor(
             toolName = executeToolRequest.toolName
             includeErrorStacktrace = executeToolRequest.includeErrorStacktrace
             input = executeToolRequest.input
+            queryId = executeToolRequest.queryId
             runAt = executeToolRequest.runAt
             toolVersion = executeToolRequest.toolVersion
             userId = executeToolRequest.userId
@@ -226,6 +255,20 @@ private constructor(
          * method is primarily for setting the field to an undocumented or not yet supported value.
          */
         fun input(input: JsonField<Input>) = apply { this.input = input }
+
+        /**
+         * Optional Condex selection query_id that surfaced this tool. When set, the execution is
+         * correlated to the selection query as training data. Ignored if empty.
+         */
+        fun queryId(queryId: String) = queryId(JsonField.of(queryId))
+
+        /**
+         * Sets [Builder.queryId] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.queryId] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
+        fun queryId(queryId: JsonField<String>) = apply { this.queryId = queryId }
 
         /**
          * The time at which the tool should be run (optional). If not provided, the tool is run
@@ -299,6 +342,7 @@ private constructor(
                 checkRequired("toolName", toolName),
                 includeErrorStacktrace,
                 input,
+                queryId,
                 runAt,
                 toolVersion,
                 userId,
@@ -324,6 +368,7 @@ private constructor(
         toolName()
         includeErrorStacktrace()
         input().ifPresent { it.validate() }
+        queryId()
         runAt()
         toolVersion()
         userId()
@@ -348,6 +393,7 @@ private constructor(
         (if (toolName.asKnown().isPresent) 1 else 0) +
             (if (includeErrorStacktrace.asKnown().isPresent) 1 else 0) +
             (input.asKnown().getOrNull()?.validity() ?: 0) +
+            (if (queryId.asKnown().isPresent) 1 else 0) +
             (if (runAt.asKnown().isPresent) 1 else 0) +
             (if (toolVersion.asKnown().isPresent) 1 else 0) +
             (if (userId.asKnown().isPresent) 1 else 0)
@@ -475,6 +521,7 @@ private constructor(
             toolName == other.toolName &&
             includeErrorStacktrace == other.includeErrorStacktrace &&
             input == other.input &&
+            queryId == other.queryId &&
             runAt == other.runAt &&
             toolVersion == other.toolVersion &&
             userId == other.userId &&
@@ -486,6 +533,7 @@ private constructor(
             toolName,
             includeErrorStacktrace,
             input,
+            queryId,
             runAt,
             toolVersion,
             userId,
@@ -496,5 +544,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "ExecuteToolRequest{toolName=$toolName, includeErrorStacktrace=$includeErrorStacktrace, input=$input, runAt=$runAt, toolVersion=$toolVersion, userId=$userId, additionalProperties=$additionalProperties}"
+        "ExecuteToolRequest{toolName=$toolName, includeErrorStacktrace=$includeErrorStacktrace, input=$input, queryId=$queryId, runAt=$runAt, toolVersion=$toolVersion, userId=$userId, additionalProperties=$additionalProperties}"
 }

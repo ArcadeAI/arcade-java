@@ -69,6 +69,7 @@ internal class ToolServiceTest {
                             .putAdditionalProperty("foo", JsonValue.from("bar"))
                             .build()
                     )
+                    .queryId("query_id")
                     .runAt("run_at")
                     .toolVersion("tool_version")
                     .userId("user_id")
