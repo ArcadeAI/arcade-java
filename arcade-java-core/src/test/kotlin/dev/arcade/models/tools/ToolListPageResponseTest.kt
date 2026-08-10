@@ -60,6 +60,8 @@ internal class ToolListPageResponseTest {
                                 .putAdditionalProperty("foo", JsonValue.from("bar"))
                                 .build()
                         )
+                        .indexState("index_state")
+                        .lastIndexedAt("last_indexed_at")
                         .metadata(
                             ToolDefinition.Metadata.builder()
                                 .behavior(
@@ -187,6 +189,8 @@ internal class ToolListPageResponseTest {
                             .putAdditionalProperty("foo", JsonValue.from("bar"))
                             .build()
                     )
+                    .indexState("index_state")
+                    .lastIndexedAt("last_indexed_at")
                     .metadata(
                         ToolDefinition.Metadata.builder()
                             .behavior(
@@ -317,6 +321,8 @@ internal class ToolListPageResponseTest {
                                 .putAdditionalProperty("foo", JsonValue.from("bar"))
                                 .build()
                         )
+                        .indexState("index_state")
+                        .lastIndexedAt("last_indexed_at")
                         .metadata(
                             ToolDefinition.Metadata.builder()
                                 .behavior(

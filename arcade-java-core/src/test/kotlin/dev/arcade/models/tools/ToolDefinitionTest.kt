@@ -55,6 +55,8 @@ internal class ToolDefinitionTest {
                         .putAdditionalProperty("foo", JsonValue.from("bar"))
                         .build()
                 )
+                .indexState("index_state")
+                .lastIndexedAt("last_indexed_at")
                 .metadata(
                     ToolDefinition.Metadata.builder()
                         .behavior(
@@ -173,6 +175,8 @@ internal class ToolDefinitionTest {
                     .putAdditionalProperty("foo", JsonValue.from("bar"))
                     .build()
             )
+        assertThat(toolDefinition.indexState()).contains("index_state")
+        assertThat(toolDefinition.lastIndexedAt()).contains("last_indexed_at")
         assertThat(toolDefinition.metadata())
             .contains(
                 ToolDefinition.Metadata.builder()
@@ -295,6 +299,8 @@ internal class ToolDefinitionTest {
                         .putAdditionalProperty("foo", JsonValue.from("bar"))
                         .build()
                 )
+                .indexState("index_state")
+                .lastIndexedAt("last_indexed_at")
                 .metadata(
                     ToolDefinition.Metadata.builder()
                         .behavior(
