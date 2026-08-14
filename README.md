@@ -3,7 +3,7 @@
 <!-- x-release-please-start-version -->
 
 [![Maven Central](https://img.shields.io/maven-central/v/dev.arcade/arcade-java)](https://central.sonatype.com/artifact/dev.arcade/arcade-java/0.1.0-alpha.5)
-[![javadoc](https://javadoc.io/badge2/dev.arcade/arcade-java/0.1.0-alpha.5/javadoc.svg)](https://javadoc.io/doc/dev.arcade/arcade-java/0.1.0-alpha.5)
+[![javadoc](https://javadoc.io/badge2/dev.arcade/arcade-java/javadoc.svg)](https://javadoc.io/doc/dev.arcade/arcade-java/0.1.0-alpha.5)
 
 <!-- x-release-please-end -->
 
