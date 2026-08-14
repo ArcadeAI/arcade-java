@@ -1353,6 +1353,7 @@ private constructor(
     class Mcp
     @JsonCreator(mode = JsonCreator.Mode.DISABLED)
     private constructor(
+        private val authorizedBy: JsonField<String>,
         private val externalId: JsonField<String>,
         private val headers: JsonField<Headers>,
         private val oauth2: JsonField<Oauth2>,
@@ -1366,6 +1367,9 @@ private constructor(
 
         @JsonCreator
         private constructor(
+            @JsonProperty("authorized_by")
+            @ExcludeMissing
+            authorizedBy: JsonField<String> = JsonMissing.of(),
             @JsonProperty("external_id")
             @ExcludeMissing
             externalId: JsonField<String> = JsonMissing.of(),
@@ -1379,6 +1383,7 @@ private constructor(
             @JsonProperty("timeout") @ExcludeMissing timeout: JsonField<Long> = JsonMissing.of(),
             @JsonProperty("uri") @ExcludeMissing uri: JsonField<String> = JsonMissing.of(),
         ) : this(
+            authorizedBy,
             externalId,
             headers,
             oauth2,
@@ -1389,6 +1394,12 @@ private constructor(
             uri,
             mutableMapOf(),
         )
+
+        /**
+         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun authorizedBy(): Optional<String> = authorizedBy.getOptional("authorized_by")
 
         /**
          * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -1437,6 +1448,16 @@ private constructor(
          *   server responded with an unexpected value).
          */
         fun uri(): Optional<String> = uri.getOptional("uri")
+
+        /**
+         * Returns the raw JSON value of [authorizedBy].
+         *
+         * Unlike [authorizedBy], this method doesn't throw if the JSON field has an unexpected
+         * type.
+         */
+        @JsonProperty("authorized_by")
+        @ExcludeMissing
+        fun _authorizedBy(): JsonField<String> = authorizedBy
 
         /**
          * Returns the raw JSON value of [externalId].
@@ -1519,6 +1540,7 @@ private constructor(
         /** A builder for [Mcp]. */
         class Builder internal constructor() {
 
+            private var authorizedBy: JsonField<String> = JsonMissing.of()
             private var externalId: JsonField<String> = JsonMissing.of()
             private var headers: JsonField<Headers> = JsonMissing.of()
             private var oauth2: JsonField<Oauth2> = JsonMissing.of()
@@ -1531,6 +1553,7 @@ private constructor(
 
             @JvmSynthetic
             internal fun from(mcp: Mcp) = apply {
+                authorizedBy = mcp.authorizedBy
                 externalId = mcp.externalId
                 headers = mcp.headers
                 oauth2 = mcp.oauth2
@@ -1540,6 +1563,19 @@ private constructor(
                 timeout = mcp.timeout
                 uri = mcp.uri
                 additionalProperties = mcp.additionalProperties.toMutableMap()
+            }
+
+            fun authorizedBy(authorizedBy: String) = authorizedBy(JsonField.of(authorizedBy))
+
+            /**
+             * Sets [Builder.authorizedBy] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.authorizedBy] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun authorizedBy(authorizedBy: JsonField<String>) = apply {
+                this.authorizedBy = authorizedBy
             }
 
             fun externalId(externalId: String) = externalId(JsonField.of(externalId))
@@ -1658,6 +1694,7 @@ private constructor(
              */
             fun build(): Mcp =
                 Mcp(
+                    authorizedBy,
                     externalId,
                     headers,
                     oauth2,
@@ -1686,6 +1723,7 @@ private constructor(
                 return@apply
             }
 
+            authorizedBy()
             externalId()
             headers().ifPresent { it.validate() }
             oauth2().ifPresent { it.validate() }
@@ -1713,7 +1751,8 @@ private constructor(
          */
         @JvmSynthetic
         internal fun validity(): Int =
-            (if (externalId.asKnown().isPresent) 1 else 0) +
+            (if (authorizedBy.asKnown().isPresent) 1 else 0) +
+                (if (externalId.asKnown().isPresent) 1 else 0) +
                 (headers.asKnown().getOrNull()?.validity() ?: 0) +
                 (oauth2.asKnown().getOrNull()?.validity() ?: 0) +
                 (if (redirectUri.asKnown().isPresent) 1 else 0) +
@@ -2769,6 +2808,7 @@ private constructor(
             }
 
             return other is Mcp &&
+                authorizedBy == other.authorizedBy &&
                 externalId == other.externalId &&
                 headers == other.headers &&
                 oauth2 == other.oauth2 &&
@@ -2782,6 +2822,7 @@ private constructor(
 
         private val hashCode: Int by lazy {
             Objects.hash(
+                authorizedBy,
                 externalId,
                 headers,
                 oauth2,
@@ -2797,7 +2838,7 @@ private constructor(
         override fun hashCode(): Int = hashCode
 
         override fun toString() =
-            "Mcp{externalId=$externalId, headers=$headers, oauth2=$oauth2, redirectUri=$redirectUri, retry=$retry, secrets=$secrets, timeout=$timeout, uri=$uri, additionalProperties=$additionalProperties}"
+            "Mcp{authorizedBy=$authorizedBy, externalId=$externalId, headers=$headers, oauth2=$oauth2, redirectUri=$redirectUri, retry=$retry, secrets=$secrets, timeout=$timeout, uri=$uri, additionalProperties=$additionalProperties}"
     }
 
     class Requirements
