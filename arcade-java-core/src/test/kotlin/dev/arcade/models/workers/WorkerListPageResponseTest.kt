@@ -43,6 +43,7 @@ internal class WorkerListPageResponseTest {
                         .managed(true)
                         .mcp(
                             WorkerResponse.Mcp.builder()
+                                .authorizedBy("authorized_by")
                                 .externalId("external_id")
                                 .headers(
                                     WorkerResponse.Mcp.Headers.builder()
@@ -144,6 +145,7 @@ internal class WorkerListPageResponseTest {
                     .managed(true)
                     .mcp(
                         WorkerResponse.Mcp.builder()
+                            .authorizedBy("authorized_by")
                             .externalId("external_id")
                             .headers(
                                 WorkerResponse.Mcp.Headers.builder()
@@ -248,6 +250,7 @@ internal class WorkerListPageResponseTest {
                         .managed(true)
                         .mcp(
                             WorkerResponse.Mcp.builder()
+                                .authorizedBy("authorized_by")
                                 .externalId("external_id")
                                 .headers(
                                     WorkerResponse.Mcp.Headers.builder()

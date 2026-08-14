@@ -40,6 +40,7 @@ internal class WorkerResponseTest {
                 .managed(true)
                 .mcp(
                     WorkerResponse.Mcp.builder()
+                        .authorizedBy("authorized_by")
                         .externalId("external_id")
                         .headers(
                             WorkerResponse.Mcp.Headers.builder()
@@ -133,6 +134,7 @@ internal class WorkerResponseTest {
         assertThat(workerResponse.mcp())
             .contains(
                 WorkerResponse.Mcp.builder()
+                    .authorizedBy("authorized_by")
                     .externalId("external_id")
                     .headers(
                         WorkerResponse.Mcp.Headers.builder()
@@ -227,6 +229,7 @@ internal class WorkerResponseTest {
                 .managed(true)
                 .mcp(
                     WorkerResponse.Mcp.builder()
+                        .authorizedBy("authorized_by")
                         .externalId("external_id")
                         .headers(
                             WorkerResponse.Mcp.Headers.builder()
