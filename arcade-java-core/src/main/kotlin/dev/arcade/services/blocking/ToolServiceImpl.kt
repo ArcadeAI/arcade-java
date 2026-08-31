@@ -27,8 +27,6 @@ import dev.arcade.models.tools.ToolListPageResponse
 import dev.arcade.models.tools.ToolListParams
 import dev.arcade.services.blocking.tools.FormattedService
 import dev.arcade.services.blocking.tools.FormattedServiceImpl
-import dev.arcade.services.blocking.tools.ScheduledService
-import dev.arcade.services.blocking.tools.ScheduledServiceImpl
 import java.util.function.Consumer
 import kotlin.jvm.optionals.getOrNull
 
@@ -38,16 +36,12 @@ class ToolServiceImpl internal constructor(private val clientOptions: ClientOpti
         WithRawResponseImpl(clientOptions)
     }
 
-    private val scheduled: ScheduledService by lazy { ScheduledServiceImpl(clientOptions) }
-
     private val formatted: FormattedService by lazy { FormattedServiceImpl(clientOptions) }
 
     override fun withRawResponse(): ToolService.WithRawResponse = withRawResponse
 
     override fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolService =
         ToolServiceImpl(clientOptions.toBuilder().apply(modifier::accept).build())
-
-    override fun scheduled(): ScheduledService = scheduled
 
     override fun formatted(): FormattedService = formatted
 
@@ -79,10 +73,6 @@ class ToolServiceImpl internal constructor(private val clientOptions: ClientOpti
         private val errorHandler: Handler<HttpResponse> =
             errorHandler(errorBodyHandler(clientOptions.jsonMapper))
 
-        private val scheduled: ScheduledService.WithRawResponse by lazy {
-            ScheduledServiceImpl.WithRawResponseImpl(clientOptions)
-        }
-
         private val formatted: FormattedService.WithRawResponse by lazy {
             FormattedServiceImpl.WithRawResponseImpl(clientOptions)
         }
@@ -93,8 +83,6 @@ class ToolServiceImpl internal constructor(private val clientOptions: ClientOpti
             ToolServiceImpl.WithRawResponseImpl(
                 clientOptions.toBuilder().apply(modifier::accept).build()
             )
-
-        override fun scheduled(): ScheduledService.WithRawResponse = scheduled
 
         override fun formatted(): FormattedService.WithRawResponse = formatted
 
