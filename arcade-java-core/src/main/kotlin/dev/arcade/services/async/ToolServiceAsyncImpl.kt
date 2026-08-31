@@ -27,8 +27,6 @@ import dev.arcade.models.tools.ToolListPageResponse
 import dev.arcade.models.tools.ToolListParams
 import dev.arcade.services.async.tools.FormattedServiceAsync
 import dev.arcade.services.async.tools.FormattedServiceAsyncImpl
-import dev.arcade.services.async.tools.ScheduledServiceAsync
-import dev.arcade.services.async.tools.ScheduledServiceAsyncImpl
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import kotlin.jvm.optionals.getOrNull
@@ -40,10 +38,6 @@ class ToolServiceAsyncImpl internal constructor(private val clientOptions: Clien
         WithRawResponseImpl(clientOptions)
     }
 
-    private val scheduled: ScheduledServiceAsync by lazy {
-        ScheduledServiceAsyncImpl(clientOptions)
-    }
-
     private val formatted: FormattedServiceAsync by lazy {
         FormattedServiceAsyncImpl(clientOptions)
     }
@@ -52,8 +46,6 @@ class ToolServiceAsyncImpl internal constructor(private val clientOptions: Clien
 
     override fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolServiceAsync =
         ToolServiceAsyncImpl(clientOptions.toBuilder().apply(modifier::accept).build())
-
-    override fun scheduled(): ScheduledServiceAsync = scheduled
 
     override fun formatted(): FormattedServiceAsync = formatted
 
@@ -91,10 +83,6 @@ class ToolServiceAsyncImpl internal constructor(private val clientOptions: Clien
         private val errorHandler: Handler<HttpResponse> =
             errorHandler(errorBodyHandler(clientOptions.jsonMapper))
 
-        private val scheduled: ScheduledServiceAsync.WithRawResponse by lazy {
-            ScheduledServiceAsyncImpl.WithRawResponseImpl(clientOptions)
-        }
-
         private val formatted: FormattedServiceAsync.WithRawResponse by lazy {
             FormattedServiceAsyncImpl.WithRawResponseImpl(clientOptions)
         }
@@ -105,8 +93,6 @@ class ToolServiceAsyncImpl internal constructor(private val clientOptions: Clien
             ToolServiceAsyncImpl.WithRawResponseImpl(
                 clientOptions.toBuilder().apply(modifier::accept).build()
             )
-
-        override fun scheduled(): ScheduledServiceAsync.WithRawResponse = scheduled
 
         override fun formatted(): FormattedServiceAsync.WithRawResponse = formatted
 
