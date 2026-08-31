@@ -1,5 +1,75 @@
 # Changelog
 
+## 0.1.0-alpha.6 (2026-08-31)
+
+Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
+
+### Features
+
+* **api:** api update ([b413275](https://github.com/ArcadeAI/arcade-java/commit/b413275aaa426d4441b4cd2405312c9590d90606))
+* **api:** api update ([56e052d](https://github.com/ArcadeAI/arcade-java/commit/56e052dece41cfaebff9862a261a6222730151ff))
+* **api:** api update ([d06b5e2](https://github.com/ArcadeAI/arcade-java/commit/d06b5e203a532194a75dbce28036a28da31c78eb))
+* **api:** api update ([d111762](https://github.com/ArcadeAI/arcade-java/commit/d11176257898a7c648bddb9a0b3699cbdda3695f))
+* **api:** api update ([ea74b4f](https://github.com/ArcadeAI/arcade-java/commit/ea74b4fe79f53b61c567e50b3c54e86118e9b68a))
+* **api:** api update ([adc7f67](https://github.com/ArcadeAI/arcade-java/commit/adc7f670fa8c905fbfe260b6055276d865627e70))
+* **api:** api update ([b5fa4c8](https://github.com/ArcadeAI/arcade-java/commit/b5fa4c8c1b5be5edd0257f92e35e8de0f5463ff1))
+* **api:** api update ([5f7dcba](https://github.com/ArcadeAI/arcade-java/commit/5f7dcba84b6546b8d197d1f5d74e107c0b1fb827))
+* **api:** api update ([b78d6c1](https://github.com/ArcadeAI/arcade-java/commit/b78d6c1e15fd105747d4637c77f31935a06b3fe4))
+* **api:** api update ([14ce6e0](https://github.com/ArcadeAI/arcade-java/commit/14ce6e040d6332053e0353e139d0c4401be55360))
+* **api:** api update ([aa56504](https://github.com/ArcadeAI/arcade-java/commit/aa565048f02eb4a21657d4e51c4975376968b579))
+* **api:** api update ([f7f972b](https://github.com/ArcadeAI/arcade-java/commit/f7f972bc274de10da54ffe2004d9d50fa16bc5a3))
+* **api:** api update ([acfd5b0](https://github.com/ArcadeAI/arcade-java/commit/acfd5b0aedbb445e1269a6b879111ff19c8aeef5))
+* **api:** api update ([5871f8b](https://github.com/ArcadeAI/arcade-java/commit/5871f8b7d0a2a89a6cbb57561a292b32381c74b6))
+* **client:** improve logging ([891246c](https://github.com/ArcadeAI/arcade-java/commit/891246cd432befc39f95ecc5fc69c123ab19414a))
+* **client:** more robust error parsing ([1043b59](https://github.com/ArcadeAI/arcade-java/commit/1043b591c5cee640130803058086ab444bd07b58))
+* **client:** support proxy authentication ([93ca773](https://github.com/ArcadeAI/arcade-java/commit/93ca7737f605353b1709e92b80ba5a0dc4075c41))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([8b91ea3](https://github.com/ArcadeAI/arcade-java/commit/8b91ea35b0de285fc8832df81b00b18f5660768e))
+* support setting headers via env ([219088d](https://github.com/ArcadeAI/arcade-java/commit/219088d6cdc541d7ae57d36a438f2e6b8894f106))
+
+
+### Bug Fixes
+
+* **client:** allow updating header/query affecting fields in `toBuilder()` ([f86e1f2](https://github.com/ArcadeAI/arcade-java/commit/f86e1f2dff33a369dd6d52119ce670747dfd2392))
+* **docs:** link the javadoc badge so the version stays current after release ([0a60567](https://github.com/ArcadeAI/arcade-java/commit/0a60567e551fed1801dec32bdbd8e62a5c34af3b))
+
+
+### Performance Improvements
+
+* **client:** create one json mapper ([be74413](https://github.com/ArcadeAI/arcade-java/commit/be744132658d4afa95b3d42edc256a3d245a931a))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([d5942be](https://github.com/ArcadeAI/arcade-java/commit/d5942be3ea63057a3267602dc72046e71d9a5855))
+* **internal:** allow the mock server port to be set with STAINLESS_MOCK_PORT ([b5054c1](https://github.com/ArcadeAI/arcade-java/commit/b5054c1a165b6951d1ac2b959368fddeed847ff3))
+* **internal:** bump ktfmt ([f38504b](https://github.com/ArcadeAI/arcade-java/commit/f38504b554f72ac9f701716ff1ad40ec5f1a47b2))
+* **internal:** codegen related update ([1283d16](https://github.com/ArcadeAI/arcade-java/commit/1283d16784167db8429d82af189b4f733b3159e5))
+* **internal:** codegen related update ([fb370f3](https://github.com/ArcadeAI/arcade-java/commit/fb370f342a7a1fbcf84275d3a9407b603722d215))
+* **internal:** codegen related update ([317c328](https://github.com/ArcadeAI/arcade-java/commit/317c328ecaf054e2fbdea4b6dbfb3a1451bb5070))
+* **internal:** tweak CI branches ([5213191](https://github.com/ArcadeAI/arcade-java/commit/521319108a7b064979e96ecf2fff5e74681b56bf))
+* **internal:** update gitignore ([c9b3d8f](https://github.com/ArcadeAI/arcade-java/commit/c9b3d8f8b7825876526e6dca16859c9f12fcce37))
+* **internal:** update multipart form array serialization ([abeec96](https://github.com/ArcadeAI/arcade-java/commit/abeec961730398bb0c49f01ea13312468be4787c))
+* **internal:** update retry delay tests ([993657b](https://github.com/ArcadeAI/arcade-java/commit/993657b3ac45eafee6b85f76a578f2c6daaacfe2))
+* redact api-key headers in debug logs ([bd21545](https://github.com/ArcadeAI/arcade-java/commit/bd215455a65ce01a6215cc56861b48cbfe7a52c4))
+* remove duplicated dokka setup ([8e3a087](https://github.com/ArcadeAI/arcade-java/commit/8e3a087be33daae54aa87f67cdc62a22f566d504))
+* **tests:** bump steady to v0.19.4 ([0d022df](https://github.com/ArcadeAI/arcade-java/commit/0d022dfe027631ea83e1794bcb9e79824ab28f0f))
+* **tests:** bump steady to v0.19.5 ([d186f97](https://github.com/ArcadeAI/arcade-java/commit/d186f9769310ebff3584418642cc0b31a13e1d1c))
+* **tests:** bump steady to v0.19.6 ([b5094e5](https://github.com/ArcadeAI/arcade-java/commit/b5094e5507917137cf7b30c90e1028c122bd1331))
+* **tests:** bump steady to v0.19.7 ([231a1a7](https://github.com/ArcadeAI/arcade-java/commit/231a1a764782bb5bdcd1118630b3bbd544333aa4))
+* **tests:** bump steady to v0.20.1 ([b936990](https://github.com/ArcadeAI/arcade-java/commit/b93699052685356a902c34f38d8e46a617e77454))
+* **tests:** bump steady to v0.20.2 ([7dfba2e](https://github.com/ArcadeAI/arcade-java/commit/7dfba2ef15e2c5f6412a64f23cde8138159c42ea))
+* **tests:** bump steady to v0.22.1 ([bca6f99](https://github.com/ArcadeAI/arcade-java/commit/bca6f993c4876c486640b25ca1d41ff45f299263))
+
+
+### Documentation
+
+* clarify forwards compat behavior ([0053367](https://github.com/ArcadeAI/arcade-java/commit/00533674a82a9ec0815ef3d6cb12390927aa9cd2))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([ae8ff34](https://github.com/ArcadeAI/arcade-java/commit/ae8ff343537d6ff24a3346fac27516c2bc3e07d9))
+
 ## 0.1.0-alpha.5 (2026-03-16)
 
 Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/ArcadeAI/arcade-java/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)

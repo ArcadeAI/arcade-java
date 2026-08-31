@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import dev.arcade.core.http.AsyncStreamResponse
 import dev.arcade.core.http.Headers
 import dev.arcade.core.http.HttpClient
+import dev.arcade.core.http.LoggingHttpClient
 import dev.arcade.core.http.PhantomReachableClosingHttpClient
 import dev.arcade.core.http.QueryParams
 import dev.arcade.core.http.RetryingHttpClient
@@ -80,6 +81,9 @@ private constructor(
     /**
      * Whether to call `validate` on every response before returning it.
      *
+     * Setting this to `true` is _not_ forwards compatible with new types from the API for existing
+     * fields.
+     *
      * Defaults to false, which means the shape of the response will not be validated upfront.
      * Instead, validation will only occur for the parts of the response that are accessed.
      */
@@ -107,6 +111,14 @@ private constructor(
      * Defaults to 2.
      */
     @get:JvmName("maxRetries") val maxRetries: Int,
+    /**
+     * The level at which to log request and response information.
+     *
+     * [fromEnv] will set the level from environment variables. See [LogLevel.fromEnv].
+     *
+     * Defaults to [LogLevel.fromEnv].
+     */
+    @get:JvmName("logLevel") val logLevel: LogLevel,
     /** API key used for authorization in header */
     @get:JvmName("apiKey") val apiKey: String,
 ) {
@@ -164,6 +176,7 @@ private constructor(
         private var responseValidation: Boolean = false
         private var timeout: Timeout = Timeout.default()
         private var maxRetries: Int = 2
+        private var logLevel: LogLevel = LogLevel.fromEnv()
         private var apiKey: String? = null
 
         @JvmSynthetic
@@ -180,6 +193,7 @@ private constructor(
             responseValidation = clientOptions.responseValidation
             timeout = clientOptions.timeout
             maxRetries = clientOptions.maxRetries
+            logLevel = clientOptions.logLevel
             apiKey = clientOptions.apiKey
         }
 
@@ -260,6 +274,9 @@ private constructor(
         /**
          * Whether to call `validate` on every response before returning it.
          *
+         * Setting this to `true` is _not_ forwards compatible with new types from the API for
+         * existing fields.
+         *
          * Defaults to false, which means the shape of the response will not be validated upfront.
          * Instead, validation will only occur for the parts of the response that are accessed.
          */
@@ -300,6 +317,15 @@ private constructor(
          * Defaults to 2.
          */
         fun maxRetries(maxRetries: Int) = apply { this.maxRetries = maxRetries }
+
+        /**
+         * The level at which to log request and response information.
+         *
+         * [fromEnv] will set the level from environment variables. See [LogLevel.fromEnv].
+         *
+         * Defaults to [LogLevel.fromEnv].
+         */
+        fun logLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
 
         /** API key used for authorization in header */
         fun apiKey(apiKey: String) = apply { this.apiKey = apiKey }
@@ -399,11 +425,20 @@ private constructor(
          * System properties take precedence over environment variables.
          */
         fun fromEnv() = apply {
+            logLevel(LogLevel.fromEnv())
             (System.getProperty("arcade.baseUrl") ?: System.getenv("ARCADE_BASE_URL"))?.let {
                 baseUrl(it)
             }
             (System.getProperty("arcade.apiKey") ?: System.getenv("ARCADE_API_KEY"))?.let {
                 apiKey(it)
+            }
+            System.getenv("ARCADE_CUSTOM_HEADERS")?.let { customHeadersEnv ->
+                for (line in customHeadersEnv.split("\n")) {
+                    val colon = line.indexOf(':')
+                    if (colon >= 0) {
+                        putHeader(line.substring(0, colon).trim(), line.substring(colon + 1).trim())
+                    }
+                }
             }
         }
 
@@ -453,18 +488,25 @@ private constructor(
             headers.put("X-Stainless-Runtime", "JRE")
             headers.put("X-Stainless-Runtime-Version", getJavaVersion())
             headers.put("X-Stainless-Kotlin-Version", KotlinVersion.CURRENT.toString())
-            apiKey.let {
-                if (!it.isEmpty()) {
-                    headers.put("Authorization", it)
-                }
-            }
+            // We replace after all the default headers to allow end-users to overwrite them.
             headers.replaceAll(this.headers.build())
             queryParams.replaceAll(this.queryParams.build())
+            apiKey.let {
+                if (!it.isEmpty()) {
+                    headers.replace("Authorization", it)
+                }
+            }
 
             return ClientOptions(
                 httpClient,
                 RetryingHttpClient.builder()
-                    .httpClient(httpClient)
+                    .httpClient(
+                        LoggingHttpClient.builder()
+                            .httpClient(httpClient)
+                            .clock(clock)
+                            .level(logLevel)
+                            .build()
+                    )
                     .sleeper(sleeper)
                     .clock(clock)
                     .maxRetries(maxRetries)
@@ -480,6 +522,7 @@ private constructor(
                 responseValidation,
                 timeout,
                 maxRetries,
+                logLevel,
                 apiKey,
             )
         }

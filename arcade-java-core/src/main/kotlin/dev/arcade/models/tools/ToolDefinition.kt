@@ -30,6 +30,8 @@ private constructor(
     private val toolkit: JsonField<Toolkit>,
     private val description: JsonField<String>,
     private val formattedSchema: JsonField<FormattedSchema>,
+    private val indexState: JsonField<String>,
+    private val lastIndexedAt: JsonField<String>,
     private val metadata: JsonField<Metadata>,
     private val output: JsonField<Output>,
     private val requirements: JsonField<Requirements>,
@@ -53,6 +55,12 @@ private constructor(
         @JsonProperty("formatted_schema")
         @ExcludeMissing
         formattedSchema: JsonField<FormattedSchema> = JsonMissing.of(),
+        @JsonProperty("index_state")
+        @ExcludeMissing
+        indexState: JsonField<String> = JsonMissing.of(),
+        @JsonProperty("last_indexed_at")
+        @ExcludeMissing
+        lastIndexedAt: JsonField<String> = JsonMissing.of(),
         @JsonProperty("metadata") @ExcludeMissing metadata: JsonField<Metadata> = JsonMissing.of(),
         @JsonProperty("output") @ExcludeMissing output: JsonField<Output> = JsonMissing.of(),
         @JsonProperty("requirements")
@@ -66,6 +74,8 @@ private constructor(
         toolkit,
         description,
         formattedSchema,
+        indexState,
+        lastIndexedAt,
         metadata,
         output,
         requirements,
@@ -114,6 +124,26 @@ private constructor(
      */
     fun formattedSchema(): Optional<FormattedSchema> =
         formattedSchema.getOptional("formatted_schema")
+
+    /**
+     * IndexState reports whether this tool is available through tool search yet ("indexed" or
+     * "pending"). Populated only when tool search is active for the org and Condex is reachable;
+     * otherwise omitted, so existing callers are unaffected. The handler derives and injects this
+     * value — see the tool-listing enrichment path.
+     *
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun indexState(): Optional<String> = indexState.getOptional("index_state")
+
+    /**
+     * LastIndexedAt is the tool's last successful index-write time, set only when IndexState is
+     * "indexed" and Condex reported a timestamp.
+     *
+     * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun lastIndexedAt(): Optional<String> = lastIndexedAt.getOptional("last_indexed_at")
 
     /**
      * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -190,6 +220,22 @@ private constructor(
     fun _formattedSchema(): JsonField<FormattedSchema> = formattedSchema
 
     /**
+     * Returns the raw JSON value of [indexState].
+     *
+     * Unlike [indexState], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    @JsonProperty("index_state") @ExcludeMissing fun _indexState(): JsonField<String> = indexState
+
+    /**
+     * Returns the raw JSON value of [lastIndexedAt].
+     *
+     * Unlike [lastIndexedAt], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    @JsonProperty("last_indexed_at")
+    @ExcludeMissing
+    fun _lastIndexedAt(): JsonField<String> = lastIndexedAt
+
+    /**
      * Returns the raw JSON value of [metadata].
      *
      * Unlike [metadata], this method doesn't throw if the JSON field has an unexpected type.
@@ -251,6 +297,8 @@ private constructor(
         private var toolkit: JsonField<Toolkit>? = null
         private var description: JsonField<String> = JsonMissing.of()
         private var formattedSchema: JsonField<FormattedSchema> = JsonMissing.of()
+        private var indexState: JsonField<String> = JsonMissing.of()
+        private var lastIndexedAt: JsonField<String> = JsonMissing.of()
         private var metadata: JsonField<Metadata> = JsonMissing.of()
         private var output: JsonField<Output> = JsonMissing.of()
         private var requirements: JsonField<Requirements> = JsonMissing.of()
@@ -265,6 +313,8 @@ private constructor(
             toolkit = toolDefinition.toolkit
             description = toolDefinition.description
             formattedSchema = toolDefinition.formattedSchema
+            indexState = toolDefinition.indexState
+            lastIndexedAt = toolDefinition.lastIndexedAt
             metadata = toolDefinition.metadata
             output = toolDefinition.output
             requirements = toolDefinition.requirements
@@ -353,6 +403,40 @@ private constructor(
             this.formattedSchema = formattedSchema
         }
 
+        /**
+         * IndexState reports whether this tool is available through tool search yet ("indexed" or
+         * "pending"). Populated only when tool search is active for the org and Condex is
+         * reachable; otherwise omitted, so existing callers are unaffected. The handler derives and
+         * injects this value — see the tool-listing enrichment path.
+         */
+        fun indexState(indexState: String) = indexState(JsonField.of(indexState))
+
+        /**
+         * Sets [Builder.indexState] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.indexState] with a well-typed [String] value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
+        fun indexState(indexState: JsonField<String>) = apply { this.indexState = indexState }
+
+        /**
+         * LastIndexedAt is the tool's last successful index-write time, set only when IndexState is
+         * "indexed" and Condex reported a timestamp.
+         */
+        fun lastIndexedAt(lastIndexedAt: String) = lastIndexedAt(JsonField.of(lastIndexedAt))
+
+        /**
+         * Sets [Builder.lastIndexedAt] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.lastIndexedAt] with a well-typed [String] value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
+        fun lastIndexedAt(lastIndexedAt: JsonField<String>) = apply {
+            this.lastIndexedAt = lastIndexedAt
+        }
+
         fun metadata(metadata: Metadata) = metadata(JsonField.of(metadata))
 
         /**
@@ -431,6 +515,8 @@ private constructor(
                 checkRequired("toolkit", toolkit),
                 description,
                 formattedSchema,
+                indexState,
+                lastIndexedAt,
                 metadata,
                 output,
                 requirements,
@@ -440,6 +526,14 @@ private constructor(
 
     private var validated: Boolean = false
 
+    /**
+     * Validates that the types of all values in this object match their expected types recursively.
+     *
+     * This method is _not_ forwards compatible with new types from the API for existing fields.
+     *
+     * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+     *   expected type.
+     */
     fun validate(): ToolDefinition = apply {
         if (validated) {
             return@apply
@@ -452,6 +546,8 @@ private constructor(
         toolkit().validate()
         description()
         formattedSchema().ifPresent { it.validate() }
+        indexState()
+        lastIndexedAt()
         metadata().ifPresent { it.validate() }
         output().ifPresent { it.validate() }
         requirements().ifPresent { it.validate() }
@@ -480,6 +576,8 @@ private constructor(
             (toolkit.asKnown().getOrNull()?.validity() ?: 0) +
             (if (description.asKnown().isPresent) 1 else 0) +
             (formattedSchema.asKnown().getOrNull()?.validity() ?: 0) +
+            (if (indexState.asKnown().isPresent) 1 else 0) +
+            (if (lastIndexedAt.asKnown().isPresent) 1 else 0) +
             (metadata.asKnown().getOrNull()?.validity() ?: 0) +
             (output.asKnown().getOrNull()?.validity() ?: 0) +
             (requirements.asKnown().getOrNull()?.validity() ?: 0)
@@ -601,6 +699,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Input = apply {
             if (validated) {
                 return@apply
@@ -888,6 +995,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Parameter = apply {
                 if (validated) {
                     return@apply
@@ -1149,6 +1266,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Toolkit = apply {
             if (validated) {
                 return@apply
@@ -1260,6 +1386,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): FormattedSchema = apply {
             if (validated) {
                 return@apply
@@ -1464,6 +1599,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Metadata = apply {
             if (validated) {
                 return@apply
@@ -1756,6 +1900,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Behavior = apply {
                 if (validated) {
                     return@apply
@@ -1945,6 +2099,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Classification = apply {
                 if (validated) {
                     return@apply
@@ -2050,6 +2214,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Extras = apply {
                 if (validated) {
                     return@apply
@@ -2302,6 +2476,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Output = apply {
             if (validated) {
                 return@apply
@@ -2536,6 +2719,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Requirements = apply {
             if (validated) {
                 return@apply
@@ -2884,6 +3076,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Authorization = apply {
                 if (validated) {
                     return@apply
@@ -3044,6 +3246,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Oauth2 = apply {
                     if (validated) {
                         return@apply
@@ -3181,6 +3393,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Status = apply {
                     if (validated) {
                         return@apply
@@ -3325,6 +3547,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): TokenStatus = apply {
                     if (validated) {
                         return@apply
@@ -3580,6 +3812,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Secret = apply {
                 if (validated) {
                     return@apply
@@ -3668,6 +3910,8 @@ private constructor(
             toolkit == other.toolkit &&
             description == other.description &&
             formattedSchema == other.formattedSchema &&
+            indexState == other.indexState &&
+            lastIndexedAt == other.lastIndexedAt &&
             metadata == other.metadata &&
             output == other.output &&
             requirements == other.requirements &&
@@ -3683,6 +3927,8 @@ private constructor(
             toolkit,
             description,
             formattedSchema,
+            indexState,
+            lastIndexedAt,
             metadata,
             output,
             requirements,
@@ -3693,5 +3939,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "ToolDefinition{fullyQualifiedName=$fullyQualifiedName, input=$input, name=$name, qualifiedName=$qualifiedName, toolkit=$toolkit, description=$description, formattedSchema=$formattedSchema, metadata=$metadata, output=$output, requirements=$requirements, additionalProperties=$additionalProperties}"
+        "ToolDefinition{fullyQualifiedName=$fullyQualifiedName, input=$input, name=$name, qualifiedName=$qualifiedName, toolkit=$toolkit, description=$description, formattedSchema=$formattedSchema, indexState=$indexState, lastIndexedAt=$lastIndexedAt, metadata=$metadata, output=$output, requirements=$requirements, additionalProperties=$additionalProperties}"
 }

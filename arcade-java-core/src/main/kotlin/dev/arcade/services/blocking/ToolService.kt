@@ -17,7 +17,6 @@ import dev.arcade.models.tools.ToolGetParams
 import dev.arcade.models.tools.ToolListPage
 import dev.arcade.models.tools.ToolListParams
 import dev.arcade.services.blocking.tools.FormattedService
-import dev.arcade.services.blocking.tools.ScheduledService
 import java.util.function.Consumer
 
 interface ToolService {
@@ -34,11 +33,12 @@ interface ToolService {
      */
     fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolService
 
-    fun scheduled(): ScheduledService
-
     fun formatted(): FormattedService
 
-    /** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+    /**
+     * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+     * metadata
+     */
     fun list(): ToolListPage = list(ToolListParams.none())
 
     /** @see list */
@@ -139,8 +139,6 @@ interface ToolService {
          * The original service is not modified.
          */
         fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolService.WithRawResponse
-
-        fun scheduled(): ScheduledService.WithRawResponse
 
         fun formatted(): FormattedService.WithRawResponse
 

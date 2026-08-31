@@ -11,10 +11,12 @@ internal class ToolListParamsTest {
     @Test
     fun create() {
         ToolListParams.builder()
+            .filter("filter")
             .includeAllVersions(true)
             .addIncludeFormat(ToolListParams.IncludeFormat.ARCADE)
             .limit(0L)
             .offset(0L)
+            .search("search")
             .toolkit("toolkit")
             .userId("user_id")
             .build()
@@ -24,10 +26,12 @@ internal class ToolListParamsTest {
     fun queryParams() {
         val params =
             ToolListParams.builder()
+                .filter("filter")
                 .includeAllVersions(true)
                 .addIncludeFormat(ToolListParams.IncludeFormat.ARCADE)
                 .limit(0L)
                 .offset(0L)
+                .search("search")
                 .toolkit("toolkit")
                 .userId("user_id")
                 .build()
@@ -37,10 +41,12 @@ internal class ToolListParamsTest {
         assertThat(queryParams)
             .isEqualTo(
                 QueryParams.builder()
+                    .put("filter", "filter")
                     .put("include_all_versions", "true")
                     .put("include_format", listOf("arcade").joinToString(","))
                     .put("limit", "0")
                     .put("offset", "0")
+                    .put("search", "search")
                     .put("toolkit", "toolkit")
                     .put("user_id", "user_id")
                     .build()

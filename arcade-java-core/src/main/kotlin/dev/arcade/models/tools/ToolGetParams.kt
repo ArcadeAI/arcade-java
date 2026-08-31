@@ -247,6 +247,8 @@ private constructor(
 
             @JvmField val ANTHROPIC = of("anthropic")
 
+            @JvmField val MCP = of("mcp")
+
             @JvmStatic fun of(value: String) = IncludeFormat(JsonField.of(value))
         }
 
@@ -255,6 +257,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
         }
 
         /**
@@ -270,6 +273,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
             /**
              * An enum member indicating that [IncludeFormat] was instantiated with an unknown
              * value.
@@ -289,6 +293,7 @@ private constructor(
                 ARCADE -> Value.ARCADE
                 OPENAI -> Value.OPENAI
                 ANTHROPIC -> Value.ANTHROPIC
+                MCP -> Value.MCP
                 else -> Value._UNKNOWN
             }
 
@@ -306,6 +311,7 @@ private constructor(
                 ARCADE -> Known.ARCADE
                 OPENAI -> Known.OPENAI
                 ANTHROPIC -> Known.ANTHROPIC
+                MCP -> Known.MCP
                 else -> throw ArcadeInvalidDataException("Unknown IncludeFormat: $value")
             }
 
@@ -323,6 +329,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): IncludeFormat = apply {
             if (validated) {
                 return@apply

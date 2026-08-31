@@ -16,7 +16,6 @@ import dev.arcade.models.tools.ToolGetParams
 import dev.arcade.models.tools.ToolListPageAsync
 import dev.arcade.models.tools.ToolListParams
 import dev.arcade.services.async.tools.FormattedServiceAsync
-import dev.arcade.services.async.tools.ScheduledServiceAsync
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
@@ -34,11 +33,12 @@ interface ToolServiceAsync {
      */
     fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolServiceAsync
 
-    fun scheduled(): ScheduledServiceAsync
-
     fun formatted(): FormattedServiceAsync
 
-    /** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+    /**
+     * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+     * metadata
+     */
     fun list(): CompletableFuture<ToolListPageAsync> = list(ToolListParams.none())
 
     /** @see list */
@@ -145,8 +145,6 @@ interface ToolServiceAsync {
          * The original service is not modified.
          */
         fun withOptions(modifier: Consumer<ClientOptions.Builder>): ToolServiceAsync.WithRawResponse
-
-        fun scheduled(): ScheduledServiceAsync.WithRawResponse
 
         fun formatted(): FormattedServiceAsync.WithRawResponse
 

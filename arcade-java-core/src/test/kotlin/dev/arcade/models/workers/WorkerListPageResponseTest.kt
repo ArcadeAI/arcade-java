@@ -43,6 +43,8 @@ internal class WorkerListPageResponseTest {
                         .managed(true)
                         .mcp(
                             WorkerResponse.Mcp.builder()
+                                .authorizedBy("authorized_by")
+                                .externalId("external_id")
                                 .headers(
                                     WorkerResponse.Mcp.Headers.builder()
                                         .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -68,6 +70,7 @@ internal class WorkerListPageResponseTest {
                                         .addSupportedScope("string")
                                         .build()
                                 )
+                                .redirectUri("redirect_uri")
                                 .retry(0L)
                                 .secrets(
                                     WorkerResponse.Mcp.Secrets.builder()
@@ -142,6 +145,8 @@ internal class WorkerListPageResponseTest {
                     .managed(true)
                     .mcp(
                         WorkerResponse.Mcp.builder()
+                            .authorizedBy("authorized_by")
+                            .externalId("external_id")
                             .headers(
                                 WorkerResponse.Mcp.Headers.builder()
                                     .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -167,6 +172,7 @@ internal class WorkerListPageResponseTest {
                                     .addSupportedScope("string")
                                     .build()
                             )
+                            .redirectUri("redirect_uri")
                             .retry(0L)
                             .secrets(
                                 WorkerResponse.Mcp.Secrets.builder()
@@ -244,6 +250,8 @@ internal class WorkerListPageResponseTest {
                         .managed(true)
                         .mcp(
                             WorkerResponse.Mcp.builder()
+                                .authorizedBy("authorized_by")
+                                .externalId("external_id")
                                 .headers(
                                     WorkerResponse.Mcp.Headers.builder()
                                         .putAdditionalProperty("foo", JsonValue.from("string"))
@@ -269,6 +277,7 @@ internal class WorkerListPageResponseTest {
                                         .addSupportedScope("string")
                                         .build()
                                 )
+                                .redirectUri("redirect_uri")
                                 .retry(0L)
                                 .secrets(
                                     WorkerResponse.Mcp.Secrets.builder()

@@ -320,6 +320,14 @@ private constructor(
 
     private var validated: Boolean = false
 
+    /**
+     * Validates that the types of all values in this object match their expected types recursively.
+     *
+     * This method is _not_ forwards compatible with new types from the API for existing fields.
+     *
+     * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+     *   expected type.
+     */
     fun validate(): WorkerResponse = apply {
         if (validated) {
             return@apply
@@ -483,6 +491,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Binding = apply {
             if (validated) {
                 return@apply
@@ -612,6 +629,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Type = apply {
                 if (validated) {
                     return@apply
@@ -849,6 +876,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Http = apply {
             if (validated) {
                 return@apply
@@ -1072,6 +1108,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Secret = apply {
                 if (validated) {
                     return@apply
@@ -1210,6 +1256,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Binding = apply {
                     if (validated) {
                         return@apply
@@ -1297,8 +1353,11 @@ private constructor(
     class Mcp
     @JsonCreator(mode = JsonCreator.Mode.DISABLED)
     private constructor(
+        private val authorizedBy: JsonField<String>,
+        private val externalId: JsonField<String>,
         private val headers: JsonField<Headers>,
         private val oauth2: JsonField<Oauth2>,
+        private val redirectUri: JsonField<String>,
         private val retry: JsonField<Long>,
         private val secrets: JsonField<Secrets>,
         private val timeout: JsonField<Long>,
@@ -1308,13 +1367,45 @@ private constructor(
 
         @JsonCreator
         private constructor(
+            @JsonProperty("authorized_by")
+            @ExcludeMissing
+            authorizedBy: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("external_id")
+            @ExcludeMissing
+            externalId: JsonField<String> = JsonMissing.of(),
             @JsonProperty("headers") @ExcludeMissing headers: JsonField<Headers> = JsonMissing.of(),
             @JsonProperty("oauth2") @ExcludeMissing oauth2: JsonField<Oauth2> = JsonMissing.of(),
+            @JsonProperty("redirect_uri")
+            @ExcludeMissing
+            redirectUri: JsonField<String> = JsonMissing.of(),
             @JsonProperty("retry") @ExcludeMissing retry: JsonField<Long> = JsonMissing.of(),
             @JsonProperty("secrets") @ExcludeMissing secrets: JsonField<Secrets> = JsonMissing.of(),
             @JsonProperty("timeout") @ExcludeMissing timeout: JsonField<Long> = JsonMissing.of(),
             @JsonProperty("uri") @ExcludeMissing uri: JsonField<String> = JsonMissing.of(),
-        ) : this(headers, oauth2, retry, secrets, timeout, uri, mutableMapOf())
+        ) : this(
+            authorizedBy,
+            externalId,
+            headers,
+            oauth2,
+            redirectUri,
+            retry,
+            secrets,
+            timeout,
+            uri,
+            mutableMapOf(),
+        )
+
+        /**
+         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun authorizedBy(): Optional<String> = authorizedBy.getOptional("authorized_by")
+
+        /**
+         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun externalId(): Optional<String> = externalId.getOptional("external_id")
 
         /**
          * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -1327,6 +1418,12 @@ private constructor(
          *   server responded with an unexpected value).
          */
         fun oauth2(): Optional<Oauth2> = oauth2.getOptional("oauth2")
+
+        /**
+         * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun redirectUri(): Optional<String> = redirectUri.getOptional("redirect_uri")
 
         /**
          * @throws ArcadeInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -1353,6 +1450,25 @@ private constructor(
         fun uri(): Optional<String> = uri.getOptional("uri")
 
         /**
+         * Returns the raw JSON value of [authorizedBy].
+         *
+         * Unlike [authorizedBy], this method doesn't throw if the JSON field has an unexpected
+         * type.
+         */
+        @JsonProperty("authorized_by")
+        @ExcludeMissing
+        fun _authorizedBy(): JsonField<String> = authorizedBy
+
+        /**
+         * Returns the raw JSON value of [externalId].
+         *
+         * Unlike [externalId], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("external_id")
+        @ExcludeMissing
+        fun _externalId(): JsonField<String> = externalId
+
+        /**
          * Returns the raw JSON value of [headers].
          *
          * Unlike [headers], this method doesn't throw if the JSON field has an unexpected type.
@@ -1365,6 +1481,15 @@ private constructor(
          * Unlike [oauth2], this method doesn't throw if the JSON field has an unexpected type.
          */
         @JsonProperty("oauth2") @ExcludeMissing fun _oauth2(): JsonField<Oauth2> = oauth2
+
+        /**
+         * Returns the raw JSON value of [redirectUri].
+         *
+         * Unlike [redirectUri], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("redirect_uri")
+        @ExcludeMissing
+        fun _redirectUri(): JsonField<String> = redirectUri
 
         /**
          * Returns the raw JSON value of [retry].
@@ -1415,8 +1540,11 @@ private constructor(
         /** A builder for [Mcp]. */
         class Builder internal constructor() {
 
+            private var authorizedBy: JsonField<String> = JsonMissing.of()
+            private var externalId: JsonField<String> = JsonMissing.of()
             private var headers: JsonField<Headers> = JsonMissing.of()
             private var oauth2: JsonField<Oauth2> = JsonMissing.of()
+            private var redirectUri: JsonField<String> = JsonMissing.of()
             private var retry: JsonField<Long> = JsonMissing.of()
             private var secrets: JsonField<Secrets> = JsonMissing.of()
             private var timeout: JsonField<Long> = JsonMissing.of()
@@ -1425,14 +1553,41 @@ private constructor(
 
             @JvmSynthetic
             internal fun from(mcp: Mcp) = apply {
+                authorizedBy = mcp.authorizedBy
+                externalId = mcp.externalId
                 headers = mcp.headers
                 oauth2 = mcp.oauth2
+                redirectUri = mcp.redirectUri
                 retry = mcp.retry
                 secrets = mcp.secrets
                 timeout = mcp.timeout
                 uri = mcp.uri
                 additionalProperties = mcp.additionalProperties.toMutableMap()
             }
+
+            fun authorizedBy(authorizedBy: String) = authorizedBy(JsonField.of(authorizedBy))
+
+            /**
+             * Sets [Builder.authorizedBy] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.authorizedBy] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun authorizedBy(authorizedBy: JsonField<String>) = apply {
+                this.authorizedBy = authorizedBy
+            }
+
+            fun externalId(externalId: String) = externalId(JsonField.of(externalId))
+
+            /**
+             * Sets [Builder.externalId] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.externalId] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun externalId(externalId: JsonField<String>) = apply { this.externalId = externalId }
 
             fun headers(headers: Headers) = headers(JsonField.of(headers))
 
@@ -1455,6 +1610,19 @@ private constructor(
              * supported value.
              */
             fun oauth2(oauth2: JsonField<Oauth2>) = apply { this.oauth2 = oauth2 }
+
+            fun redirectUri(redirectUri: String) = redirectUri(JsonField.of(redirectUri))
+
+            /**
+             * Sets [Builder.redirectUri] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.redirectUri] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun redirectUri(redirectUri: JsonField<String>) = apply {
+                this.redirectUri = redirectUri
+            }
 
             fun retry(retry: Long) = retry(JsonField.of(retry))
 
@@ -1526,8 +1694,11 @@ private constructor(
              */
             fun build(): Mcp =
                 Mcp(
+                    authorizedBy,
+                    externalId,
                     headers,
                     oauth2,
+                    redirectUri,
                     retry,
                     secrets,
                     timeout,
@@ -1538,13 +1709,25 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Mcp = apply {
             if (validated) {
                 return@apply
             }
 
+            authorizedBy()
+            externalId()
             headers().ifPresent { it.validate() }
             oauth2().ifPresent { it.validate() }
+            redirectUri()
             retry()
             secrets().ifPresent { it.validate() }
             timeout()
@@ -1568,8 +1751,11 @@ private constructor(
          */
         @JvmSynthetic
         internal fun validity(): Int =
-            (headers.asKnown().getOrNull()?.validity() ?: 0) +
+            (if (authorizedBy.asKnown().isPresent) 1 else 0) +
+                (if (externalId.asKnown().isPresent) 1 else 0) +
+                (headers.asKnown().getOrNull()?.validity() ?: 0) +
                 (oauth2.asKnown().getOrNull()?.validity() ?: 0) +
+                (if (redirectUri.asKnown().isPresent) 1 else 0) +
                 (if (retry.asKnown().isPresent) 1 else 0) +
                 (secrets.asKnown().getOrNull()?.validity() ?: 0) +
                 (if (timeout.asKnown().isPresent) 1 else 0) +
@@ -1636,6 +1822,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Headers = apply {
                 if (validated) {
                     return@apply
@@ -1987,6 +2183,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Oauth2 = apply {
                 if (validated) {
                     return@apply
@@ -2229,6 +2435,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ClientSecret = apply {
                     if (validated) {
                         return@apply
@@ -2369,6 +2585,16 @@ private constructor(
 
                     private var validated: Boolean = false
 
+                    /**
+                     * Validates that the types of all values in this object match their expected
+                     * types recursively.
+                     *
+                     * This method is _not_ forwards compatible with new types from the API for
+                     * existing fields.
+                     *
+                     * @throws ArcadeInvalidDataException if any value type in this object doesn't
+                     *   match its expected type.
+                     */
                     fun validate(): Binding = apply {
                         if (validated) {
                             return@apply
@@ -2525,6 +2751,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Secrets = apply {
                 if (validated) {
                     return@apply
@@ -2572,8 +2808,11 @@ private constructor(
             }
 
             return other is Mcp &&
+                authorizedBy == other.authorizedBy &&
+                externalId == other.externalId &&
                 headers == other.headers &&
                 oauth2 == other.oauth2 &&
+                redirectUri == other.redirectUri &&
                 retry == other.retry &&
                 secrets == other.secrets &&
                 timeout == other.timeout &&
@@ -2582,13 +2821,24 @@ private constructor(
         }
 
         private val hashCode: Int by lazy {
-            Objects.hash(headers, oauth2, retry, secrets, timeout, uri, additionalProperties)
+            Objects.hash(
+                authorizedBy,
+                externalId,
+                headers,
+                oauth2,
+                redirectUri,
+                retry,
+                secrets,
+                timeout,
+                uri,
+                additionalProperties,
+            )
         }
 
         override fun hashCode(): Int = hashCode
 
         override fun toString() =
-            "Mcp{headers=$headers, oauth2=$oauth2, retry=$retry, secrets=$secrets, timeout=$timeout, uri=$uri, additionalProperties=$additionalProperties}"
+            "Mcp{authorizedBy=$authorizedBy, externalId=$externalId, headers=$headers, oauth2=$oauth2, redirectUri=$redirectUri, retry=$retry, secrets=$secrets, timeout=$timeout, uri=$uri, additionalProperties=$additionalProperties}"
     }
 
     class Requirements
@@ -2723,6 +2973,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Requirements = apply {
             if (validated) {
                 return@apply
@@ -2879,6 +3138,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Authorization = apply {
                 if (validated) {
                     return@apply
@@ -3006,6 +3275,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Oauth2 = apply {
                     if (validated) {
                         return@apply
@@ -3180,6 +3459,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Type = apply {
             if (validated) {
                 return@apply

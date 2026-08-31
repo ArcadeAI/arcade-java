@@ -15,6 +15,7 @@ import kotlin.jvm.optionals.getOrNull
  */
 class FormattedListParams
 private constructor(
+    private val filter: String?,
     private val format: String?,
     private val includeAllVersions: Boolean?,
     private val limit: Long?,
@@ -24,6 +25,13 @@ private constructor(
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
+
+    /**
+     * JSON metadata filter. Array fields (service_domains, operations): shorthand array or object
+     * with any_of/all_of/none_of operators (case-insensitive). Boolean fields: read_only,
+     * destructive, idempotent, open_world. Extras: case-sensitive key-value subset match.
+     */
+    fun filter(): Optional<String> = Optional.ofNullable(filter)
 
     /** Provider format */
     fun format(): Optional<String> = Optional.ofNullable(format)
@@ -62,6 +70,7 @@ private constructor(
     /** A builder for [FormattedListParams]. */
     class Builder internal constructor() {
 
+        private var filter: String? = null
         private var format: String? = null
         private var includeAllVersions: Boolean? = null
         private var limit: Long? = null
@@ -73,6 +82,7 @@ private constructor(
 
         @JvmSynthetic
         internal fun from(formattedListParams: FormattedListParams) = apply {
+            filter = formattedListParams.filter
             format = formattedListParams.format
             includeAllVersions = formattedListParams.includeAllVersions
             limit = formattedListParams.limit
@@ -82,6 +92,17 @@ private constructor(
             additionalHeaders = formattedListParams.additionalHeaders.toBuilder()
             additionalQueryParams = formattedListParams.additionalQueryParams.toBuilder()
         }
+
+        /**
+         * JSON metadata filter. Array fields (service_domains, operations): shorthand array or
+         * object with any_of/all_of/none_of operators (case-insensitive). Boolean fields:
+         * read_only, destructive, idempotent, open_world. Extras: case-sensitive key-value subset
+         * match.
+         */
+        fun filter(filter: String?) = apply { this.filter = filter }
+
+        /** Alias for calling [Builder.filter] with `filter.orElse(null)`. */
+        fun filter(filter: Optional<String>) = filter(filter.getOrNull())
 
         /** Provider format */
         fun format(format: String?) = apply { this.format = format }
@@ -251,6 +272,7 @@ private constructor(
          */
         fun build(): FormattedListParams =
             FormattedListParams(
+                filter,
                 format,
                 includeAllVersions,
                 limit,
@@ -267,6 +289,7 @@ private constructor(
     override fun _queryParams(): QueryParams =
         QueryParams.builder()
             .apply {
+                filter?.let { put("filter", it) }
                 format?.let { put("format", it) }
                 includeAllVersions?.let { put("include_all_versions", it.toString()) }
                 limit?.let { put("limit", it.toString()) }
@@ -283,6 +306,7 @@ private constructor(
         }
 
         return other is FormattedListParams &&
+            filter == other.filter &&
             format == other.format &&
             includeAllVersions == other.includeAllVersions &&
             limit == other.limit &&
@@ -295,6 +319,7 @@ private constructor(
 
     override fun hashCode(): Int =
         Objects.hash(
+            filter,
             format,
             includeAllVersions,
             limit,
@@ -306,5 +331,5 @@ private constructor(
         )
 
     override fun toString() =
-        "FormattedListParams{format=$format, includeAllVersions=$includeAllVersions, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "FormattedListParams{filter=$filter, format=$format, includeAllVersions=$includeAllVersions, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }

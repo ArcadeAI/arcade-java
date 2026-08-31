@@ -14,18 +14,30 @@ import java.util.Objects
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
-/** Returns a page of tools from the engine configuration, optionally filtered by toolkit */
+/**
+ * Returns a page of tools from the engine configuration, optionally filtered by toolkit and/or
+ * metadata
+ */
 class ToolListParams
 private constructor(
+    private val filter: String?,
     private val includeAllVersions: Boolean?,
     private val includeFormat: List<IncludeFormat>?,
     private val limit: Long?,
     private val offset: Long?,
+    private val search: String?,
     private val toolkit: String?,
     private val userId: String?,
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
+
+    /**
+     * JSON metadata filter. Array fields (service_domains, operations): shorthand array or object
+     * with any_of/all_of/none_of operators (case-insensitive). Boolean fields: read_only,
+     * destructive, idempotent, open_world. Extras: case-sensitive key-value subset match.
+     */
+    fun filter(): Optional<String> = Optional.ofNullable(filter)
 
     /** Include all versions of each tool */
     fun includeAllVersions(): Optional<Boolean> = Optional.ofNullable(includeAllVersions)
@@ -38,6 +50,13 @@ private constructor(
 
     /** Offset from the start of the list (default: 0) */
     fun offset(): Optional<Long> = Optional.ofNullable(offset)
+
+    /**
+     * Case-insensitive literal substring matched against each tool's name, MCP server name,
+     * qualified name, and description; multiple whitespace-separated terms must all match. Max 2000
+     * characters.
+     */
+    fun search(): Optional<String> = Optional.ofNullable(search)
 
     /** Toolkit name */
     fun toolkit(): Optional<String> = Optional.ofNullable(toolkit)
@@ -64,10 +83,12 @@ private constructor(
     /** A builder for [ToolListParams]. */
     class Builder internal constructor() {
 
+        private var filter: String? = null
         private var includeAllVersions: Boolean? = null
         private var includeFormat: MutableList<IncludeFormat>? = null
         private var limit: Long? = null
         private var offset: Long? = null
+        private var search: String? = null
         private var toolkit: String? = null
         private var userId: String? = null
         private var additionalHeaders: Headers.Builder = Headers.builder()
@@ -75,15 +96,28 @@ private constructor(
 
         @JvmSynthetic
         internal fun from(toolListParams: ToolListParams) = apply {
+            filter = toolListParams.filter
             includeAllVersions = toolListParams.includeAllVersions
             includeFormat = toolListParams.includeFormat?.toMutableList()
             limit = toolListParams.limit
             offset = toolListParams.offset
+            search = toolListParams.search
             toolkit = toolListParams.toolkit
             userId = toolListParams.userId
             additionalHeaders = toolListParams.additionalHeaders.toBuilder()
             additionalQueryParams = toolListParams.additionalQueryParams.toBuilder()
         }
+
+        /**
+         * JSON metadata filter. Array fields (service_domains, operations): shorthand array or
+         * object with any_of/all_of/none_of operators (case-insensitive). Boolean fields:
+         * read_only, destructive, idempotent, open_world. Extras: case-sensitive key-value subset
+         * match.
+         */
+        fun filter(filter: String?) = apply { this.filter = filter }
+
+        /** Alias for calling [Builder.filter] with `filter.orElse(null)`. */
+        fun filter(filter: Optional<String>) = filter(filter.getOrNull())
 
         /** Include all versions of each tool */
         fun includeAllVersions(includeAllVersions: Boolean?) = apply {
@@ -148,6 +182,16 @@ private constructor(
 
         /** Alias for calling [Builder.offset] with `offset.orElse(null)`. */
         fun offset(offset: Optional<Long>) = offset(offset.getOrNull())
+
+        /**
+         * Case-insensitive literal substring matched against each tool's name, MCP server name,
+         * qualified name, and description; multiple whitespace-separated terms must all match. Max
+         * 2000 characters.
+         */
+        fun search(search: String?) = apply { this.search = search }
+
+        /** Alias for calling [Builder.search] with `search.orElse(null)`. */
+        fun search(search: Optional<String>) = search(search.getOrNull())
 
         /** Toolkit name */
         fun toolkit(toolkit: String?) = apply { this.toolkit = toolkit }
@@ -266,10 +310,12 @@ private constructor(
          */
         fun build(): ToolListParams =
             ToolListParams(
+                filter,
                 includeAllVersions,
                 includeFormat?.toImmutable(),
                 limit,
                 offset,
+                search,
                 toolkit,
                 userId,
                 additionalHeaders.build(),
@@ -282,10 +328,12 @@ private constructor(
     override fun _queryParams(): QueryParams =
         QueryParams.builder()
             .apply {
+                filter?.let { put("filter", it) }
                 includeAllVersions?.let { put("include_all_versions", it.toString()) }
                 includeFormat?.let { put("include_format", it.joinToString(",") { it.toString() }) }
                 limit?.let { put("limit", it.toString()) }
                 offset?.let { put("offset", it.toString()) }
+                search?.let { put("search", it) }
                 toolkit?.let { put("toolkit", it) }
                 userId?.let { put("user_id", it) }
                 putAll(additionalQueryParams)
@@ -313,6 +361,8 @@ private constructor(
 
             @JvmField val ANTHROPIC = of("anthropic")
 
+            @JvmField val MCP = of("mcp")
+
             @JvmStatic fun of(value: String) = IncludeFormat(JsonField.of(value))
         }
 
@@ -321,6 +371,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
         }
 
         /**
@@ -336,6 +387,7 @@ private constructor(
             ARCADE,
             OPENAI,
             ANTHROPIC,
+            MCP,
             /**
              * An enum member indicating that [IncludeFormat] was instantiated with an unknown
              * value.
@@ -355,6 +407,7 @@ private constructor(
                 ARCADE -> Value.ARCADE
                 OPENAI -> Value.OPENAI
                 ANTHROPIC -> Value.ANTHROPIC
+                MCP -> Value.MCP
                 else -> Value._UNKNOWN
             }
 
@@ -372,6 +425,7 @@ private constructor(
                 ARCADE -> Known.ARCADE
                 OPENAI -> Known.OPENAI
                 ANTHROPIC -> Known.ANTHROPIC
+                MCP -> Known.MCP
                 else -> throw ArcadeInvalidDataException("Unknown IncludeFormat: $value")
             }
 
@@ -389,6 +443,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): IncludeFormat = apply {
             if (validated) {
                 return@apply
@@ -433,10 +496,12 @@ private constructor(
         }
 
         return other is ToolListParams &&
+            filter == other.filter &&
             includeAllVersions == other.includeAllVersions &&
             includeFormat == other.includeFormat &&
             limit == other.limit &&
             offset == other.offset &&
+            search == other.search &&
             toolkit == other.toolkit &&
             userId == other.userId &&
             additionalHeaders == other.additionalHeaders &&
@@ -445,10 +510,12 @@ private constructor(
 
     override fun hashCode(): Int =
         Objects.hash(
+            filter,
             includeAllVersions,
             includeFormat,
             limit,
             offset,
+            search,
             toolkit,
             userId,
             additionalHeaders,
@@ -456,5 +523,5 @@ private constructor(
         )
 
     override fun toString() =
-        "ToolListParams{includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "ToolListParams{filter=$filter, includeAllVersions=$includeAllVersions, includeFormat=$includeFormat, limit=$limit, offset=$offset, search=$search, toolkit=$toolkit, userId=$userId, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }

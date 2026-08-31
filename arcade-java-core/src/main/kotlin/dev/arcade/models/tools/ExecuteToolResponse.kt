@@ -380,6 +380,14 @@ private constructor(
 
     private var validated: Boolean = false
 
+    /**
+     * Validates that the types of all values in this object match their expected types recursively.
+     *
+     * This method is _not_ forwards compatible with new types from the API for existing fields.
+     *
+     * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+     *   expected type.
+     */
     fun validate(): ExecuteToolResponse = apply {
         if (validated) {
             return@apply
@@ -687,6 +695,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Output = apply {
             if (validated) {
                 return@apply
@@ -1128,6 +1145,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Error = apply {
                 if (validated) {
                     return@apply
@@ -1231,6 +1258,17 @@ private constructor(
 
                     @JvmField val UPSTREAM_RUNTIME_UNMAPPED = of("UPSTREAM_RUNTIME_UNMAPPED")
 
+                    @JvmField
+                    val NETWORK_TRANSPORT_RUNTIME_TIMEOUT = of("NETWORK_TRANSPORT_RUNTIME_TIMEOUT")
+
+                    @JvmField
+                    val NETWORK_TRANSPORT_RUNTIME_UNREACHABLE =
+                        of("NETWORK_TRANSPORT_RUNTIME_UNREACHABLE")
+
+                    @JvmField
+                    val NETWORK_TRANSPORT_RUNTIME_UNMAPPED =
+                        of("NETWORK_TRANSPORT_RUNTIME_UNMAPPED")
+
                     @JvmField val UNKNOWN = of("UNKNOWN")
 
                     @JvmStatic fun of(value: String) = Kind(JsonField.of(value))
@@ -1257,6 +1295,9 @@ private constructor(
                     UPSTREAM_RUNTIME_RATE_LIMIT,
                     UPSTREAM_RUNTIME_SERVER_ERROR,
                     UPSTREAM_RUNTIME_UNMAPPED,
+                    NETWORK_TRANSPORT_RUNTIME_TIMEOUT,
+                    NETWORK_TRANSPORT_RUNTIME_UNREACHABLE,
+                    NETWORK_TRANSPORT_RUNTIME_UNMAPPED,
                     UNKNOWN,
                 }
 
@@ -1289,6 +1330,9 @@ private constructor(
                     UPSTREAM_RUNTIME_RATE_LIMIT,
                     UPSTREAM_RUNTIME_SERVER_ERROR,
                     UPSTREAM_RUNTIME_UNMAPPED,
+                    NETWORK_TRANSPORT_RUNTIME_TIMEOUT,
+                    NETWORK_TRANSPORT_RUNTIME_UNREACHABLE,
+                    NETWORK_TRANSPORT_RUNTIME_UNMAPPED,
                     UNKNOWN,
                     /**
                      * An enum member indicating that [Kind] was instantiated with an unknown value.
@@ -1324,6 +1368,11 @@ private constructor(
                         UPSTREAM_RUNTIME_RATE_LIMIT -> Value.UPSTREAM_RUNTIME_RATE_LIMIT
                         UPSTREAM_RUNTIME_SERVER_ERROR -> Value.UPSTREAM_RUNTIME_SERVER_ERROR
                         UPSTREAM_RUNTIME_UNMAPPED -> Value.UPSTREAM_RUNTIME_UNMAPPED
+                        NETWORK_TRANSPORT_RUNTIME_TIMEOUT -> Value.NETWORK_TRANSPORT_RUNTIME_TIMEOUT
+                        NETWORK_TRANSPORT_RUNTIME_UNREACHABLE ->
+                            Value.NETWORK_TRANSPORT_RUNTIME_UNREACHABLE
+                        NETWORK_TRANSPORT_RUNTIME_UNMAPPED ->
+                            Value.NETWORK_TRANSPORT_RUNTIME_UNMAPPED
                         UNKNOWN -> Value.UNKNOWN
                         else -> Value._UNKNOWN
                     }
@@ -1358,6 +1407,11 @@ private constructor(
                         UPSTREAM_RUNTIME_RATE_LIMIT -> Known.UPSTREAM_RUNTIME_RATE_LIMIT
                         UPSTREAM_RUNTIME_SERVER_ERROR -> Known.UPSTREAM_RUNTIME_SERVER_ERROR
                         UPSTREAM_RUNTIME_UNMAPPED -> Known.UPSTREAM_RUNTIME_UNMAPPED
+                        NETWORK_TRANSPORT_RUNTIME_TIMEOUT -> Known.NETWORK_TRANSPORT_RUNTIME_TIMEOUT
+                        NETWORK_TRANSPORT_RUNTIME_UNREACHABLE ->
+                            Known.NETWORK_TRANSPORT_RUNTIME_UNREACHABLE
+                        NETWORK_TRANSPORT_RUNTIME_UNMAPPED ->
+                            Known.NETWORK_TRANSPORT_RUNTIME_UNMAPPED
                         UNKNOWN -> Known.UNKNOWN
                         else -> throw ArcadeInvalidDataException("Unknown Kind: $value")
                     }
@@ -1378,6 +1432,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Kind = apply {
                     if (validated) {
                         return@apply
@@ -1477,6 +1541,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Extra = apply {
                     if (validated) {
                         return@apply
@@ -1741,6 +1815,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Log = apply {
                 if (validated) {
                     return@apply

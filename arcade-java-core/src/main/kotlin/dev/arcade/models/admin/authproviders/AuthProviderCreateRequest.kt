@@ -311,6 +311,14 @@ private constructor(
 
     private var validated: Boolean = false
 
+    /**
+     * Validates that the types of all values in this object match their expected types recursively.
+     *
+     * This method is _not_ forwards compatible with new types from the API for existing fields.
+     *
+     * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+     *   expected type.
+     */
     fun validate(): AuthProviderCreateRequest = apply {
         if (validated) {
             return@apply
@@ -768,6 +776,15 @@ private constructor(
 
         private var validated: Boolean = false
 
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
         fun validate(): Oauth2 = apply {
             if (validated) {
                 return@apply
@@ -1190,6 +1207,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): AuthorizeRequest = apply {
                 if (validated) {
                     return@apply
@@ -1292,6 +1319,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Params = apply {
                     if (validated) {
                         return@apply
@@ -1433,6 +1470,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): RequestContentType = apply {
                     if (validated) {
                         return@apply
@@ -1569,6 +1616,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseContentType = apply {
                     if (validated) {
                         return@apply
@@ -1668,6 +1725,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseMap = apply {
                     if (validated) {
                         return@apply
@@ -1887,6 +1954,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): Pkce = apply {
                 if (validated) {
                     return@apply
@@ -2316,6 +2393,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): RefreshRequest = apply {
                 if (validated) {
                     return@apply
@@ -2418,6 +2505,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Params = apply {
                     if (validated) {
                         return@apply
@@ -2559,6 +2656,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): RequestContentType = apply {
                     if (validated) {
                         return@apply
@@ -2695,6 +2802,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseContentType = apply {
                     if (validated) {
                         return@apply
@@ -2794,6 +2911,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseMap = apply {
                     if (validated) {
                         return@apply
@@ -2969,6 +3096,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): ScopeDelimiter = apply {
                 if (validated) {
                     return@apply
@@ -3426,6 +3563,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): TokenIntrospectionRequest = apply {
                 if (validated) {
                     return@apply
@@ -3613,6 +3760,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Triggers = apply {
                     if (validated) {
                         return@apply
@@ -3724,6 +3881,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Params = apply {
                     if (validated) {
                         return@apply
@@ -3865,6 +4032,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): RequestContentType = apply {
                     if (validated) {
                         return@apply
@@ -4001,6 +4178,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseContentType = apply {
                     if (validated) {
                         return@apply
@@ -4100,6 +4287,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseMap = apply {
                     if (validated) {
                         return@apply
@@ -4562,6 +4759,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): TokenRequest = apply {
                 if (validated) {
                     return@apply
@@ -4664,6 +4871,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Params = apply {
                     if (validated) {
                         return@apply
@@ -4805,6 +5022,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): RequestContentType = apply {
                     if (validated) {
                         return@apply
@@ -4941,6 +5168,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseContentType = apply {
                     if (validated) {
                         return@apply
@@ -5040,6 +5277,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseMap = apply {
                     if (validated) {
                         return@apply
@@ -5538,6 +5785,16 @@ private constructor(
 
             private var validated: Boolean = false
 
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws ArcadeInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
             fun validate(): UserInfoRequest = apply {
                 if (validated) {
                     return@apply
@@ -5725,6 +5982,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Triggers = apply {
                     if (validated) {
                         return@apply
@@ -5836,6 +6103,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): Params = apply {
                     if (validated) {
                         return@apply
@@ -5977,6 +6254,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): RequestContentType = apply {
                     if (validated) {
                         return@apply
@@ -6113,6 +6400,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseContentType = apply {
                     if (validated) {
                         return@apply
@@ -6212,6 +6509,16 @@ private constructor(
 
                 private var validated: Boolean = false
 
+                /**
+                 * Validates that the types of all values in this object match their expected types
+                 * recursively.
+                 *
+                 * This method is _not_ forwards compatible with new types from the API for existing
+                 * fields.
+                 *
+                 * @throws ArcadeInvalidDataException if any value type in this object doesn't match
+                 *   its expected type.
+                 */
                 fun validate(): ResponseMap = apply {
                     if (validated) {
                         return@apply

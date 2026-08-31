@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import dev.arcade.client.ArcadeClientAsync
 import dev.arcade.client.ArcadeClientAsyncImpl
 import dev.arcade.core.ClientOptions
+import dev.arcade.core.LogLevel
 import dev.arcade.core.Sleeper
 import dev.arcade.core.Timeout
 import dev.arcade.core.http.AsyncStreamResponse
 import dev.arcade.core.http.Headers
 import dev.arcade.core.http.HttpClient
+import dev.arcade.core.http.ProxyAuthenticator
 import dev.arcade.core.http.QueryParams
 import dev.arcade.core.jsonMapper
 import java.net.Proxy
@@ -49,6 +51,7 @@ class ArcadeOkHttpClientAsync private constructor() {
         private var clientOptions: ClientOptions.Builder = ClientOptions.builder()
         private var dispatcherExecutorService: ExecutorService? = null
         private var proxy: Proxy? = null
+        private var proxyAuthenticator: ProxyAuthenticator? = null
         private var maxIdleConnections: Int? = null
         private var keepAliveDuration: Duration? = null
         private var sslSocketFactory: SSLSocketFactory? = null
@@ -78,6 +81,20 @@ class ArcadeOkHttpClientAsync private constructor() {
 
         /** Alias for calling [Builder.proxy] with `proxy.orElse(null)`. */
         fun proxy(proxy: Optional<Proxy>) = proxy(proxy.getOrNull())
+
+        /**
+         * Provides credentials when an HTTP proxy responds with `407 Proxy Authentication
+         * Required`.
+         */
+        fun proxyAuthenticator(proxyAuthenticator: ProxyAuthenticator?) = apply {
+            this.proxyAuthenticator = proxyAuthenticator
+        }
+
+        /**
+         * Alias for calling [Builder.proxyAuthenticator] with `proxyAuthenticator.orElse(null)`.
+         */
+        fun proxyAuthenticator(proxyAuthenticator: Optional<ProxyAuthenticator>) =
+            proxyAuthenticator(proxyAuthenticator.getOrNull())
 
         /**
          * The maximum number of idle connections kept by the underlying OkHttp connection pool.
@@ -230,6 +247,9 @@ class ArcadeOkHttpClientAsync private constructor() {
         /**
          * Whether to call `validate` on every response before returning it.
          *
+         * Setting this to `true` is _not_ forwards compatible with new types from the API for
+         * existing fields.
+         *
          * Defaults to false, which means the shape of the response will not be validated upfront.
          * Instead, validation will only occur for the parts of the response that are accessed.
          */
@@ -270,6 +290,15 @@ class ArcadeOkHttpClientAsync private constructor() {
          * Defaults to 2.
          */
         fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
+
+        /**
+         * The level at which to log request and response information.
+         *
+         * [fromEnv] will set the level from environment variables. See [LogLevel.fromEnv].
+         *
+         * Defaults to [LogLevel.fromEnv].
+         */
+        fun logLevel(logLevel: LogLevel) = apply { clientOptions.logLevel(logLevel) }
 
         /** API key used for authorization in header */
         fun apiKey(apiKey: String) = apply { clientOptions.apiKey(apiKey) }
@@ -373,6 +402,7 @@ class ArcadeOkHttpClientAsync private constructor() {
                         OkHttpClient.builder()
                             .timeout(clientOptions.timeout())
                             .proxy(proxy)
+                            .proxyAuthenticator(proxyAuthenticator)
                             .maxIdleConnections(maxIdleConnections)
                             .keepAliveDuration(keepAliveDuration)
                             .dispatcherExecutorService(dispatcherExecutorService)
